@@ -6370,7 +6370,7 @@ $-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,100,0
 1:current.vdfx
 1:sample_calc.vdfx
 4:Time
-5:Total GDP
+5:River discharge
 9:current
 19:5,0
 24:0
