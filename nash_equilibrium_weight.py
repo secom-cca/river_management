@@ -1,13 +1,16 @@
 '''
 Example: Upstream (U) vs. Downstream (D) with payoff depending on (environment, economy, safety) plus weights.
 '''
-
+# ================================================================
 # 1. Strategy labels
+# ================================================================
 strategies_U = ["NP", "PT", "IL"]  # Upstream: No-Plant, Plant-Trees, Invest-Levee
 strategies_D = ["DN", "IL", "RE"]  # Downstream: Do-Nothing, Invest-Levee, Relocation
 
+# ================================================================
 # 2. Example (env, econ, safe) payoff dictionaries
 #    for each (sU, sD) from the perspective of U and D.
+# ================================================================
 
 # Upstream environment/economy/safety
 env_U = {
@@ -43,7 +46,9 @@ safe_D = {
     ("IL","DN"): +1, ("IL","IL"): +3, ("IL","RE"): +4
 }
 
+# ================================================================
 # 3. Set weights for both players (example)
+# ================================================================
 wU_env, wU_econ, wU_safe = 1, 1, 1   # Upstream weights
 wD_env, wD_econ, wD_safe = 1, 1, 1   # Downstream weights
 
@@ -57,7 +62,9 @@ def payoff_D(sU, sD):
           + wD_econ * econ_D[(sU,sD)]
           + wD_safe * safe_D[(sU,sD)])
 
+# ================================================================
 # 4. Find pure-strategy Nash equilibria
+# ================================================================
 def find_nash_equilibria():
     nash_list = []
     for sU in strategies_U:
