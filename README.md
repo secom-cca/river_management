@@ -1,4 +1,21 @@
-# template-default
+# System Dynamics Model for River Resilience
+
+## 1. Overview
+
+This model is for evaluating several adaptation measures for the river basen flood risk management.
+
+- **Tool**: This is made by Vensim PLE .
+- **Main File**:  
+  - `river_management.mdl`: main model file  
+  - `river_management.2mdl`, `river_management.3mdl`: backup file(s)
+
+## 2.Detailed Explanation
+
+Please refer to the following link:
+https://docs.google.com/document/d/116Xg9WkcorllC6vz6C-agFRKM3BDTerf/edit?usp=drive_link&ouid=107470865859100242765&rtpof=true&sd=true
+
+
+## X. template-default
 
 This is a template that is used by the `@sdeverywhere/create` package to generate a
 new project that uses SDEverywhere.
