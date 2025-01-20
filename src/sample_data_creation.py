@@ -51,7 +51,7 @@ for date in dates:
 df = pd.DataFrame({'Date': dates, 'Rainfall': rain_data})
 
 # CSVに保存
-output_filename = 'rainfall/rainfall_data_2000_2100_climate_change.csv'
+output_filename = '../rainfall/rainfall_data_2000_2100_climate_change.csv'
 df.to_csv(output_filename, index=False)
 
 print(f"{output_filename} に気候変動の影響を考慮したデータを保存しました。")
