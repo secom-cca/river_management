@@ -1,14 +1,14 @@
 import pandas as pd
 
 # CSVファイルの読み込み
-input_csv = '../rainfall/daily_prec_gifu.csv'  # CSVファイル名
-output_txt = '../rainfall/daily_prec_gifu.txt'  # Vensim用のLOOKUPデータ出力ファイル
+input_csv = '../rainfall/daily_prec_gifu2000.csv'  # CSVファイル名
+output_txt = '../rainfall/daily_prec_gifu2000.txt'  # Vensim用のLOOKUPデータ出力ファイル
 
 # CSVデータの読み込み
 df = pd.read_csv(input_csv)
 
 # 日付から日数（タイムステップ）を計算
-df['Time'] = pd.to_datetime(df['Date']).sub(pd.Timestamp("1990/1/1")).dt.days + 1
+df['Time'] = pd.to_datetime(df['Date']).sub(pd.Timestamp("2000/1/1")).dt.days + 1
 
 # LOOKUP形式の生成
 lookup_values = []
