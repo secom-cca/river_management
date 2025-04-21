@@ -1,1 +1,4 @@
 id,input type,viewid,varname,label,view level,group name,slider min,slider max,slider/switch default,slider step,units,format,reversed,range 2 start,range 3 start,range 4 start,range 5 start,range 1 label,range 2 label,range 3 label,range 4 label,range 5 label,enabled value,disabled value,controlled input ids,listing label,description
+1,slider,view1,Downstream storage depth,Downstream storage depth,,Sliders,0,1,0.1,0.01,(m),,,,,,,,,,,,,,,,
+2,slider,view1,Number of migration,Number of migration,,Sliders,0,10000,1000,100,(people),,,,,,,,,,,,,,,,
+3,slider,view1,Paddy dam ratio,Paddy dam ratio,,Sliders,0,1,0.1,0.1,(ha/ha),,,,,,,,,,,,,,,,
