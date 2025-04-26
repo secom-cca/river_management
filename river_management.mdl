@@ -2965,7 +2965,7 @@ Outflow of houses in flood risk=
 	~	
 	~		|
 
-Downstream storage depth=0.01
+Downstream storage depth=0.02
 	~	m [0,0.1,0.01]
 	~		|
 
@@ -4365,7 +4365,7 @@ $-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,100,0
 :L<%^E!@
 1:future.vdfx
 4:Time
-5:Paddy dam ratio
+5:Downstream storage depth
 9:future
 19:5,0
 24:0
