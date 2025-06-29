@@ -1,0 +1,1377 @@
+{UTF-8}
+Wild animal damage=IF THEN ELSE(Daily ave temp > 25, 150*2 / 365, 150 / 365)
+	~	ha/day
+	~		|
+
+Landslide disaster risk=MAX((Daily precip * Daily precipitation future ratio - (Erosion control dam capacity\
+		 + Forest area/Upstream area
+	 * Erosion control of forest))/Erosion control dam capacity
+	 , 0)
+	~	
+	~		|
+
+Deterioration ratio by heat=IF THEN ELSE( Daily ave temp < 25 , 0 , (Daily ave temp -\
+		 25)/25 )
+	~	
+	~		|
+
+Upstream inflow=Daily precip * Upstream area * 10000 / 1000 *Daily precipitation future ratio
+	~	m3
+	~		|
+
+Evaporation ratio=0.0023*(Daily ave temp+17.8)
+	*(Daily max temp-Daily min temp)^0.5
+	*Solar radiation time
+	~	
+	~		|
+
+Downstream inflow=Daily precip * Downstream area * 10000 / 1000 * Daily precipitation future ratio
+	~	m3/day
+	~		|
+
+Daily min temp:INTERPOLATE::=GET XLS DATA ( 'jma_kurume_2023.xls' , 'jma' , 'B' , 'V7'\
+		 )
+	~	
+	~		|
+
+Solar radiation time:INTERPOLATE::=GET XLS DATA ( 'jma_kurume_2023.xls' , 'jma' , 'B'\
+		 , 'K7' )
+	~	
+	~		|
+
+Daily ave temp:INTERPOLATE::=GET XLS DATA ( 'jma_kurume_2023.xls' , 'jma' , 'B' , 'E7'\
+		 )
+	~	
+	~		|
+
+Daily max temp:INTERPOLATE::=GET XLS DATA ( 'jma_kurume_2023.xls' , 'jma' , 'B' , 'Q7'\
+		 )
+	~	
+	~		|
+
+Daily precip:INTERPOLATE::=GET XLS DATA ( 'jma_kurume_2023.xls' , 'jma' , 'B' , 'H7' \
+		)
+	~	mm
+	~		|
+
+Paddy dam area= INTEG (Paddy dam investment / Paddy dam cost per area,
+		Downstream area*Paddy field ratio*Initial paddy dam ratio)
+	~	ha
+	~		|
+
+Initial paddy dam ratio=0.1
+	~	 [0,1,0.1]
+	~		|
+
+Financial damage= INTEG (Financial damage by innundation,
+		0)
+	~	Yen
+	~		|
+
+Biodiversity=
+	1 - Coefficient for ecosystem * Dam capacity / Forest area storage capacity
+	~	
+	~		|
+
+Degradation of paddy dam=
+	0.05
+	~	 [0,0.1,0.01]
+	~		|
+
+Daily crop production=
+	Paddy field * Paddy field productivity * (1 - Deterioration ratio by heat) * Crop price\
+		 * 
+	((1 - Paddy dam ratio) + Paddy dam ratio * (1 - Degradation of paddy dam))
+	~	Yen
+	~		|
+
+Coefficient for ecosystem=
+	1
+	~	 [0,10,1]
+	~		|
+
+Delay of recovery=
+	365
+	~	day [0,770,1]
+	~		|
+
+Outflow of damaged houses=
+	MAX(0, MIN(DELAY3(Damaged houses*Recovery ratio,Delay of recovery),Damaged houses))
+	~	house
+	~		|
+
+Recovery ratio=0.9
+	~	 [0,1,0.01]
+	~		|
+
+Paddy dam investment=IF THEN ELSE ( Paddy dam ratio < 1 , Annual Paddy dam investment\
+		 , 0 )
+	~	
+	~		|
+
+Inflow of houses in risky area=Houses in inundation risk * Inflow rate of residents
+	+ Outflow of damaged houses
+	~	house
+	~		|
+
+Damaged houses= INTEG (Inflow of damaged houses-Outflow of damaged houses,
+		0)
+	~	
+	~		|
+
+Outflow of houses in risky area=Houses in inundation risk * Outflow rate of residents\
+		 + Number of house elevation / 365 + Number of migration / 365
+	+ Houses damaged by inundation
+	~	house
+	~		|
+
+Inflow of damaged houses=Houses damaged by inundation
+	~	house
+	~		|
+
+Municipality cost=Green infrastructure cost +
+	Infrastructure Cost + 
+	House elevation cost +
+	Migration cost + 
+	Drainage investment +
+	Paddy dam investment
+	~	
+	~		|
+
+Annual Paddy dam investment=1e+06
+	~	Yen/Year [0,5e+07,1e+06]
+	~		|
+
+Upstream percolation=Upstream percolation ratio * Upstream inflow
+	~	m3/day
+	~		|
+
+Paddy dam ratio=Paddy dam area/(Paddy field ratio*Downstream area)
+	~	 [0,1,0.05]
+	~		|
+
+Downstream percolation=MAX(MIN(Downstream storage * Downstream percolation ratio,Downstream storage\
+		-Evaporation downstream),0)
+	~	
+	~		|
+
+Drainage=MAX(MIN(Drainage capacity*3600*24, Downstream storage-Evaporation downstream\
+		-Downstream percolation-Downstream outflow),0)
+	~	m3/day
+	~		|
+
+Downstream outflow=MIN(Downstream outflow ratio * Downstream storage,Downstream storage\
+		-Evaporation downstream-Downstream percolation)
+	~	m3/day
+	~		|
+
+Drainage investment amount=0
+	~	Yen [0,1e+10,1e+08]
+	~		|
+
+Drainage investment=Drainage investment amount * PULSE ( 0 , 365 ) / 365
+	~	Yen [0,1e+10,1e+08]
+	~		|
+
+Discharge allowance= INTEG (Levee level increase,
+		"Current high-water discharge" * 60 * 60 * 24)
+	~	m3/day
+	~		|
+
+Green infrastructure cost=Number of planting trees / 365 / Trees per area * Unit cost of planting trees
+	~	Yen
+	~		|
+
+Level per levee investment=1000
+	~	m3/day/Yen [0,10000,100]
+	~		|
+
+Levee level increase=DELAY3I( Levee investment * Level per levee investment , Levee construction time\
+		 * 365 , 0 )
+	~	m3/day
+	~		|
+
+Levee investment amount=0
+	~	Yen [0,1e+08,1e+07]
+	~		|
+
+Levee investment=Levee investment amount * PULSE ( Levee investment start time * 365 \
+		, 365 ) / 365
+	~	Yen
+	~		|
+
+Levee investment start time=0
+	~	Year [0,10,1]
+	~		|
+
+Dam investment amount=0
+	~	 [0,1e+10,1e+09]
+	~		|
+
+Dam investment start time=0
+	~	Year [0,11,1]
+	~		|
+
+Dam capacity= INTEG (Dam capacity increase,
+		Initial dam capacity)
+	~	m3
+	~		|
+
+Initial dam capacity=7.42e+07
+	~	m3
+	~		|
+
+Dam investment=Dam investment amount * PULSE ( Dam investment start time * 365 , 365 \
+		) / 365
+	~	Yen/Year [0,1e+11,1e+09]
+	~		|
+
+Downstream deep percolation=Downstream underground * Downstream deep percolation ratio
+	~	
+	~		|
+
+Downstream deep percolation ratio=0.2
+	~	 [0,1,0.1]
+	~		|
+
+Downstream middle flow ratio=0.5
+	~	 [0,1,0.1]
+	~		|
+
+Downstream middle flow=Downstream underground * Downstream middle flow ratio
+	~	
+	~		|
+
+Downstream percolation ratio=0.2
+	~	 [0,1,0.1]
+	~		|
+
+Upstream deep Percolation=Upstream underground * Upstream deep percolation ratio
+	~	
+	~		|
+
+Upstream deep percolation ratio=0.5
+	~	 [0,1,0.1]
+	~		|
+
+Paddyfield storage capacity=Paddy field * Paddy dam ratio * Paddy field capacity per area
+	~	m2
+	~		|
+
+Drainage capacity= INTEG (Drainage investment / Cost for unit drainage increase,
+		Initial drainage capacity)
+	~	m3/s [0,100,1]
+	~		|
+
+Paddy field= INTEG (Inflow of paddy field-Outflow of paddy field,
+		Downstream area * Paddy field ratio)
+	~	ha
+	~		|
+
+Initial drainage capacity=50
+	~	m3/s [0,50,10]
+	~		|
+
+Cost for unit drainage increase=1e+08
+	~	Yen [0,2e+08,1e+07]
+	~		|
+
+Crop price=4000
+	~	Yen/kg [0,10000,100]
+	~		|
+
+Forest area= INTEG (Inflow of forest area-Outflow of forest area,
+		Upstream area * Forest area ratio)
+	~	ha [0,?]
+	~		|
+
+Forest area ratio=166000/(198500*0.9)
+	~	 [0,1,0.01]
+	~		|
+
+Daily Total GDP=(Houses in inundation risk + "Houses in non-risky area") * GDP per resident\
+		 + Daily crop production - Financial damage by innundation
+	 - Financial damage by flood
+	~	Yen/day
+	~		|
+
+Paddy field ratio=0.12
+	~	 [0,1,0.1]
+	~		|
+
+Paddy dam cost per area=2.5e+06/30 + 140000*260/100/0.3
+	~	Yen/ha
+	~		|
+
+River water level downstream=10 + SQRT(River discharge downstream)/ 1000
+	~	
+	~		|
+
+Upstream middle flow ratio=
+	0.5
+	~	 [0,1,0.1]
+	~		|
+
+Middle flow=
+	Upstream underground * Upstream middle flow ratio
+	~	
+	~		|
+
+River discharge downstream=
+	River discharge upstream + Downstream outflow + Downstream middle flow
+	~	
+	~		|
+
+River discharge upstream=
+	Upstream outflow * Direct discharge ratio + Dam outflow + Middle flow
+	~	m3/day
+	~		|
+
+Flood water amount=
+	MAX(River discharge downstream - Discharge allowance, 0)
+	~	m3/day
+	~		|
+
+Discharge amount ratio=
+	River discharge downstream/Discharge allowance
+	~	
+	~		|
+
+Upstream storage capacity=
+	Forest area storage capacity
+	~	m3
+	~		|
+
+Downstream storage capacity=
+	Downstream area * 10000 * Downstream storage depth + Paddyfield storage capacity
+	~	m3 [0,1e+09,1e+07]
+	~		|
+
+Daily precipitation future ratio=1
+	~	 [1,2,0.01]
+	~		|
+
+Evaporation downstream=IF THEN ELSE(Evaporation ratio * Downstream area * 0.001 * 100\
+		 * 100 < Downstream storage,
+	Evaporation ratio * Downstream area * 0.001 * 100 * 100,
+	Downstream storage) * 0.01
+	~	
+	~		|
+
+Evaporation upstream=IF THEN ELSE(Evaporation ratio * Upstream area * 0.001 * 100 * 100\
+		 < Upstream storage, 
+	Evaporation ratio * Upstream area * 0.001 * 100 * 100, 
+	Upstream storage
+	) * 0.01
+	~	
+	~		|
+
+Downstream outflow ratio=0.5
+	~	 [0,1,0.1]
+	~		|
+
+Downstream storage= INTEG (
+	Downstream inflow-Downstream outflow-Downstream percolation-Drainage-Evaporation downstream\
+		,
+		0)
+	~	m3
+	~		|
+
+Upstream outflow ratio=0.5
+	~	 [0,1,0.1]
+	~		|
+
+Upstream outflow=
+	Upstream storage * Upstream outflow ratio + Excessive surface flow
+	~	m3
+	~		|
+
+Downstream underground= INTEG (
+	Downstream percolation-Downstream deep percolation-Downstream middle flow,
+		0)
+	~	
+	~		|
+
+River water level upstream=10+SQRT(River discharge upstream)/1000
+	~	
+	~		|
+
+Upstream storage= INTEG (
+	Upstream inflow-Evaporation upstream-Upstream percolation-Upstream outflow,
+		0)
+	~	m3
+	~		|
+
+Upstream underground= INTEG (
+	Upstream percolation-Middle flow-Upstream deep Percolation,
+		0)
+	~	
+	~		|
+
+Flood risky area ratio=
+	0.05
+	~	
+	~		|
+
+Inflow of houses in flood risk=
+	0
+	~	
+	~		|
+
+Flood water level=
+	Flood water amount / (Downstream area * 10000 * Flood risky area ratio) * 1000
+	~	
+	~		|
+
+Houses in flood risk= INTEG (
+	Inflow of houses in flood risk-Outflow of houses in flood risk,
+		282000)
+	~	
+	~		|
+
+Financial damage by flood=
+	Flood damage per resident * Houses damaged by flood
+	~	
+	~		|
+
+Flood damage per resident=
+	1e+07
+	~	
+	~		|
+
+Flood damage ratio = WITH LOOKUP (
+	Flood water level,
+		   ([(0,0)-(10,1)],(0,0),(0.5,0.2),(1,0.4),(1.8,0.5),(10,1) ))
+	~	
+	~		|
+
+Houses damaged by flood=
+	Houses in flood risk * Flood damage ratio * (1 - Evacuation ratio)
+	~	
+	~		|
+
+Outflow of houses in flood risk=
+	0
+	~	
+	~		|
+
+Downstream storage depth=0.03
+	~	m [0,0.1,0.01]
+	~		|
+
+Outflow of forest area=Forest area * Tree die ratio / 365 + Number of lumbering trees\
+		 / Trees per area / 365 + Wild animal damage * 0
+	~	ha/day
+	~		|
+
+Infrastructure Cost=
+	Dam investment +
+	Levee investment
+	~	
+	~		|
+
+Inundation damage ratio = WITH LOOKUP (
+	Innundation level,
+		  ([(0,0)-(10,1)],(0,0),(0.5,0.2),(1,0.4),(1.8,0.5),(10,1) ))
+	~	 [0,1]
+	~		|
+
+Houses damaged by inundation=
+	Houses in inundation risk * Inundation damage ratio * (1 - Evacuation ratio)
+	~	house
+	~		|
+
+Innundation level=
+	(Inside water innundation level) / (Downstream area * 10000 * Innundation risky area ratio\
+		)
+	~	m
+	~		|
+
+Innundation risky area ratio=0.2
+	~	
+	~		|
+
+Upstream percolation ratio=
+	0.2
+	~	 [0,1,0.1]
+	~		|
+
+current planting trees=10000
+	~	tree/Year [0,20000,1000]
+	~		|
+
+Excessive surface flow=
+	MAX (Upstream storage - Upstream storage capacity, 0)
+	~	
+	~		|
+
+Inflow of forest area=DELAY3I( Number of planting trees / 365 / Trees per area + current planting trees\
+		 / 365 / Trees per area , (Tree growth time + Planting start time) * 365 , current planting trees\
+		 / Trees per area / 365 )
+	~	ha
+	~		|
+
+Dam outflow=
+	Predischarge control + Dam spill
+	~	
+	~		|
+
+Dam spill=
+	MAX(Dam storage - Dam capacity, 0)
+	~	
+	~		|
+
+Price per tree=
+	10000
+	~	Yen/tree [0,100000]
+	~		|
+
+Sales of forestry=
+	Number of lumbering trees * Price per tree / 365
+	~	Yen/day
+	~		|
+
+Dam storage= INTEG (
+	Dam inflow-Dam outflow,
+		8.5e+06*0.6)
+	~	m3
+	~		|
+
+Dam inflow=
+	Upstream outflow * (1 - Direct discharge ratio)
+	~	
+	~		|
+
+Predischarge control=
+	IF THEN ELSE (Dam storage/Dam capacity > 0.6,
+	IF THEN ELSE (Dam storage/Dam capacity < 0.9, MAX(Predischarge capacity, Dam storage\
+		 * 0.1), 0),
+	0
+	)
+	~	
+	~		|
+
+Direct discharge ratio=
+	(1-40/1950)
+	~	 [0,1,0.1]
+	~		|
+
+Predischarge capacity=
+	10000
+	~	m3/day [0,10000,100]
+	~		|
+
+Evacuation ratio=
+	(1 - Eldery people ratio) * Capacity Building
+	~	
+	~		|
+
+Eldery people ratio=
+	0.6
+	~	 [0,1,0.01]
+	~		|
+
+Capacity Building=
+	0.5
+	~	 [0,1,0.1]
+	~		|
+
+Inside water innundation level=
+	MAX(Downstream storage - Downstream storage capacity, 0)
+	~	m3
+	~		|
+
+Planting start time=5
+	~	Year [0,11,1]
+	~		|
+
+Number of planting trees=1e+06
+	~	tree/Year [0,1e+06,100000]
+	~		|
+
+Inflow of damaged paddy field=
+	IF THEN ELSE( Innundation level , Ratio of paddy field in risky area * Paddy field, \
+		0)
+	~	
+	~		|
+
+"Current high-water discharge"=11500
+	~	m3/s [0,30000,1000]
+	~		|
+
+Paddy field capacity per area=
+	1000
+	~	m3/ha [0,2000,100]
+	~		|
+
+Paddy field productivity=5400/365
+	~	kg/ha/day
+	~		|
+
+Outflow of damaged paddy field=
+	Damaged paddy field * 0.1
+	~	
+	~		|
+
+Downstream area=143951
+	~	ha [0,1e+10,1e+08]
+	~		|
+
+Upstream area=157585
+	~	ha
+	~		|
+
+Erosion control dam capacity=
+	200
+	~	mm/day [0,1000,100]
+	~		|
+
+Dam capacity increase=DELAY3I( Dam investment * Capacity per dam investment , Dam construction time\
+		 * 365 , 0 )
+	~	m3
+	~		|
+
+Capacity per dam investment=
+	0.0002
+	~	m3/Yen [0,0.005,0.0005]
+	~		|
+
+Erosion control of forest=
+	50
+	~	mm/ha [0,100,1]
+	~		|
+
+Number of migration=10
+	~	house [0,1000,10]
+	~		|
+
+"Houses in non-risky area"= INTEG (
+	"Inflow of houses in non-risky area"-"Outflow of houses in non-risky area",
+		10000)
+	~	house
+	~		|
+
+Elevated houses= INTEG (
+	Inflow of elevated houses-Outflow of elevated houses,
+		0)
+	~	
+	~		|
+
+Migration cost=
+	Number of migration*Unit cost of migration
+	~	Yen
+	~		|
+
+Number of house elevation=10
+	~	house/Year [0,1000,10]
+	~		|
+
+House elevation cost=
+	Number of house elevation * Unit cost of elevation
+	~	Yen
+	~		|
+
+Unit cost of elevation=
+	3e+06
+	~	Yen/house [1e+06,5e+06,100000]
+	~		|
+
+Outflow of elevated houses=
+	Elevated houses * Outflow rate of residents
+	~	
+	~		|
+
+Damaged paddy field= INTEG (
+	Inflow of damaged paddy field - Outflow of damaged paddy field,
+		0)
+	~	
+	~		|
+
+Outflow of paddy field=
+	Inflow of damaged paddy field
+	~	ha
+	~		|
+
+Inflow of paddy field=
+	Outflow of damaged paddy field
+	~	ha
+	~		|
+
+Trees per area=900
+	~	tree/ha [0,2000]
+	~		|
+
+"Inflow of houses in non-risky area"=
+	"Houses in non-risky area" * Inflow rate of residents + Number of migration / 365
+	~	house
+	~		|
+
+Inflow of elevated houses=
+	Number of house elevation / 365
+	~	house
+	~		|
+
+Unit cost of migration=
+	3e+06
+	~	Yen [0,1e+07,1e+06]
+	~		|
+
+"Outflow of houses in non-risky area"=
+	"Houses in non-risky area"*Outflow rate of residents
+	~	house/Year
+	~		|
+
+"Water-holding Capacity of Forest"=
+	200
+	~	mm [200,500,10]
+	~		|
+
+Forest area storage capacity=
+	Forest area * "Water-holding Capacity of Forest" * 10000 / 1000
+	~	m3
+	~		|
+
+Levee construction time=5
+	~	Year [1,10,1]
+	~		|
+
+CO2 absorption=Forest area*CO2 absorption per area/365
+	~	CO2ton/day
+	~		|
+
+CO2 absorption per area=8.8
+	~	CO2ton/ha/Year [1,10,0.1]
+	~		|
+
+Dam construction time=10
+	~	 [0,20,1]
+	~		|
+
+Unit cost of planting trees=
+	2.31e+06
+	~	Yen/ha [1e+06,3e+06,100000]
+	~		|
+
+Tree die ratio=0.01
+	~	{(ha/ha)/day} [0,0.01,0.001]
+	~		|
+
+Tree growth time=40
+	~	Year [0,40,1]
+	~		|
+
+Number of lumbering trees=100000
+	~	tree/Year [0,1e+06,100000]
+	~		|
+
+Outflow rate of residents=
+	0.01 / 365
+	~	 [0,0.1,0.01]
+	~		|
+
+Financial damage by innundation=
+	Innundation damage per resident * Houses damaged by inundation
+	~	
+	~		|
+
+GDP per resident=3e+06/365
+	~	Yen [0,5e+06,10000]
+	~		|
+
+Inflow rate of residents=
+	0.01 / 365
+	~	 [0,0.1,0.01]
+	~		|
+
+Ratio of paddy field in risky area=
+	0.01
+	~	 [0,1,0.01]
+	~		|
+
+Innundation damage per resident=1e+07 / 365
+	~	Yen/person
+	~		|
+
+Houses in inundation risk= INTEG (Inflow of houses in risky area -Outflow of houses in risky area\
+		,
+		500000)
+	~	house
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 365
+	~	day
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	day
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP 
+	~	day [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 1
+	~	day [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,5,0
+10,1,Houses in inundation risk,1696,813,44,23,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,2,48,1543,815,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,3,5,2,100,0,0,22,0,192,0,-1--1--1,,1|(1568,815)|
+1,4,5,1,4,0,0,22,0,192,0,-1--1--1,,1|(1624,815)|
+11,5,0,1590,815,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,6,Inflow of houses in risky area,1590,846,52,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,7,48,1847,816,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,8,10,1,100,0,0,22,0,192,0,-1--1--1,,1|(1770,816)|
+1,9,10,7,4,0,0,22,0,192,0,-1--1--1,,1|(1824,816)|
+11,10,0,1806,816,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,11,Outflow of houses in risky area,1806,847,52,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,12,Innundation level,1412,862,48,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,13,Houses damaged by inundation,1649,744,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,14,Inundation damage ratio,1518,791,58,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,15,1,13,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,16,14,13,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,17,Innundation damage per resident,1969,838,58,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,18,Discharge allowance,1408,521,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,19,Dam capacity,1267,307,52,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,20,Upstream storage,794,686,61,22,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,21,48,629,686,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,22,24,21,100,0,0,22,0,192,0,-1--1--1,,1|(653,686)|
+1,23,24,20,4,0,0,22,0,192,0,-1--1--1,,1|(706,686)|
+11,24,0,673,686,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,25,Upstream inflow,673,717,44,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,26,48,1041,685,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,27,29,20,100,0,0,22,0,192,0,-1--1--1,,1|(871,685)|
+1,28,29,26,4,0,0,22,0,192,0,-1--1--1,,1|(965,685)|
+11,29,0,893,685,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,30,Upstream outflow,893,716,44,23,40,3,0,0,-1,1,0,0,0,0,0,0,0,0
+10,31,River discharge upstream,1062,606,42,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,32,30,31,1,0,0,0,0,192,0,-1--1--1,,1|(973,681)|
+10,33,Paddy dam ratio,1535,1248,61,26,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,|||0-0-0,0,0,0,0,0,0
+10,34,Downstream storage,1153,1053,44,22,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,35,48,965,1064,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,36,41,35,100,0,0,22,0,192,0,-1--1--1,,1|(998,1064)|
+1,37,41,34,4,0,0,22,0,192,0,-1--1--1,,1|(1071,1064)|
+12,38,48,1327,1048,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,39,43,34,100,0,0,22,0,192,0,-1--1--1,,1|(1226,1048)|
+1,40,43,38,4,0,0,22,0,192,0,-1--1--1,,1|(1292,1048)|
+11,41,0,1028,1064,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,42,Downstream inflow,1028,1095,46,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+11,43,0,1262,1048,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,44,Downstream outflow,1262,1071,47,15,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,45,Paddy field productivity,2216,1185,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,46,Daily crop production,2062,1003,48,22,3,3,0,4,-1,1,0,0,0-0-0,255-255-10,|||0-0-0,0,0,0,0,0,0
+1,47,45,46,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,48,Damaged paddy field,1760,1005,56,22,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,49,Paddy field,1755,1142,48,22,3,3,0,0,-1,1,0,0,0,0,0,0,0,0
+10,50,Upstream storage capacity,948,538,42,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,51,Paddyfield storage capacity,1492,1150,44,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,52,48,1944,1138,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,53,55,49,100,0,0,22,0,192,0,-1--1--1,,1|(1835,1138)|
+1,54,55,52,4,0,0,22,0,192,0,-1--1--1,,1|(1906,1138)|
+11,55,0,1873,1138,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,56,Outflow of paddy field,1873,1168,48,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,57,49,46,1,0,0,0,0,192,0,-1--1--1,,1|(1923,1097)|
+12,58,48,1605,1138,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,59,61,58,100,0,0,22,0,192,0,-1--1--1,,1|(1631,1138)|
+1,60,61,49,4,0,0,22,0,192,0,-1--1--1,,1|(1683,1138)|
+11,61,0,1654,1138,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,62,Inflow of paddy field,1654,1168,48,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,63,GDP per resident,2257,1003,42,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,64,49,51,1,0,0,0,0,192,0,-1--1--1,,1|(1573,1200)|
+10,65,Ratio of paddy field in risky area,1552,1088,61,23,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,66,65,149,1,0,0,0,0,192,0,-1--1--1,,1|(1577,1034)|
+10,67,Daily Total GDP,2117,898,42,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,68,1,67,1,0,0,0,0,192,0,-1--1--1,,1|(1886,928)|
+1,69,63,67,1,0,0,0,0,192,0,-1--1--1,,1|(2216,901)|
+10,70,Financial damage by innundation,1906,764,42,22,3,3,0,5,-1,1,0,0,0-0-0,255-255-10,|||0-0-0,0,0,0,0,0,0
+1,71,17,70,1,0,0,0,0,192,0,-1--1--1,,1|(1927,806)|
+1,72,13,70,1,0,0,0,0,192,0,-1--1--1,,1|(1795,734)|
+1,73,70,67,1,0,0,0,0,192,0,-1--1--1,,1|(2006,797)|
+1,74,46,67,1,0,0,0,0,192,0,-1--1--1,,1|(2104,958)|
+10,75,Inflow rate of residents,1674,514,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,76,75,6,1,0,0,0,0,192,0,-1--1--1,,1|(1739,708)|
+1,77,1,6,1,0,0,0,0,192,0,-1--1--1,,1|(1672,869)|
+10,78,Outflow rate of residents,2174,683,52,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,79,1,11,1,0,0,0,0,192,0,-1--1--1,,1|(1801,860)|
+1,80,78,11,1,0,0,0,0,192,0,-1--1--1,,1|(2118,813)|
+10,81,Biodiversity,876,98,52,22,3,3,0,4,-1,1,0,0,0-0-0,255-255-10,|||0-0-0,0,0,0,0,0,0
+10,82,Forest area,688,424,48,22,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,83,48,516,427,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,84,86,83,100,0,0,22,0,192,0,-1--1--1,,1|(549,427)|
+1,85,86,82,4,0,0,22,0,192,0,-1--1--1,,1|(612,427)|
+11,86,0,578,427,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,87,Inflow of forest area,578,457,42,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,88,48,842,425,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,89,91,82,100,0,0,22,0,192,0,-1--1--1,,1|(756,425)|
+1,90,91,88,4,0,0,22,0,192,0,-1--1--1,,1|(810,425)|
+11,91,0,783,425,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,92,Outflow of forest area,783,455,44,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,93,82,92,1,0,0,0,0,192,0,-1--1--1,,1|(754,499)|
+10,94,Tree growth time,529,550,48,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,95,94,87,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,96,Number of planting trees,476,361,61,22,8,3,0,19,-1,1,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+1,97,96,87,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,98,Number of lumbering trees,844,531,52,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+1,99,98,92,1,0,0,0,0,192,0,-1--1--1,,1|(849,492)|
+10,100,Tree die ratio,881,476,39,18,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,101,100,92,1,0,0,0,0,192,0,-1--1--1,,1|(840,428)|
+10,102,CO2 absorption per area,324,246,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,103,CO2 absorption,399,308,61,22,3,3,0,4,-1,1,0,0,0-0-0,255-255-10,|||0-0-0,0,0,0,0,0,0
+1,104,82,103,1,0,0,0,0,192,0,-1--1--1,,1|(566,327)|
+1,105,102,103,1,0,0,0,0,192,0,-1--1--1,,1|(324,331)|
+10,106,Green infrastructure cost,824,217,61,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,107,96,106,1,0,0,0,0,192,0,-1--1--1,,1|(624,222)|
+10,108,Unit cost of planting trees,595,165,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,109,108,106,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,110,Infrastructure Cost,1234,169,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,111,Dam investment,1147,232,61,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,|||0-0-0,0,0,0,0,0,0
+1,112,111,110,1,0,0,0,0,192,0,-1--1--1,,1|(1144,204)|
+10,113,Levee investment,1399,298,44,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,|||0-0-0,0,0,0,0,0,0
+1,114,113,110,1,0,0,0,0,192,0,-1--1--1,,1|(1331,225)|
+10,115,Dam construction time,971,282,57,24,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,116,Levee construction time,1637,378,54,28,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,117,Municipality cost,1096,82,52,22,3,3,0,4,-1,1,0,0,0-0-0,255-255-10,|||0-0-0,0,0,0,0,0,0
+1,118,106,117,1,0,0,0,0,192,0,-1--1--1,,1|(805,151)|
+1,119,110,117,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,120,Dam capacity increase,1151,291,53,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,121,111,120,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,122,115,120,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,123,120,19,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,124,"Water-holding Capacity of Forest",851,294,57,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,125,Forest area storage capacity,907,392,48,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,126,82,125,1,0,0,0,0,192,0,-1--1--1,,1|(777,380)|
+1,127,124,125,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,128,125,50,1,0,0,0,0,192,0,-1--1--1,,1|(953,456)|
+10,129,"Houses in non-risky area",2028,447,61,22,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,130,48,1873,447,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,131,133,130,100,0,0,22,0,192,0,-1--1--1,,1|(1900,447)|
+1,132,133,129,4,0,0,22,0,192,0,-1--1--1,,1|(1948,447)|
+11,133,0,1924,447,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,134,"Inflow of houses in non-risky area",1924,478,61,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,135,48,2188,452,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,136,138,129,100,0,0,22,0,192,0,-1--1--1,,1|(2103,452)|
+1,137,138,135,4,0,0,22,0,192,0,-1--1--1,,1|(2154,452)|
+11,138,0,2124,452,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,139,"Outflow of houses in non-risky area",2124,483,61,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,140,78,139,1,0,0,0,0,192,0,-1--1--1,,1|(2198,603)|
+1,141,129,139,1,0,0,0,0,192,0,-1--1--1,,1|(2045,527)|
+1,142,75,134,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,143,129,134,1,0,0,0,0,192,0,-1--1--1,,1|(1921,424)|
+1,144,129,67,1,0,0,0,0,192,0,-1--1--1,,1|(2108,666)|
+12,145,48,1619,1005,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,146,148,145,100,0,0,22,0,192,0,-1--1--1,,1|(1640,1005)|
+1,147,148,48,4,0,0,22,0,192,0,-1--1--1,,1|(1684,1005)|
+11,148,0,1658,1005,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,149,Inflow of damaged paddy field,1658,1036,56,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,150,48,1932,1004,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,151,153,48,100,0,0,22,0,192,0,-1--1--1,,1|(1847,1004)|
+1,152,153,150,4,0,0,22,0,192,0,-1--1--1,,1|(1906,1004)|
+11,153,0,1884,1004,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,154,Outflow of damaged paddy field,1884,1035,56,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,155,154,62,1,0,0,0,0,192,0,-1--1--1,,1|(1750,1077)|
+1,156,48,154,1,0,0,0,0,192,0,-1--1--1,,1|(1844,971)|
+1,157,12,149,1,0,0,0,0,192,0,-1--1--1,,1|(1610,926)|
+1,158,149,56,1,0,0,0,0,192,0,-1--1--1,,1|(1797,1087)|
+10,159,Trees per area,758,341,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,160,159,87,1,0,0,0,0,192,0,-1--1--1,,1|(654,354)|
+1,161,159,92,1,0,0,0,0,192,0,-1--1--1,,1|(798,391)|
+1,162,159,106,1,0,0,0,0,192,0,-1--1--1,,1|(767,259)|
+10,163,Time,837,735,23,9,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,164,Time,1476,432,23,9,8,2,1,3,-1,0,0,0,128-128-128,0-0-0,|||128-128-128,0,0,0,0,0,0
+10,165,Number of house elevation,1699,285,61,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+10,166,Elevated houses,1963,355,44,23,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,167,48,1750,351,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,168,170,167,100,0,0,22,0,192,0,-1--1--1,,1|(1810,351)|
+1,169,170,166,4,0,0,22,0,192,0,-1--1--1,,1|(1895,351)|
+11,170,0,1866,351,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,171,Inflow of elevated houses,1866,389,44,30,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,172,48,2121,355,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,173,175,166,100,0,0,22,0,192,0,-1--1--1,,1|(2030,355)|
+1,174,175,172,4,0,0,22,0,192,0,-1--1--1,,1|(2088,355)|
+11,175,0,2059,355,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,176,Outflow of elevated houses,2059,386,44,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,177,165,171,1,0,0,0,0,192,0,-1--1--1,,1|(1786,310)|
+1,178,166,176,1,0,0,0,0,192,0,-1--1--1,,1|(2014,280)|
+1,179,78,176,1,0,0,0,0,192,0,-1--1--1,,1|(2210,527)|
+1,180,165,11,1,0,0,0,0,192,0,-1--1--1,,1|(1811,521)|
+10,181,Unit cost of elevation,1578,88,52,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,182,House elevation cost,1430,164,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,183,165,182,1,0,0,0,0,192,0,-1--1--1,,1|(1640,190)|
+1,184,181,182,1,0,0,0,0,192,0,-1--1--1,,1|(1443,111)|
+1,185,182,117,1,0,0,0,0,192,0,-1--1--1,,1|(1274,95)|
+10,186,Number of migration,1681,332,42,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+1,187,186,11,1,0,0,0,0,192,0,-1--1--1,,1|(1846,558)|
+1,188,186,134,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,189,Unit cost of migration,1574,191,52,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,190,Migration cost,1431,242,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,191,190,117,1,0,0,0,0,192,0,-1--1--1,,1|(1301,135)|
+1,192,186,190,1,0,0,0,0,192,0,-1--1--1,,1|(1626,271)|
+1,193,189,190,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,194,Landslide disaster risk,435,627,56,22,3,3,0,6,-1,1,0,0,0-0-0,255-255-10,|||64-64-64,0,0,0,0,0,0
+10,195,Erosion control dam capacity,256,629,48,22,8,3,0,2,-1,0,0,0,0-0-0,0-0-0,|||64-64-64,0,0,0,0,0,0
+1,196,195,194,1,0,0,0,0,192,0,-1--1--1,,1|(326,650)|
+1,197,82,194,1,0,0,0,0,192,0,-1--1--1,,1|(592,573)|
+10,198,Capacity per dam investment,982,214,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,199,198,120,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,200,Erosion control of forest,219,691,61,30,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,|||64-64-64,0,0,0,0,0,0
+1,201,200,194,1,0,0,0,0,192,0,-1--1--1,,1|(314,688)|
+10,202,Upstream area,489,790,57,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,||B|253-128-8,0,0,0,0,0,0
+10,203,Downstream area,946,951,58,17,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|253-128-8,0,0,0,0,0,0
+1,204,202,25,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,205,49,149,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,206,Paddy field capacity per area,1393,1225,48,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,207,206,51,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,208,Deterioration ratio by heat,2017,1168,57,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,209,208,46,1,0,0,0,0,192,0,-1--1--1,,1|(2070,1066)|
+10,210,"Current high-water discharge",1404,430,46,27,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,211,210,18,0,0,0,0,0,192,1,-1--1--1,,1|(0,0)|
+1,212,203,42,1,0,0,0,0,192,0,-1--1--1,,1|(937,1008)|
+10,213,Drainage capacity,1403,985,46,26,8,3,0,0,-1,1,0,0,0,0,0,0,0,0
+10,214,Evacuation ratio,1861,674,44,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,215,Eldery people ratio,2000,674,42,22,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+10,216,Capacity Building,2015,743,42,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+10,217,Inside water innundation level,1391,927,63,20,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,218,Planting start time,440,521,61,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+1,219,218,87,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,220,Downstream storage capacity,1217,859,44,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,221,220,217,1,0,0,0,0,192,0,-1--1--1,,1|(1283,861)|
+1,222,34,217,1,0,0,0,0,192,0,-1--1--1,,1|(1210,913)|
+10,223,Flood water amount,1333,689,48,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,224,18,223,1,0,0,0,0,192,0,-1--1--1,,1|(1346,587)|
+1,225,217,12,1,0,0,0,0,192,0,-1--1--1,,1|(1392,899)|
+1,226,215,214,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,227,216,214,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,228,214,13,1,0,0,0,0,192,0,-1--1--1,,1|(1781,609)|
+10,229,Predischarge control,1127,433,53,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,230,Predischarge capacity,1168,506,53,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,231,230,229,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,232,Dam storage,1116,352,48,22,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,233,48,966,346,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,234,236,233,100,0,0,22,0,192,0,-1--1--1,,1|(994,346)|
+1,235,236,232,4,0,0,22,0,192,0,-1--1--1,,1|(1046,346)|
+11,236,0,1019,346,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,237,Dam inflow,1019,376,44,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,238,48,1273,352,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,239,241,232,100,0,0,22,0,192,0,-1--1--1,,1|(1182,352)|
+1,240,241,238,4,0,0,22,0,192,0,-1--1--1,,1|(1237,352)|
+11,241,0,1206,352,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,242,Dam outflow,1206,382,48,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,243,232,229,1,0,0,0,0,192,0,-1--1--1,,1|(1107,389)|
+1,244,19,229,1,0,0,0,0,192,0,-1--1--1,,1|(1170,349)|
+1,245,229,242,1,0,0,0,0,192,0,-1--1--1,,1|(1205,430)|
+1,246,242,31,1,0,0,0,0,192,0,-1--1--1,,1|(1235,513)|
+1,247,30,237,1,0,0,0,0,192,0,-1--1--1,,1|(1004,604)|
+10,248,Direct discharge ratio,1087,519,42,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,249,248,31,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,250,248,237,1,0,0,0,0,192,0,-1--1--1,,1|(1061,443)|
+10,251,Sales of forestry,348,536,42,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,252,98,251,1,0,0,0,0,192,0,-1--1--1,,1|(608,589)|
+10,253,Price per tree,242,421,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,254,253,251,1,0,0,0,0,192,0,-1--1--1,,1|(271,492)|
+1,255,203,12,1,0,0,0,0,192,0,-1--1--1,,1|(1075,836)|
+10,256,Dam spill,1301,426,42,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,257,232,256,1,0,0,0,0,192,0,-1--1--1,,1|(1216,370)|
+1,258,19,256,1,0,0,0,0,192,0,-1--1--1,,1|(1349,365)|
+1,259,256,242,1,0,0,0,0,192,0,-1--1--1,,1|(1267,379)|
+10,260,Wild animal damage,707,541,48,22,8,3,0,2,-1,1,0,0,0-0-0,0-0-0,|||64-64-64,0,0,0,0,0,0
+1,261,260,92,1,0,0,0,1,192,0,64-64-64,|||0-0-0,1|(730,486)|
+10,262,Evaporation ratio,564,863,48,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,263,current planting trees,375,410,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,264,263,87,1,0,0,0,0,192,0,-1--1--1,,1|(479,478)|
+10,265,Upstream percolation ratio,686,757,48,22,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+12,266,48,755,583,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,267,269,20,100,0,0,22,0,192,0,-1--1--1,,1|(755,650)|
+1,268,269,266,4,0,0,22,0,192,0,-1--1--1,,1|(755,607)|
+11,269,0,755,630,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,270,Evaporation upstream,811,630,48,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,271,262,270,1,0,0,0,0,192,0,-1--1--1,,1|(617,665)|
+10,272,Excessive surface flow,922,603,53,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,273,50,272,1,0,0,0,0,192,0,-1--1--1,,1|(956,577)|
+1,274,20,272,1,0,0,0,0,192,0,-1--1--1,,1|(834,618)|
+1,275,272,30,1,0,0,0,0,192,0,-1--1--1,,1|(952,681)|
+12,276,48,1045,913,10,8,0,3,0,0,-1,1,0,0,0,0,0,0,0,0
+1,277,279,34,100,0,0,22,0,192,0,-1--1--1,,1|(1045,1053)|
+1,278,279,276,4,0,0,22,0,192,0,-1--1--1,,1|(1045,939)|
+11,279,0,1045,963,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,280,Evaporation downstream,1101,963,48,16,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,281,48,1189,910,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,282,284,34,100,0,0,22,0,192,0,-1--1--1,,1|(1189,1010)|
+1,283,284,281,4,0,0,22,0,192,0,-1--1--1,,1|(1189,947)|
+11,284,0,1189,983,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,285,Drainage,1239,983,42,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,286,213,285,1,0,0,0,0,192,0,-1--1--1,,1|(1316,970)|
+1,287,19,81,1,0,0,0,0,192,0,-1--1--1,,1|(1193,184)|
+10,288,Innundation risky area ratio,1404,787,64,26,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,289,288,12,1,0,0,0,0,192,0,-1--1--1,,1|(1402,832)|
+1,290,12,14,1,0,0,0,0,192,0,-1--1--1,,1|(1487,835)|
+1,291,34,285,1,0,0,0,0,192,0,-1--1--1,,1|(1215,1040)|
+1,292,203,220,1,0,0,0,0,192,0,-1--1--1,,1|(1060,881)|
+10,293,Downstream storage depth,1160,789,57,22,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,294,293,220,1,0,0,0,0,192,0,-1--1--1,,1|(1206,820)|
+10,295,Houses in flood risk,1586,666,48,23,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,296,48,1422,662,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,297,299,296,100,0,0,22,0,192,0,-1--1--1,,1|(1457,662)|
+1,298,299,295,4,0,0,22,0,192,0,-1--1--1,,1|(1516,662)|
+11,299,0,1489,662,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,300,Inflow of houses in flood risk,1489,693,44,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,301,48,1750,666,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,302,304,295,100,0,0,22,0,192,0,-1--1--1,,1|(1657,666)|
+1,303,304,301,4,0,0,22,0,192,0,-1--1--1,,1|(1716,666)|
+11,304,0,1687,666,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,305,Outflow of houses in flood risk,1687,697,44,23,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,306,Houses damaged by flood,1716,592,61,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,307,Flood risky area ratio,1510,531,48,22,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+10,308,Flood water level,1416,624,48,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,309,223,308,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,310,307,308,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,311,203,308,1,0,0,0,0,192,0,-1--1--1,,1|(1133,758)|
+10,312,Flood damage ratio,1561,581,53,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,313,308,312,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,314,295,306,1,0,0,0,0,192,0,-1--1--1,,1|(1633,611)|
+1,315,312,306,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,316,214,306,1,0,0,0,0,192,0,-1--1--1,,1|(1839,584)|
+10,317,Financial damage by flood,1974,599,64,26,3,3,0,4,-1,1,0,0,0-0-0,255-255-10,|||0-0-0,0,0,0,0,0,0
+1,318,306,317,1,0,0,0,0,192,0,-1--1--1,,1|(1833,563)|
+1,319,317,67,1,0,0,0,0,192,0,-1--1--1,,1|(2088,692)|
+10,320,Flood damage per resident,1964,532,53,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,321,320,317,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,322,Upstream underground,790,800,60,21,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,323,325,20,100,0,0,22,0,192,0,-1--1--1,,1|(792,723)|
+1,324,325,322,4,0,0,22,0,192,0,-1--1--1,,1|(792,764)|
+11,325,0,792,744,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,326,Upstream percolation,858,744,58,17,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,327,25,326,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,328,265,326,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+12,329,48,996,799,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,330,332,322,100,0,0,22,0,192,0,-1--1--1,,1|(882,799)|
+1,331,332,329,4,0,0,22,0,192,0,-1--1--1,,1|(956,799)|
+11,332,0,921,799,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,333,Middle flow,921,829,48,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,334,333,31,1,0,0,0,0,192,0,-1--1--1,,1|(1093,734)|
+1,335,20,30,1,0,0,0,0,192,0,-1--1--1,,1|(850,735)|
+1,336,322,333,1,0,0,0,0,192,0,-1--1--1,,1|(879,767)|
+12,337,48,753,915,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,338,340,322,100,0,0,22,0,192,0,-1--1--1,,1|(753,836)|
+1,339,340,337,4,0,0,22,0,192,0,-1--1--1,,1|(753,885)|
+11,340,0,753,857,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,341,Upstream deep Percolation,814,857,53,26,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,342,322,341,1,0,0,0,0,192,0,-1--1--1,,1|(818,841)|
+10,343,River water level upstream,1199,630,45,24,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,344,31,343,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,345,Upstream outflow ratio,1007,742,48,1,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,346,345,30,1,0,0,0,0,192,0,-1--1--1,,1|(955,709)|
+10,347,Downstream underground,1163,1181,48,22,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,348,350,34,100,0,0,22,0,192,0,-1--1--1,,1|(1151,1095)|
+1,349,350,347,4,0,0,22,0,192,0,-1--1--1,,1|(1151,1143)|
+11,350,0,1151,1121,8,6,33,3,0,0,4,0,0,0,0,0,0,0,0,0
+10,351,Downstream percolation,1207,1121,48,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,352,48,1336,1181,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,353,355,347,100,0,0,22,0,192,0,-1--1--1,,1|(1236,1181)|
+1,354,355,352,4,0,0,22,0,192,0,-1--1--1,,1|(1300,1181)|
+11,355,0,1268,1181,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,356,Downstream middle flow,1268,1211,48,22,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,357,48,955,1178,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,358,360,347,100,0,0,22,0,192,0,-1--1--1,,1|(1079,1178)|
+1,359,360,357,4,0,0,22,0,192,0,-1--1--1,,1|(998,1178)|
+11,360,0,1038,1178,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,361,Downstream deep percolation,1038,1207,72,21,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,362,Downstream outflow ratio,1447,1097,57,22,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,363,362,44,1,0,0,0,0,192,0,-1--1--1,,1|(1396,1053)|
+1,364,262,280,1,0,0,0,0,192,0,-1--1--1,,1|(815,1013)|
+1,365,34,44,1,0,0,0,0,192,0,-1--1--1,,1|(1247,1089)|
+1,366,34,351,1,0,0,0,0,192,0,-1--1--1,,1|(1144,1102)|
+1,367,347,356,1,0,0,0,0,192,0,-1--1--1,,1|(1205,1236)|
+1,368,347,361,1,0,0,0,0,192,0,-1--1--1,,1|(1115,1221)|
+1,369,203,280,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,370,20,270,1,0,0,0,0,192,0,-1--1--1,,1|(866,647)|
+1,371,34,280,1,0,0,0,0,192,0,-1--1--1,,1|(1104,1042)|
+1,372,202,270,1,0,0,0,0,192,0,-1--1--1,,1|(586,641)|
+10,373,Daily precipitation future ratio,181,788,57,23,8,3,0,6,-1,1,0,0,0-0-0,255-255-255,|||0-0-255,0,0,0,0,0,0
+1,374,51,220,1,0,0,0,0,192,0,-1--1--1,,1|(1295,1042)|
+10,375,Discharge amount ratio,1272,577,53,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,376,18,375,1,0,0,0,0,192,0,-1--1--1,,1|(1319,510)|
+10,377,River discharge downstream,1258,741,44,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,378,31,377,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,379,356,377,1,0,0,0,0,192,0,-1--1--1,,1|(1342,984)|
+1,380,44,377,1,0,0,0,0,192,0,-1--1--1,,1|(1300,984)|
+1,381,377,223,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,382,377,375,1,0,0,0,0,192,0,-1--1--1,,1|(1257,642)|
+1,383,203,49,1,0,0,0,0,192,1,-1--1--1,,1|(1253,1330)|
+1,384,373,194,0,1,0,0,0,64,0,-1--1--1,,1|(0,0)|
+1,385,373,25,0,1,0,0,0,64,0,-1--1--1,,1|(0,0)|
+1,386,373,42,0,1,0,0,0,64,0,-1--1--1,,1|(0,0)|
+10,387,Upstream middle flow ratio,855,907,61,26,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,388,387,333,1,0,0,0,0,192,0,-1--1--1,,1|(904,881)|
+10,389,River water level downstream,1406,742,48,23,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,390,377,389,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,391,Paddy dam cost per area,1264,1290,57,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,392,Paddy field ratio,1757,1223,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,393,392,49,1,0,0,0,0,192,1,-1--1--1,,1|(1773,1170)|
+10,394,Forest area ratio,588,289,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,395,394,82,1,0,0,0,0,192,1,-1--1--1,,1|(679,314)|
+1,396,202,82,1,0,0,0,0,192,1,-1--1--1,,1|(541,600)|
+10,397,Crop price,2262,1142,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,398,397,46,1,0,0,0,0,192,0,-1--1--1,,1|(2230,1126)|
+10,399,Drainage investment,1497,905,46,26,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,|||0-0-0,0,0,0,0,0,0
+1,400,399,213,1,0,0,0,0,192,0,-1--1--1,,1|(1429,954)|
+10,401,Initial drainage capacity,1498,1032,64,26,8,3,0,0,-1,1,0,0,0,0,0,0,0,0
+1,402,401,213,1,0,0,0,0,192,1,-1--1--1,,1|(1439,984)|
+10,403,Cost for unit drainage increase,1556,950,53,27,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,404,403,213,1,0,0,0,0,192,0,-1--1--1,,1|(1494,970)|
+1,405,399,117,1,0,0,0,0,192,0,-1--1--1,,1|(1595,634)|
+1,406,33,51,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,407,Upstream deep percolation ratio,659,816,64,26,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,408,407,341,1,0,0,0,0,192,0,-1--1--1,,1|(720,866)|
+10,409,Downstream middle flow ratio,1090,1275,46,27,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,410,409,356,1,0,0,0,0,192,0,-1--1--1,,1|(1188,1270)|
+10,411,Downstream deep percolation ratio,909,1222,57,22,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,412,411,361,1,0,0,0,0,192,0,-1--1--1,,1|(1001,1247)|
+10,413,Downstream percolation ratio,849,1158,46,27,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,414,413,351,1,0,0,0,0,192,0,-1--1--1,,1|(1030,1116)|
+10,415,Initial dam capacity,1688,133,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,416,415,19,1,0,0,0,0,192,1,-1--1--1,,1|(1489,179)|
+10,417,Dam investment start time,945,156,57,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,418,417,111,1,0,0,0,0,192,0,-1--1--1,,1|(1050,163)|
+10,419,Dam investment amount,980,47,57,26,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+1,420,419,111,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,421,Level per levee investment,1684,454,61,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,422,Levee level increase,1470,347,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,423,113,422,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,424,116,422,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,425,421,422,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,426,Levee investment start time,1552,288,64,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,427,Levee investment amount,1838,240,64,26,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+1,428,427,113,1,0,0,0,0,192,0,-1--1--1,,1|(1612,246)|
+1,429,426,113,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,430,422,18,1,0,0,0,0,192,0,-1--1--1,,1|(1480,477)|
+10,431,Drainage investment amount,1678,921,46,27,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+1,432,431,399,1,0,0,0,0,192,0,-1--1--1,,1|(1588,893)|
+1,433,280,44,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,434,280,285,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,435,44,285,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,436,351,44,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,437,351,285,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,438,280,351,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,439,Annual Paddy dam investment,2187,1288,64,26,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+10,440,Paddy dam area,1457,1320,57,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,441,391,440,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,442,440,33,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,443,392,33,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,444,203,33,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,445,Paddy dam investment,2014,1261,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,446,445,117,1,0,0,0,0,192,0,-1--1--1,,1|(2207,468)|
+1,447,445,440,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,448,439,445,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,449,33,445,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,450,Damaged houses,2363,830,57,26,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+12,451,48,2208,827,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,452,454,451,100,0,0,22,0,192,0,-1--1--1,,1|(2237,827)|
+1,453,454,450,4,0,0,22,0,192,0,-1--1--1,,1|(2287,827)|
+11,454,0,2262,827,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,455,Inflow of damaged houses,2262,861,57,26,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,456,13,455,1,0,0,0,0,192,0,-1--1--1,,1|(2123,755)|
+1,457,13,11,1,0,0,0,0,192,0,-1--1--1,,1|(1762,767)|
+12,458,48,2522,830,10,8,0,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,459,461,450,100,0,0,22,0,192,0,-1--1--1,,1|(2440,830)|
+1,460,461,458,4,0,0,22,0,192,0,-1--1--1,,1|(2492,830)|
+11,461,0,2466,830,6,8,34,3,0,0,1,0,0,0,0,0,0,0,0,0
+10,462,Outflow of damaged houses,2466,864,57,26,40,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,463,462,6,1,0,0,0,0,192,0,-1--1--1,,1|(2067,965)|
+10,464,Recovery ratio,2383,741,57,26,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|251-2-7,0,0,0,0,0,0
+1,465,464,462,1,0,0,0,0,192,0,-1--1--1,,1|(2499,769)|
+1,466,450,462,1,0,0,0,0,192,0,-1--1--1,,1|(2386,900)|
+10,467,Delay of recovery,2427,963,42,22,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,468,467,462,1,0,0,0,0,192,0,-1--1--1,,1|(2510,947)|
+1,469,33,46,1,0,0,0,0,192,0,-1--1--1,,1|(1945,1176)|
+10,470,Degradation of paddy dam,2298,1083,53,22,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,471,470,46,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+10,472,Coefficient for ecosystem,725,49,45,22,8,3,0,18,-1,1,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,473,125,81,1,0,0,0,0,192,0,-1--1--1,,1|(909,272)|
+1,474,472,81,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,475,202,194,1,0,0,0,0,192,0,-1--1--1,,1|(406,719)|
+10,476,Financial damage,2344,619,64,26,3,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,477,70,476,1,0,0,0,0,192,0,-1--1--1,,1|(2152,764)|
+10,478,Initial paddy dam ratio,1815,1336,53,26,8,3,0,18,-1,0,0,0,0-0-0,0-0-0,||B|128-0-128,0,0,0,0,0,0
+1,479,478,440,0,0,0,0,0,192,1,-1--1--1,,1|(0,0)|
+1,480,203,440,0,0,0,0,0,192,1,-1--1--1,,1|(0,0)|
+1,481,392,440,0,0,0,0,0,192,1,-1--1--1,,1|(0,0)|
+10,482,Daily precip,169,907,50,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,483,Daily ave temp,224,1013,57,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,484,Daily max temp,414,1089,57,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,485,Daily min temp,551,1098,57,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,486,Solar radiation time,682,1101,61,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,487,482,194,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,488,482,25,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,489,482,42,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,490,483,260,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,491,483,262,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,492,483,208,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,493,484,262,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,494,485,262,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,495,486,262,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 2
+$-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,100,0
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 3
+$-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,100,0
+///---\\\
+:GRAPH Daily_crop_production
+:TITLE Daily crop production
+:SCALE
+:VAR Daily crop production
+:DATASET 
+:LINE-WIDTH 1
+:L<%^E!@
+1:future.vdfx
+4:Time
+5:Daily precip
+9:future
+19:5,0
+24:0
+25:365
+26:365
+23:0
+18:test.vsc
+20:test.lst
+15:0,0,0,0,0,0
+27:0,
+34:0,
+42:0
+113:1
+72:0
+73:0
+95:0
+96:0
+97:0
+77:0
+78:0
+102:1
+93:0
+94:0
+92:0
+91:0
+90:0
+87:0
+75:
+43:
+103:8,8,8,3,8
+105:0,0,0,0,0,0,0,0,0,0
+104:Courier New|12||0-0-0|0-0-0|-1--1--1|0-0-255|192-192-192|-1--1--1

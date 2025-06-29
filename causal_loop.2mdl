@@ -1,0 +1,187 @@
+{UTF-8}
+Biodiversity level  = A FUNCTION OF( "Dam/Levee capacity",Forest area)
+	~	
+	~		|
+
+Capacity building  = A FUNCTION OF( Flood damage)
+	~	
+	~		|
+
+Citizens' burden  = A FUNCTION OF( Crop production,Flood damage)
+	~	
+	~		|
+
+Crop production  = A FUNCTION OF( Paddy dam,"R&D for resilient crop",Temperature)
+	~	
+	~		|
+
+"Dam/Levee capacity"  = A FUNCTION OF( "Dam/Levee investment")
+	~	
+	~		|
+
+"Dam/Levee investment"  = A FUNCTION OF( Biodiversity level,Citizens' burden,Flood damage\
+		)
+	~	
+	~		|
+
+Evacualtion level  = A FUNCTION OF( Capacity building)
+	~	
+	~		|
+
+Exposure personnel  = A FUNCTION OF( Migration to safer area)
+	~	
+	~		|
+
+Flood damage  = A FUNCTION OF( Evacualtion level,Exposure personnel,Flood impact)
+	~	
+	~		|
+
+Flood impact  = A FUNCTION OF( "Dam/Levee capacity",Forest area,Paddy dam,Precipitation\
+		)
+	~	
+	~		|
+
+Forest area  = A FUNCTION OF( Plant tree)
+	~	
+	~		|
+
+Migration to safer area  = A FUNCTION OF( Citizens' burden,Flood damage)
+	~	
+	~		|
+
+Paddy dam  = A FUNCTION OF( Paddy dam investment)
+	~	
+	~		|
+
+Paddy dam investment  = A FUNCTION OF( Citizens' burden,Crop production,Flood damage)
+	~	
+	~		|
+
+Plant tree  = A FUNCTION OF( Biodiversity level,Citizens' burden,Flood damage)
+	~	
+	~		|
+
+Precipitation  = A FUNCTION OF( )
+	~	
+	~		|
+
+"R&D for resilient crop"  = A FUNCTION OF( Citizens' burden)
+	~	
+	~		|
+
+Temperature  = A FUNCTION OF( )
+	~	
+	~		|
+
+********************************************************
+	.Control
+********************************************************~
+		Simulation Control Parameters
+	|
+
+FINAL TIME  = 100
+	~	Month
+	~	The final time for the simulation.
+	|
+
+INITIAL TIME  = 0
+	~	Month
+	~	The initial time for the simulation.
+	|
+
+SAVEPER  = 
+        TIME STEP 
+	~	Month [0,?]
+	~	The frequency with which output is stored.
+	|
+
+TIME STEP  = 1
+	~	Month [0,?]
+	~	The time step for the simulation.
+	|
+
+\\\---/// Sketch information - do not modify anything except names
+V300  Do not put anything below this section - it will be ignored
+*View 1
+$-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,100,2
+10,1,Flood damage,743,461,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,2,"Dam/Levee capacity",709,289,53,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,3,Forest area,577,291,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,4,Plant tree,533,423,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,5,Biodiversity level,740,185,43,27,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,6,Exposure personnel,895,506,53,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,7,Migration to safer area,893,592,60,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,8,1,7,1,0,83,0,0,192,0,-1--1--1,,1|(831,593)|
+1,9,7,6,1,0,79,0,0,192,0,-1--1--1,,1|(909,542)|
+1,10,6,1,1,0,83,0,0,192,0,-1--1--1,,1|(827,493)|
+1,11,1,4,1,0,83,0,0,192,0,-1--1--1,,1|(609,452)|
+1,12,4,3,1,0,83,0,0,193,0,-1--1--1,,1|(541,363)|
+10,13,"Dam/Levee investment",876,298,60,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,14,13,2,1,0,83,0,0,192,0,-1--1--1,,1|(797,257)|
+1,15,1,13,1,0,83,0,0,192,0,-1--1--1,,1|(852,422)|
+1,16,5,13,1,0,79,0,0,192,0,-1--1--1,,1|(880,263)|
+1,17,2,5,1,0,79,0,0,193,0,-1--1--1,,1|(714,247)|
+1,18,3,5,1,0,83,0,1,193,0,0-0-255,|||0-0-0,1|(634,212)|
+1,19,5,4,1,0,79,0,0,192,0,-1--1--1,,1|(473,249)|
+10,20,Paddy dam,960,362,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,21,Crop production,1095,408,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,22,Paddy dam investment,967,459,60,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,23,1,22,0,0,83,0,0,192,0,-1--1--1,,1|(0,0)|
+1,24,22,20,0,0,83,0,0,192,0,-1--1--1,,1|(0,0)|
+1,25,20,21,1,0,79,0,0,192,0,-1--1--1,,1|(1032,370)|
+1,26,21,22,1,0,79,0,0,192,0,-1--1--1,,1|(1037,448)|
+10,27,Flood impact,740,364,46,26,8,3,0,0,-1,1,0,0,0,0,0,0,0,0
+1,28,27,1,0,0,83,0,0,192,0,-1--1--1,,1|(0,0)|
+1,29,2,27,1,0,79,0,0,192,0,-1--1--1,,1|(695,358)|
+1,30,3,27,1,0,79,0,0,192,0,-1--1--1,,1|(643,361)|
+1,31,20,27,0,0,79,0,0,192,0,-1--1--1,,1|(0,0)|
+10,32,Capacity building,655,584,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,33,Evacualtion level,603,512,41,29,8,3,0,0,-1,1,0,0,0,0,0,0,0,0
+1,34,1,32,1,0,83,0,0,192,0,-1--1--1,,1|(709,537)|
+1,35,32,33,1,0,83,0,0,192,0,-1--1--1,,1|(592,573)|
+1,36,33,1,0,0,79,0,0,192,0,-1--1--1,,1|(0,0)|
+10,37,Precipitation,1013,113,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,38,Temperature,1141,148,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,39,"R&D for resilient crop",1143,527,57,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+10,40,Citizens' burden,957,665,46,26,8,3,0,0,-1,0,0,0,0,0,0,0,0,0
+1,41,1,40,1,0,83,0,0,192,0,-1--1--1,,1|(787,621)|
+1,42,21,40,1,0,79,0,0,192,0,-1--1--1,,1|(1047,566)|
+1,43,40,22,1,0,79,0,0,192,0,-1--1--1,,1|(1002,568)|
+1,44,40,4,1,0,79,0,0,192,0,-1--1--1,,1|(613,648)|
+1,45,40,13,1,0,79,0,0,192,0,-1--1--1,,1|(1224,466)|
+1,46,40,7,1,0,79,0,0,192,0,-1--1--1,,1|(885,651)|
+1,47,37,27,0,0,83,0,0,192,0,-1--1--1,,1|(0,0)|
+1,48,38,21,0,0,79,0,0,192,0,-1--1--1,,1|(0,0)|
+1,49,39,21,1,0,83,0,0,193,0,-1--1--1,,1|(1173,474)|
+1,50,40,39,1,0,79,0,0,192,0,-1--1--1,,1|(1077,627)|
+///---\\\
+:L<%^E!@
+5:Temperature
+19:100,0
+24:0
+25:0
+26:0
+23:0
+15:0,0,0,0,0,0
+27:0,
+34:0,
+42:0
+72:0
+73:0
+95:0
+96:0
+97:0
+77:0
+78:0
+102:1
+93:0
+94:0
+92:0
+91:0
+90:0
+87:0
+75:
+43:
+103:8,8,8,3,8
+105:0,0,0,0,0,0,0,0,0,0
+104:Vensim Sans|12||0-0-0|0-0-0|-1--1--1|0-0-255|192-192-192|-1--1--1
