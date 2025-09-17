@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from pysd.py_backend.functions import pulse, if_then_else
-from pysd.py_backend.statefuls import Delay, Integ
+from pysd.py_backend.statefuls import Integ, Delay
 from pysd.py_backend.external import ExtData
 from pysd import Component
 
@@ -141,10 +141,10 @@ def wild_animal_damage():
     depends_on={
         "daily_precip": 1,
         "daily_precipitation_future_ratio": 1,
-        "erosion_control_dam_capacity": 2,
+        "forest_area": 1,
         "erosion_control_of_forest": 1,
         "upstream_area": 1,
-        "forest_area": 1,
+        "erosion_control_dam_capacity": 2,
     },
 )
 def landslide_disaster_risk():
@@ -898,8 +898,8 @@ def levee_investment_amount():
     comp_subtype="Normal",
     depends_on={
         "levee_investment_amount": 1,
-        "levee_investment_start_time": 1,
         "time": 1,
+        "levee_investment_start_time": 1,
     },
 )
 def levee_investment():
@@ -1747,8 +1747,8 @@ def houses_damaged_by_inundation():
     comp_subtype="Normal",
     depends_on={
         "inside_water_innundation_level": 1,
-        "downstream_area": 1,
         "innundation_risky_area_ratio": 1,
+        "downstream_area": 1,
     },
 )
 def innundation_level():
@@ -1806,15 +1806,15 @@ def excessive_surface_flow():
             "initial": {
                 "current_planting_trees": 1,
                 "trees_per_area": 1,
-                "tree_growth_time": 1,
                 "planting_start_time": 1,
+                "tree_growth_time": 1,
             },
             "step": {
                 "number_of_planting_trees": 1,
                 "trees_per_area": 2,
                 "current_planting_trees": 1,
-                "tree_growth_time": 1,
                 "planting_start_time": 1,
+                "tree_growth_time": 1,
             },
         }
     },
@@ -1994,8 +1994,8 @@ def number_of_planting_trees():
     comp_subtype="Normal",
     depends_on={
         "innundation_level": 1,
-        "ratio_of_paddy_field_in_risky_area": 1,
         "paddy_field": 1,
+        "ratio_of_paddy_field_in_risky_area": 1,
     },
 )
 def inflow_of_damaged_paddy_field():
