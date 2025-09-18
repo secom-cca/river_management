@@ -12,8 +12,8 @@ from pysd import load, read_vensim
 # =========================
 # 設定
 # =========================
-DEFAULT_MODEL_PY  = Path("River_management_chikugo.py")
-DEFAULT_MODEL_MDL = Path("River_management_chikugo.mdl")
+DEFAULT_MODEL_PY  = Path("River_management_xls.py")
+DEFAULT_MODEL_MDL = Path("River_management_xls.mdl")
 DEFAULT_XLS_NAME  = "jma_kurume_2023.xls"   # モデル内 ExtData が参照する既定名
 
 # ==== 流域プリセット（代表値セット） ====
@@ -36,15 +36,6 @@ PRESETS = {
         "direct_discharge_ratio": 0.97,
         "current_highwater_discharge": 8_900,   # m3/s
         "paddy_field_ratio": 0.8,
-    },
-    "吉野川流域（例）": {
-        "initial_dam_capacity": 50_000_000,
-        "upstream_area": 200_000,
-        "downstream_area": 120_000,
-        "forest_area_ratio": 0.88,
-        "direct_discharge_ratio": 0.97,
-        "current_highwater_discharge": 9_000,
-        "paddy_field_ratio": 0.08,
     },
     "利根川流域（例）": {
         "initial_dam_capacity": 200_000_000,

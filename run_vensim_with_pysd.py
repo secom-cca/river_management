@@ -1,11 +1,10 @@
-# run_vensim_with_pysd.py  ← ファイル名はこのままでOK
 from pathlib import Path
 from pysd import read_vensim, load
 
 # ---- 入力ファイル設定 ----
 MODEL_MDL = Path("River_management_chikugo.mdl")   # Vensim テキスト（任意）
 MODEL_PY  = Path("River_management_chikugo.py")    # 変換済み PySD モデル（任意）
-EXCEL_FILE = Path("jma_kurume_2023.xls")           # GET XLS DATA で参照される外部データ
+EXCEL_FILE = Path("data/jma_kurume_2023.xls")           # GET XLS DATA で参照される外部データ
 
 # ---- モデル読み込み（.py があれば優先、なければ .mdl を読み込んで自動変換）----
 if MODEL_PY.exists():
@@ -26,7 +25,7 @@ params = {
     "dam_investment_amount": 0,
 }
 
-# ---- 取得したい出力（スネークケース！）----
+# ---- 取得したい出力（スネークケース）----
 return_cols = [
     "daily_total_gdp",
     "dam_storage",
@@ -47,4 +46,4 @@ res = model.run(
 )
 
 print(res.head())
-res.to_csv("simulation_output.csv", index_label="day")
+res.to_csv("data/simulation_output.csv", index_label="day")

@@ -4377,9 +4377,8 @@ $-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,100,0
 :DATASET 
 :LINE-WIDTH 1
 :L<%^E!@
-1:future.vdfx
 4:Time
-5:Discharge allowance
+5:GDP per resident
 9:future
 19:5,0
 24:0

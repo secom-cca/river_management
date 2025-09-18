@@ -1,7 +1,16 @@
 {UTF-8}
-Financial damage  = A FUNCTION OF( Financial damage by flood,Financial damage by innundation\
-		) ~~|
-Financial damage= INTEG (Financial damage by innundation,
+Direct discharge ratio=
+	1
+	~	
+	~		|
+
+Upstream storage capacity=
+	Forest area storage capacity + Dam capacity
+	~	m3
+	~		|
+
+Financial damage= INTEG (
+	Financial damage by flood+Financial damage by innundation,
 		0)
 	~	Yen
 	~		|
@@ -239,7 +248,8 @@ Forest area= INTEG (Inflow of forest area-Outflow of forest area,
 	~	ha [0,?]
 	~		|
 
-Forest area ratio=166000/(198500*0.9)
+Forest area ratio=
+	0.92
 	~	 [0,1,0.01]
 	~		|
 
@@ -300,11 +310,6 @@ Flood water amount=
 Discharge amount ratio=
 	River discharge downstream/Discharge allowance
 	~	
-	~		|
-
-Upstream storage capacity=
-	Forest area storage capacity
-	~	m3
 	~		|
 
 Solar radiation = WITH LOOKUP (Time,
@@ -3071,11 +3076,6 @@ Predischarge control=
 	~	
 	~		|
 
-Direct discharge ratio=
-	(1-40/1950)
-	~	 [0,1,0.1]
-	~		|
-
 Predischarge capacity=
 	10000
 	~	m3/day [0,10000,100]
@@ -4360,6 +4360,7 @@ $-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,5,0
 1,508,210,468,0,0,0,0,0,192,1,-1--1--1,,1|(0,0)|
 1,509,420,468,0,0,0,0,0,192,1,-1--1--1,,1|(0,0)|
 1,510,327,504,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
+1,511,20,51,0,0,0,0,0,192,0,-1--1--1,,1|(0,0)|
 \\\---/// Sketch information - do not modify anything except names
 V300  Do not put anything below this section - it will be ignored
 *View 2
@@ -4378,7 +4379,7 @@ $-1--1--1,0,|12||-1--1--1|-1--1--1|-1--1--1|-1--1--1|-1--1--1|96,96,100,0
 :L<%^E!@
 1:future.vdfx
 4:Time
-5:Biodiversity
+5:Discharge allowance
 9:future
 19:5,0
 24:0
