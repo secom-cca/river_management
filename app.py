@@ -19,14 +19,23 @@ DEFAULT_XLS_NAME  = "jma_kurume_2023.xls"   # モデル内 ExtData が参照す�
 # ==== 流域プリセット（代表値セット） ====
 # 必要に応じて値を実測・資料の代表値に差し替えてください
 PRESETS = {
-    "筑後川流域（デフォルト）": {
+    "筑後川流域": {
         "initial_dam_capacity": 74_200_000,      # m3
         "upstream_area": 157_585,                # ha
         "downstream_area": 143_951,              # ha
         "forest_area_ratio": 166_000/(198_500*0.9),
-        "direct_discharge_ratio": 1 - 40/1950,
+        "direct_discharge_ratio": 0.97,
         "current_highwater_discharge": 11_500,   # m3/s
         "paddy_field_ratio": 0.12,
+    },
+    "長良川流域": {
+        "initial_dam_capacity": 8_500_000,      # m3
+        "upstream_area": 178_650,                # ha
+        "downstream_area": 19_850,              # ha
+        "forest_area_ratio": 0.92,
+        "direct_discharge_ratio": 0.97,
+        "current_highwater_discharge": 8_900,   # m3/s
+        "paddy_field_ratio": 0.8,
     },
     "吉野川流域（例）": {
         "initial_dam_capacity": 50_000_000,
@@ -63,7 +72,7 @@ DEFAULT_RETURN_COLS = [
 
 PARAM_SPECS = {
     "daily_precipitation_future_ratio": dict(label="将来降水補正（×）", min=0.5, max=2.0, step=0.01, value=1.0),
-    "dam_investment_amount":           dict(label="ダム投資額（円/年）",           min=0, max=1_000_000_000, step=10_000_000, value=0),
+    "dam_investment_amount":           dict(label="ダム投資額（円/年）",           min=0, max=1_000_000_000, step=1_000_000, value=0),
     "levee_investment_amount":         dict(label="堤防投資額（円/年）",           min=0, max=100_000_000,  step=1_000_000,  value=0),
     "drainage_investment_amount":      dict(label="排水能力投資額（円/年）",       min=0, max=10_000_000_000, step=100_000_000, value=0),
     "annual_paddy_dam_investment":     dict(label="ため池（圃場）投資額（円/年）",   min=0, max=50_000_000,   step=1_000_000,  value=1_000_000),
@@ -238,25 +247,6 @@ with st.sidebar:
                 value=default_value,
                 key=f"param_{name}",
                 format="%.6f" if spec["step"] < 1 else "%d"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             )
         else:
             ui_values[name] = st.slider(label, value=float(default_value), key=f"param_{name}")

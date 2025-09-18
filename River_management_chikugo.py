@@ -100,6 +100,51 @@ def time_step():
 
 
 @component.add(
+    name="Accumulated flood damage",
+    units="Yen",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_accumulated_flood_damage": 1},
+    other_deps={
+        "_integ_accumulated_flood_damage": {
+            "initial": {},
+            "step": {"financial_damage_by_flood": 1},
+        }
+    },
+)
+def accumulated_flood_damage():
+    return _integ_accumulated_flood_damage()
+
+
+_integ_accumulated_flood_damage = Integ(
+    lambda: financial_damage_by_flood(), lambda: 0, "_integ_accumulated_flood_damage"
+)
+
+
+@component.add(
+    name="Accumulated innundation damage",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_accumulated_innundation_damage": 1},
+    other_deps={
+        "_integ_accumulated_innundation_damage": {
+            "initial": {},
+            "step": {"financial_damage_by_innundation": 1},
+        }
+    },
+)
+def accumulated_innundation_damage():
+    return _integ_accumulated_innundation_damage()
+
+
+_integ_accumulated_innundation_damage = Integ(
+    lambda: financial_damage_by_innundation(),
+    lambda: 0,
+    "_integ_accumulated_innundation_damage",
+)
+
+
+@component.add(
     name="Dam storage",
     units="m3",
     comp_type="Stateful",
@@ -142,9 +187,9 @@ def wild_animal_damage():
         "daily_precip": 1,
         "daily_precipitation_future_ratio": 1,
         "forest_area": 1,
-        "erosion_control_of_forest": 1,
-        "upstream_area": 1,
         "erosion_control_dam_capacity": 2,
+        "upstream_area": 1,
+        "erosion_control_of_forest": 1,
     },
 )
 def landslide_disaster_risk():
@@ -202,8 +247,8 @@ def upstream_inflow():
     comp_subtype="Normal",
     depends_on={
         "daily_ave_temp": 1,
-        "daily_min_temp": 1,
         "daily_max_temp": 1,
+        "daily_min_temp": 1,
         "solar_radiation_time": 1,
     },
 )
@@ -412,28 +457,6 @@ def initial_paddy_dam_ratio():
 
 
 @component.add(
-    name="Financial damage",
-    units="Yen",
-    comp_type="Stateful",
-    comp_subtype="Integ",
-    depends_on={"_integ_financial_damage": 1},
-    other_deps={
-        "_integ_financial_damage": {
-            "initial": {},
-            "step": {"financial_damage_by_innundation": 1},
-        }
-    },
-)
-def financial_damage():
-    return _integ_financial_damage()
-
-
-_integ_financial_damage = Integ(
-    lambda: financial_damage_by_innundation(), lambda: 0, "_integ_financial_damage"
-)
-
-
-@component.add(
     name="Biodiversity",
     comp_type="Auxiliary",
     comp_subtype="Normal",
@@ -470,8 +493,8 @@ def degradation_of_paddy_dam():
         "paddy_field_productivity": 1,
         "deterioration_ratio_by_heat": 1,
         "crop_price": 1,
-        "paddy_dam_ratio": 2,
         "degradation_of_paddy_dam": 1,
+        "paddy_dam_ratio": 2,
     },
 )
 def daily_crop_production():
@@ -690,7 +713,7 @@ def upstream_percolation():
     limits=(0.0, 1.0, 0.05),
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"paddy_dam_area": 1, "paddy_field_ratio": 1, "downstream_area": 1},
+    depends_on={"paddy_dam_area": 1, "downstream_area": 1, "paddy_field_ratio": 1},
 )
 def paddy_dam_ratio():
     return paddy_dam_area() / (paddy_field_ratio() * downstream_area())
@@ -727,10 +750,10 @@ def downstream_percolation():
     comp_subtype="Normal",
     depends_on={
         "drainage_capacity": 1,
-        "evaporation_downstream": 1,
         "downstream_percolation": 1,
         "downstream_storage": 1,
         "downstream_outflow": 1,
+        "evaporation_downstream": 1,
     },
 )
 def drainage():
@@ -758,8 +781,8 @@ def drainage():
     depends_on={
         "downstream_outflow_ratio": 1,
         "downstream_storage": 2,
-        "evaporation_downstream": 1,
         "downstream_percolation": 1,
+        "evaporation_downstream": 1,
     },
 )
 def downstream_outflow():
@@ -1630,7 +1653,7 @@ def financial_damage_by_flood():
     name="Flood damage per resident", comp_type="Constant", comp_subtype="Normal"
 )
 def flood_damage_per_resident():
-    return 10000000.0
+    return 10000000.0 / 365
 
 
 @component.add(
@@ -1685,8 +1708,8 @@ def downstream_storage_depth():
     depends_on={
         "forest_area": 1,
         "tree_die_ratio": 1,
-        "number_of_lumbering_trees": 1,
         "trees_per_area": 1,
+        "number_of_lumbering_trees": 1,
         "wild_animal_damage": 1,
     },
 )
@@ -1747,8 +1770,8 @@ def houses_damaged_by_inundation():
     comp_subtype="Normal",
     depends_on={
         "inside_water_innundation_level": 1,
-        "innundation_risky_area_ratio": 1,
         "downstream_area": 1,
+        "innundation_risky_area_ratio": 1,
     },
 )
 def innundation_level():
@@ -1806,15 +1829,15 @@ def excessive_surface_flow():
             "initial": {
                 "current_planting_trees": 1,
                 "trees_per_area": 1,
-                "planting_start_time": 1,
                 "tree_growth_time": 1,
+                "planting_start_time": 1,
             },
             "step": {
                 "number_of_planting_trees": 1,
                 "trees_per_area": 2,
                 "current_planting_trees": 1,
-                "planting_start_time": 1,
                 "tree_growth_time": 1,
+                "planting_start_time": 1,
             },
         }
     },
