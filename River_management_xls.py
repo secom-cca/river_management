@@ -186,9 +186,9 @@ def wild_animal_damage():
     depends_on={
         "daily_precip": 1,
         "daily_precipitation_future_ratio": 1,
-        "forest_area": 1,
-        "upstream_area": 1,
         "erosion_control_of_forest": 1,
+        "upstream_area": 1,
+        "forest_area": 1,
         "erosion_control_dam_capacity": 2,
     },
 )
@@ -297,10 +297,10 @@ def daily_min_temp():
 
 
 _ext_data_daily_min_temp = ExtData(
-    r"jma_kurume_2023.xls",
-    "jma",
-    "B",
-    "V7",
+    r"input.xlsx",
+    "input",
+    "A",
+    "E2",
     "interpolate",
     {},
     _root,
@@ -324,10 +324,10 @@ def solar_radiation_time():
 
 
 _ext_data_solar_radiation_time = ExtData(
-    r"jma_kurume_2023.xls",
-    "jma",
-    "B",
-    "K7",
+    r"input.xlsx",
+    "input",
+    "A",
+    "F2",
     "interpolate",
     {},
     _root,
@@ -351,10 +351,10 @@ def daily_ave_temp():
 
 
 _ext_data_daily_ave_temp = ExtData(
-    r"jma_kurume_2023.xls",
-    "jma",
-    "B",
-    "E7",
+    r"input.xlsx",
+    "input",
+    "A",
+    "C2",
     "interpolate",
     {},
     _root,
@@ -378,10 +378,10 @@ def daily_max_temp():
 
 
 _ext_data_daily_max_temp = ExtData(
-    r"jma_kurume_2023.xls",
-    "jma",
-    "B",
-    "Q7",
+    r"input.xlsx",
+    "input",
+    "A",
+    "D2",
     "interpolate",
     {},
     _root,
@@ -406,10 +406,10 @@ def daily_precip():
 
 
 _ext_data_daily_precip = ExtData(
-    r"jma_kurume_2023.xls",
-    "jma",
-    "B",
-    "H7",
+    r"input.xlsx",
+    "input",
+    "A",
+    "B2",
     "interpolate",
     {},
     _root,
@@ -750,10 +750,10 @@ def downstream_percolation():
     comp_subtype="Normal",
     depends_on={
         "drainage_capacity": 1,
-        "downstream_outflow": 1,
-        "evaporation_downstream": 1,
-        "downstream_percolation": 1,
         "downstream_storage": 1,
+        "evaporation_downstream": 1,
+        "downstream_outflow": 1,
+        "downstream_percolation": 1,
     },
 )
 def drainage():
@@ -921,8 +921,8 @@ def levee_investment_amount():
     comp_subtype="Normal",
     depends_on={
         "levee_investment_amount": 1,
-        "time": 1,
         "levee_investment_start_time": 1,
+        "time": 1,
     },
 )
 def levee_investment():
@@ -1829,15 +1829,15 @@ def excessive_surface_flow():
             "initial": {
                 "current_planting_trees": 1,
                 "trees_per_area": 1,
-                "tree_growth_time": 1,
                 "planting_start_time": 1,
+                "tree_growth_time": 1,
             },
             "step": {
                 "number_of_planting_trees": 1,
                 "trees_per_area": 2,
                 "current_planting_trees": 1,
-                "tree_growth_time": 1,
                 "planting_start_time": 1,
+                "tree_growth_time": 1,
             },
         }
     },
@@ -2017,8 +2017,8 @@ def number_of_planting_trees():
     comp_subtype="Normal",
     depends_on={
         "innundation_level": 1,
-        "paddy_field": 1,
         "ratio_of_paddy_field_in_risky_area": 1,
+        "paddy_field": 1,
     },
 )
 def inflow_of_damaged_paddy_field():
