@@ -1,0 +1,45 @@
+:COMSYS After 6169 simulations
+:COMSYS Best payoff is -18.7593
+:COMSYS Normally terminated optimization
+:OPTIMIZER=Powell
+:SENSITIVITY=Off
+:MULTIPLE_START=Random
+:RANDOM_NUMBER=Default
+:OUTPUT_LEVEL=On
+:TRACE=Off
+:MAX_ITERATIONS=1000
+:RESTART_MAX=10
+:PASS_LIMIT=2
+:FRACTIONAL_TOLERANCE=0.0003
+:TOLERANCE_MULTIPLIER=21
+:ABSOLUTE_TOLERANCE=1
+:SCALE_ABSOLUTE=1
+:VECTOR_POINTS=25
+:MCLIMIT=0
+:MCJUMP=0.05
+:MCBURNIN=0
+:MCDELTA=0.0001
+:MCTEMP=1
+:MCNCHAINS=2
+:MCUPDATEPAIRS=1
+:MCSCHEDULE=0
+:MCOUTLIER=0.05
+:MCXOVER=0.2
+:MCCOOLING=1000
+:MCINITMETHOD=0
+:MCPAYOFFTYPE=0
+:MCGAMMA=1
+:MCRECORD=0
+:MCKNN=0
+:MCEPSILON=0.01
+:MCFTEMP=1
+0.01 <= Upstream outflow ratio = 0.0270484  <= 0.99
+0.01 <= Downstream outflow ratio = 0.0446371  <= 0.99
+0.01 <= Direct discharge ratio = 0.99  <= 0.99
+0.01 <= Upstream percolation ratio = 0.303752  <= 0.5
+0.01 <= Downstream deep percolation ratio = 0.251362  <= 0.5
+0.01 <= Upstream middle flow ratio = 0.141604  <= 0.99
+0.01 <= Downstream percolation ratio = 0.191405  <= 0.5
+0.01 <= Downstream middle flow ratio = 0.0620332  <= 0.99
+150 <= "Water-holding Capacity of Forest" = 157.484  <= 250
+0.01 <= Upstream deep percolation ratio = 0.922893  <= 0.99

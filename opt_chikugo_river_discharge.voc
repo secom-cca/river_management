@@ -1,0 +1,47 @@
+:OPTIMIZER=Powell
+:SENSITIVITY=Off
+:MULTIPLE_START=Random
+:RANDOM_NUMBER=Default
+:OUTPUT_LEVEL=On
+:TRACE=Off
+:MAX_ITERATIONS=1000
+:RESTART_MAX=10
+:PASS_LIMIT=2
+:FRACTIONAL_TOLERANCE=0.0003
+:TOLERANCE_MULTIPLIER=21
+:ABSOLUTE_TOLERANCE=1
+:SCALE_ABSOLUTE=1
+:VECTOR_POINTS=25
+:MCLIMIT=0
+:MCJUMP=0.05
+:MCBURNIN=0
+:MCDELTA=0.0001
+:MCTEMP=1
+:MCNCHAINS=2
+:MCUPDATEPAIRS=1
+:MCSCHEDULE=0
+:MCOUTLIER=0.05
+:MCXOVER=0.2
+:MCCOOLING=1000
+:MCINITMETHOD=0
+:MCPAYOFFTYPE=0
+:MCGAMMA=1
+:MCRECORD=0
+:MCKNN=0
+:MCEPSILON=0.01
+:MCFTEMP=1
+&100766<=Downstream area=143951<=187136
+0.01<=Upstream outflow ratio=0.5<=0.99
+0.01<=Downstream outflow ratio=0.5<=0.99
+&110310<=Upstream area=157585<=204861
+0.01<=Direct discharge ratio=0.97<=0.99
+0.01<=Upstream percolation ratio=0.2<=0.5
+&Initial dam capacity
+&Forest area ratio
+0.01<=Downstream deep percolation ratio=0.2<=0.5
+0.01<=Upstream middle flow ratio=0.5<=0.99
+0.01<=Downstream percolation ratio=0.2<=0.5
+0.01<=Downstream middle flow ratio=0.5<=0.99
+150<="Water-holding Capacity of Forest"=200<=250
+&Initial drainage capacity=50
+0.01<=Upstream deep percolation ratio=0.5<=0.99
