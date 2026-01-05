@@ -92,6 +92,17 @@ PARAM_SPECS = {
     "current_highwater_discharge": dict(label="計画高水流量（m³/秒）", min=0, max=30_000, step=100, value=11_500),
 }
 
+# ---- 年積算したい指標（表示名 → 候補となるモデル変数名）----
+INDICATORS_ANNUAL = {
+    "Financial Damage by Flood": ["financial_damage_by_flood"],
+    "Financial Damage by Inundation": ["financial_damage_by_innundation"],
+    "Daily Crop Production": ["daily_crop_production"],
+    "Biodiversity": ["biodiversity"],
+    "CO2 absorption": ["co2_absorption"],
+    "Municipality Cost": ["municipality_cost"],
+}
+# 依頼指標の候補列は run 時に常に要求しておく（ユーザーの表示選択に関わらず取得）
+REQUIRED_RETURN_COLS_FOR_ANNUAL = set(sum(INDICATORS_ANNUAL.values(), []))
 
 # =========================
 # 共通ユーティリティ
@@ -175,6 +186,19 @@ def _best_lag(y_true: pd.Series, y_pred: pd.Series, max_lag_days: int) -> Tuple[
             best_r, best_lag = r, lag
     return best_lag, best_r
 
+def _pick_existing_var(columns: pd.Index, candidates: list[str]) -> str | None:
+    """候補名のうち最初に存在する列名を返す。なければ None。"""
+    for c in candidates:
+        if c in columns:
+            return c
+    return None
+
+def _annual_sum(s: pd.Series) -> pd.Series:
+    """日系列を年ごと合計に集計（index: 年）。"""
+    idx = s.index
+    if not isinstance(idx, pd.DatetimeIndex):
+        raise ValueError("年集計するには DatetimeIndex が必要です。")
+    return s.groupby(idx.year).sum(min_count=1)
 
 # =========================
 # NIES SSP CSV 読み込み＆成形
@@ -406,6 +430,8 @@ run_btn = st.button("▶ AMeDAS再現（観測比較）＋ 5 GCM 将来計算 �
 if run_btn:
     amedas_result: pd.DataFrame | None = None
     gcm_results: Dict[str, pd.DataFrame] = {}
+    gcm_inputs:  Dict[str, pd.DataFrame] = {} 
+    start_dt = pd.Timestamp(f"{int(start_year)}-01-01")
 
     # ---------- AMeDAS 再現（観測比較） ----------
     with st.spinner("AMeDAS を用いた再現計算を実施中..."):
@@ -528,6 +554,7 @@ if run_btn:
         for gcm in models_to_run:
             try:
                 in_table = build_extdata_multi_year(ssp_code, gcm, int(start_year), int(n_years))
+                gcm_inputs[gcm] = in_table.copy()
                 write_input_excel_no_blank(in_table, INPUT_XLSX_PATH)
 
                 model_gcm = _load_model_fresh(use_py_first, str(model_py_path), str(model_mdl_path))
@@ -539,11 +566,12 @@ if run_btn:
                     if hasattr(model_gcm.components, k):
                         sim_params[k] = v
 
+                requested_cols = sorted(set(return_cols) | REQUIRED_RETURN_COLS_FOR_ANNUAL)
                 res = _run_simulation(
                     model_gcm,
                     params=sim_params,
                     timestamps=timestamps,
-                    return_cols=list(set(return_cols))
+                    return_cols=requested_cols
                 )
                 res = _build_model_datetime_index(res, start_dt_nies)
                 gcm_results[gcm] = res
@@ -600,6 +628,57 @@ if run_btn:
                 file_name=f"river_discharge_5gcm_ssp{ssp_code}_{start_year}_{int(n_years)}y.csv",
                 mime="text/csv"
             )
+
+        # ==== 年別集計（合計）: 5 GCM（折れ線） ====
+        st.divider()
+        st.subheader("📅 年別集計（合計・折れ線）: 5 GCM")
+
+        metric_labels = {
+            "financial_damage_by_flood":       "Financial Damage by Flood",
+            "financial_damage_by_innundation": "Financial Damage by Inundation",
+            "daily_crop_production":           "Daily Crop Production",
+            "biodiversity":                    "Biodiversity",
+            "co2_absorption":                  "CO₂ absorption",
+            "municipality_cost":               "Municipality Cost",
+        }
+
+        last_year = int(start_year) + int(n_years) - 1
+
+        def _annual_sum(df: pd.DataFrame, col: str) -> pd.Series:
+            if col not in df.columns:
+                return pd.Series(dtype=float)
+            tmp = df[[col]].copy()
+            tmp["__year__"] = df.index.year
+            out = tmp.groupby("__year__", sort=True)[col].sum(numeric_only=True)
+            # 実データの年だけに限定し、希望範囲でクリップ
+            out = out.loc[(out.index >= int(start_year)) & (out.index <= last_year)]
+            return out
+
+        for metric, label in metric_labels.items():
+            pieces = []
+            for gcm, df in gcm_results.items():
+                s = _annual_sum(df, metric)
+                if not s.empty:
+                    pieces.append(s.rename(gcm))
+            if not pieces:
+                continue
+
+            yearly_wide = pd.concat(pieces, axis=1).sort_index()
+
+            st.markdown(f"**{label}**")
+            # 折れ線グラフ（年×5GCM）
+            st.line_chart(yearly_wide, height=280, use_container_width=True)
+
+            # ダウンロード（そのまま維持）
+            csv_bytes = yearly_wide.to_csv(index_label="year").encode("utf-8")
+            st.download_button(
+                f"{label}（年別合計, 折れ線, 5 GCM）CSV を保存",
+                data=csv_bytes,
+                file_name=f"annual_{metric}_5gcm_ssp{ssp_code}_{start_year}-{last_year}.csv",
+                mime="text/csv",
+                key=f"dl_{metric}"
+            )
+
 
     # AMeDAS 再現出力の保存
     if amedas_result is not None:
