@@ -5,3 +5,4 @@ sde-prep
 *.vdfx
 *.3vmfx
 data
+out_metrics
