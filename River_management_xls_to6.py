@@ -976,33 +976,54 @@ def wild_animal_damage():
 
 
 @component.add(
-    name="Landslide disaster risk",
+    name="Scenario adjusted daily precipitation upstream",
+    units="mm/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"daily_precip_up": 1, "daily_precipitation_future_ratio": 1},
+)
+def scenario_adjusted_daily_precip_up():
+    return daily_precip_up() * daily_precipitation_future_ratio()
+
+
+@component.add(
+    name="Forest mitigation",
+    units="mm/day",
     comp_type="Auxiliary",
     comp_subtype="Normal",
     depends_on={
-        "daily_precip_up": 1,
-        "daily_precipitation_future_ratio": 1,
-        "erosion_control_dam_capacity": 2,
         "forest_area": 1,
         "upstream_area": 1,
         "erosion_control_of_forest": 1,
         "forest_function_coef": 1,
     },
 )
+def forest_mitigation():
+    return (
+        forest_area()
+        / upstream_area()
+        * erosion_control_of_forest()
+        * forest_function_coef()
+    )
+
+
+@component.add(
+    name="Landslide disaster risk",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "scenario_adjusted_daily_precip_up": 1,
+        "forest_mitigation": 1,
+        "landslide_design_daily_precipitation": 1,
+    },
+)
 def landslide_disaster_risk():
     return float(
         np.maximum(
             (
-                daily_precip_up() * daily_precipitation_future_ratio()
-                - (
-                    erosion_control_dam_capacity()
-                    + forest_area()
-                    / upstream_area()
-                    * erosion_control_of_forest()
-                    * forest_function_coef()
-                )
+                scenario_adjusted_daily_precip_up() - forest_mitigation()
             )
-            / erosion_control_dam_capacity(),
+            / landslide_design_daily_precipitation(),
             0,
         )
     )
@@ -1271,6 +1292,7 @@ def initial_paddy_dam_ratio():
     depends_on={
         "natural_forest_area": 1,
         "managed_plantation_forest_area": 1,
+        "managed_plantation_forest_coef": 1,
         "unmanaged_plantation_forest_area": 1,
         "unmanaged_plantation_forest_coef": 1,
         "forest_area": 1,
@@ -1283,7 +1305,7 @@ def biodiversity():
     """
     return (
         natural_forest_area()
-        + managed_plantation_forest_area()
+        + managed_plantation_forest_area() * managed_plantation_forest_coef()
         + unmanaged_plantation_forest_area() * unmanaged_plantation_forest_coef()
     ) / forest_area()
 
@@ -1320,7 +1342,11 @@ def accumulated_precipitation_jul_sep():
 
 
 _integ_accumulated_precipitation_jul_sep = Integ(
-    lambda: daily_precip_down() * julsep_accumulation_window()
+    # Keep raw daily precipitation as an output, but apply the climate-scenario
+    # multiplier to the precipitation explanatory variable used for yield.
+    lambda: daily_precip_down()
+    * daily_precipitation_future_ratio()
+    * julsep_accumulation_window()
     - reset_heat_stress_each_year()
     * accumulated_precipitation_jul_sep()
     / time_step(),
@@ -1755,13 +1781,30 @@ def recovery_ratio():
 
 @component.add(
     name="Paddy dam investment",
+    units="Yen/day",
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"paddy_dam_ratio": 1, "annual_paddy_dam_investment": 1},
+    depends_on={
+        "annual_paddy_dam_investment": 1,
+        "current_year_length": 1,
+        "paddy_field_ratio": 1,
+        "downstream_area": 1,
+        "paddy_dam_area": 1,
+        "paddy_dam_cost_per_area": 1,
+    },
 )
 def paddy_dam_investment():
-    return if_then_else(
-        paddy_dam_ratio() < 1, lambda: annual_paddy_dam_investment(), lambda: 0
+    """Annual budget converted to a daily rate and capped at full coverage."""
+    remaining_cost = float(
+        np.maximum(
+            paddy_field_ratio() * downstream_area() - paddy_dam_area(), 0
+        )
+        * paddy_dam_cost_per_area()
+    )
+    return float(
+        np.minimum(
+            annual_paddy_dam_investment() / current_year_length(), remaining_cost
+        )
     )
 
 
@@ -1807,6 +1850,17 @@ _integ_damaged_houses = Integ(
 
 
 @component.add(
+    name="Innundation risk policy share",
+    limits=(0.0, 1.0, 0.1),
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def innundation_risk_policy_share():
+    """Fixed half-share of migration and elevation capacity for innundation risk."""
+    return 0.5
+
+
+@component.add(
     name="Outflow of houses in risky area",
     units="house",
     comp_type="Auxiliary",
@@ -1814,16 +1868,21 @@ _integ_damaged_houses = Integ(
     depends_on={
         "houses_in_inundation_risk": 1,
         "outflow_rate_of_residents": 1,
+        "innundation_risk_policy_share": 1,
         "number_of_house_elevation": 1,
         "number_of_migration": 1,
+        "current_year_length": 1,
         "houses_damaged_by_inundation": 1,
+        "innundation_only_policy_outflow": 1,
+        "overlapping_risk_policy_outflow_from_inundation": 1,
     },
 )
 def outflow_of_houses_in_risky_area():
+    """Total daily outflow from the inner-flood-risk population."""
     return (
         houses_in_inundation_risk() * outflow_rate_of_residents()
-        + number_of_house_elevation() / 365
-        + number_of_migration() / 365
+        + innundation_only_policy_outflow()
+        + overlapping_risk_policy_outflow_from_inundation()
         + houses_damaged_by_inundation()
     )
 
@@ -1841,6 +1900,7 @@ def inflow_of_damaged_houses():
 
 @component.add(
     name="Municipality cost",
+    units="Yen/day",
     comp_type="Auxiliary",
     comp_subtype="Normal",
     depends_on={
@@ -1851,19 +1911,21 @@ def inflow_of_damaged_houses():
         "migration_cost": 1,
         "drainage_investment": 1,
         "paddy_dam_investment": 1,
-        "annual_breeding_investment": 1,
+        "breeding_investment": 1,
+        "current_year_length": 1,
     },
 )
 def municipality_cost():
+    """Daily municipal expenditure with annual policy costs converted to daily rates."""
     return (
         green_infrastructure_cost()
-        + forest_management_cost()
+        + forest_management_cost() / current_year_length()
         + infrastructure_cost()
-        + house_elevation_cost()
-        + migration_cost()
+        + house_elevation_cost() / current_year_length()
+        + migration_cost() / current_year_length()
         + drainage_investment()
         + paddy_dam_investment()
-        + annual_breeding_investment()
+        + breeding_investment()
     )
 
 
@@ -1880,6 +1942,17 @@ def annual_breeding_investment():
 
 
 @component.add(
+    name="Breeding investment",
+    units="Yen/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"annual_breeding_investment": 1, "current_year_length": 1},
+)
+def breeding_investment():
+    return annual_breeding_investment() / current_year_length()
+
+
+@component.add(
     name="Forest management cost",
     units="Yen/Year",
     comp_type="Auxiliary",
@@ -1892,6 +1965,28 @@ def forest_management_cost():
 
 
 @component.add(
+    name="Additional forest management cost",
+    units="Yen/Year",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "managed_plantation_forest_area": 1,
+        "initial_managed_plantation_forest_area": 1,
+    },
+)
+def additional_forest_management_cost():
+    """Annual management cost added by newly managed plantation area."""
+    return float(
+        np.maximum(
+            managed_plantation_forest_area()
+            - initial_managed_plantation_forest_area(),
+            0,
+        )
+        * 37200
+    )
+
+
+@component.add(
     name="Accumulated breeding investment",
     units="Yen",
     comp_type="Stateful",
@@ -1901,8 +1996,7 @@ def forest_management_cost():
         "_integ_accumulated_breeding_investment": {
             "initial": {},
             "step": {
-                "annual_breeding_investment": 1,
-                "current_year_length": 1,
+                "breeding_investment": 1,
             },
         }
     },
@@ -1912,7 +2006,7 @@ def accumulated_breeding_investment():
 
 
 _integ_accumulated_breeding_investment = Integ(
-    lambda: annual_breeding_investment() / current_year_length(),
+    lambda: breeding_investment(),
     lambda: 0,
     "_integ_accumulated_breeding_investment",
 )
@@ -2057,15 +2151,50 @@ def drainage_investment_amount():
 
 
 @component.add(
+    name="Drainage investment start time",
+    units="Day",
+    limits=(0.0, 10000.0, 1.0),
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def drainage_investment_start_time():
+    return 0
+
+
+@component.add(
+    name="Drainage investment duration",
+    units="Day",
+    limits=(1.0, 366.0, 1.0),
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def drainage_investment_duration():
+    return 365
+
+
+@component.add(
     name="Drainage investment",
     units="Yen",
     limits=(0.0, 10000000000.0, 100000000.0),
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"drainage_investment_amount": 1, "time": 1},
+    depends_on={
+        "drainage_investment_amount": 1,
+        "drainage_investment_start_time": 1,
+        "drainage_investment_duration": 2,
+        "time": 1,
+    },
 )
 def drainage_investment():
-    return drainage_investment_amount() * pulse(__data["time"], 0, width=365) / 365
+    return (
+        drainage_investment_amount()
+        * pulse(
+            __data["time"],
+            drainage_investment_start_time(),
+            width=drainage_investment_duration(),
+        )
+        / drainage_investment_duration()
+    )
 
 
 @component.add(
@@ -2077,7 +2206,10 @@ def drainage_investment():
     other_deps={
         "_integ_discharge_allowance": {
             "initial": {"current_highwater_discharge": 1, "peaktomean_flow_ratio": 1},
-            "step": {"levee_level_increase": 1},
+            "step": {
+                "levee_level_increase": 1,
+                "peaktomean_flow_ratio": 1,
+            },
         }
     },
 )
@@ -2089,7 +2221,11 @@ def discharge_allowance():
 
 
 _integ_discharge_allowance = Integ(
-    lambda: levee_level_increase(),
+    # Levee capacity is stored at the peak-flow scale. Convert it to the
+    # model's daily mean-flow scale here. The 7,200 m3/s planning target is
+    # deliberately not a hard ceiling: future climate scenarios may justify
+    # further channel improvement beyond the current long-term plan.
+    lambda: levee_level_increase() / peaktomean_flow_ratio(),
     lambda: current_highwater_discharge() * 60 * 60 * 24 / peaktomean_flow_ratio(),
     "_integ_discharge_allowance",
 )
@@ -2110,12 +2246,19 @@ def green_infrastructure_cost():
 @component.add(
     name="Level per levee investment",
     units="m3/day/Yen",
-    limits=(0.0, 10000.0, 100.0),
     comp_type="Constant",
     comp_subtype="Normal",
 )
 def level_per_levee_investment():
-    return 1000
+    """
+    Peak-flow-scale daily capacity gained per Yen of levee investment.
+    A 2,000 m3/s increase (5,200 to 7,200 m3/s) over 20 years at
+    5 billion Yen/year costs 100 billion Yen:
+    2,000 * 86,400 / 100,000,000,000 = 0.001728 m3/day/Yen.
+    `discharge_allowance` divides this peak-scale increment by the
+    peak-to-mean flow ratio before comparing it with daily model flow.
+    """
+    return 0.001728
 
 
 @component.add(
@@ -2168,26 +2311,42 @@ def levee_investment_amount():
     depends_on={
         "levee_investment_amount": 1,
         "levee_investment_start_time": 1,
+        "levee_investment_duration": 2,
         "time": 1,
     },
 )
 def levee_investment():
     return (
         levee_investment_amount()
-        * pulse(__data["time"], levee_investment_start_time() * 365, width=365)
-        / 365
+        * pulse(
+            __data["time"],
+            levee_investment_start_time(),
+            width=levee_investment_duration(),
+        )
+        / levee_investment_duration()
     )
 
 
 @component.add(
     name="Levee investment start time",
-    units="Year",
-    limits=(0.0, 10.0, 1.0),
+    units="Day",
+    limits=(0.0, 10000.0, 1.0),
     comp_type="Constant",
     comp_subtype="Normal",
 )
 def levee_investment_start_time():
     return 0
+
+
+@component.add(
+    name="Levee investment duration",
+    units="Day",
+    limits=(1.0, 366.0, 1.0),
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def levee_investment_duration():
+    return 365
 
 
 @component.add(
@@ -2202,13 +2361,24 @@ def dam_investment_amount():
 
 @component.add(
     name="Dam investment start time",
-    units="Year",
-    limits=(0.0, 11.0, 1.0),
+    units="Day",
+    limits=(0.0, 10000.0, 1.0),
     comp_type="Constant",
     comp_subtype="Normal",
 )
 def dam_investment_start_time():
     return 0
+
+
+@component.add(
+    name="Dam investment duration",
+    units="Day",
+    limits=(1.0, 366.0, 1.0),
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def dam_investment_duration():
+    return 365
 
 
 @component.add(
@@ -2248,13 +2418,22 @@ def initial_dam_capacity():
     limits=(0.0, 100000000000.0, 1000000000.0),
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"dam_investment_amount": 1, "time": 1, "dam_investment_start_time": 1},
+    depends_on={
+        "dam_investment_amount": 1,
+        "time": 1,
+        "dam_investment_start_time": 1,
+        "dam_investment_duration": 2,
+    },
 )
 def dam_investment():
     return (
         dam_investment_amount()
-        * pulse(__data["time"], dam_investment_start_time() * 365, width=365)
-        / 365
+        * pulse(
+            __data["time"],
+            dam_investment_start_time(),
+            width=dam_investment_duration(),
+        )
+        / dam_investment_duration()
     )
 
 
@@ -2498,7 +2677,8 @@ def crop_price_quality_factor():
     comp_subtype="Normal",
 )
 def crop_price():
-    return 4000
+    # 2009-2023 producer-price representative value (Yen/kg).
+    return 250
 
 
 @component.add(
@@ -2535,42 +2715,311 @@ def natural_forest_area():
 
 
 @component.add(
-    name="Managed plantation forest area",
+    name="Initial managed plantation forest area",
     units="ha",
     comp_type="Auxiliary",
     comp_subtype="Normal",
     depends_on={"forest_area": 1},
 )
-def managed_plantation_forest_area():
+def initial_managed_plantation_forest_area():
+    """Initial 30% of forest area is assumed to be managed plantation."""
     return forest_area() * 0.3
+
+
+@component.add(
+    name="Annual forest management conversion area",
+    units="ha/Year",
+    limits=(0.0, np.nan, 1.0),
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def annual_forest_management_conversion_area():
+    """Area of unmanaged plantation brought under management each year."""
+    return 0
+
+
+@component.add(
+    name="Forest management conversion",
+    units="ha/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "annual_forest_management_conversion_area": 1,
+        "unmanaged_plantation_forest_area": 1,
+        "current_year_length": 1,
+    },
+)
+def forest_management_conversion():
+    """Do not convert more unmanaged plantation than remains available."""
+    return float(
+        np.minimum(
+            annual_forest_management_conversion_area() / current_year_length(),
+            unmanaged_plantation_forest_area() / current_year_length(),
+        )
+    )
 
 
 @component.add(
     name="Unmanaged plantation forest area",
     units="ha",
-    comp_type="Auxiliary",
-    comp_subtype="Normal",
-    depends_on={"forest_area": 1},
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_unmanaged_plantation_forest_area": 1},
+    other_deps={
+        "_integ_unmanaged_plantation_forest_area": {
+            "initial": {"forest_area": 1},
+            "step": {"forest_management_conversion": 1},
+        }
+    },
 )
 def unmanaged_plantation_forest_area():
-    return forest_area() * 0.3
+    return _integ_unmanaged_plantation_forest_area()
+
+
+_integ_unmanaged_plantation_forest_area = Integ(
+    lambda: -forest_management_conversion(),
+    lambda: forest_area() * 0.3,
+    "_integ_unmanaged_plantation_forest_area",
+)
+
+
+@component.add(
+    name="Managed plantation recovery stage 0",
+    units="ha",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_managed_plantation_recovery_stage_0": 1},
+    other_deps={
+        "_integ_managed_plantation_recovery_stage_0": {
+            "initial": {},
+            "step": {"forest_management_conversion": 1, "current_year_length": 1},
+        }
+    },
+)
+def managed_plantation_recovery_stage_0():
+    return _integ_managed_plantation_recovery_stage_0()
+
+
+_integ_managed_plantation_recovery_stage_0 = Integ(
+    lambda: forest_management_conversion()
+    - managed_plantation_recovery_stage_0() / current_year_length(),
+    lambda: 0,
+    "_integ_managed_plantation_recovery_stage_0",
+)
+
+
+@component.add(
+    name="Managed plantation recovery stage 1",
+    units="ha",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_managed_plantation_recovery_stage_1": 1},
+    other_deps={
+        "_integ_managed_plantation_recovery_stage_1": {
+            "initial": {},
+            "step": {"managed_plantation_recovery_stage_0": 1, "current_year_length": 1},
+        }
+    },
+)
+def managed_plantation_recovery_stage_1():
+    return _integ_managed_plantation_recovery_stage_1()
+
+
+_integ_managed_plantation_recovery_stage_1 = Integ(
+    lambda: managed_plantation_recovery_stage_0() / current_year_length()
+    - managed_plantation_recovery_stage_1() / current_year_length(),
+    lambda: 0,
+    "_integ_managed_plantation_recovery_stage_1",
+)
+
+
+@component.add(
+    name="Managed plantation recovery stage 2",
+    units="ha",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_managed_plantation_recovery_stage_2": 1},
+    other_deps={
+        "_integ_managed_plantation_recovery_stage_2": {
+            "initial": {},
+            "step": {"managed_plantation_recovery_stage_1": 1, "current_year_length": 1},
+        }
+    },
+)
+def managed_plantation_recovery_stage_2():
+    return _integ_managed_plantation_recovery_stage_2()
+
+
+_integ_managed_plantation_recovery_stage_2 = Integ(
+    lambda: managed_plantation_recovery_stage_1() / current_year_length()
+    - managed_plantation_recovery_stage_2() / current_year_length(),
+    lambda: 0,
+    "_integ_managed_plantation_recovery_stage_2",
+)
+
+
+@component.add(
+    name="Managed plantation recovery stage 3",
+    units="ha",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_managed_plantation_recovery_stage_3": 1},
+    other_deps={
+        "_integ_managed_plantation_recovery_stage_3": {
+            "initial": {},
+            "step": {"managed_plantation_recovery_stage_2": 1, "current_year_length": 1},
+        }
+    },
+)
+def managed_plantation_recovery_stage_3():
+    return _integ_managed_plantation_recovery_stage_3()
+
+
+_integ_managed_plantation_recovery_stage_3 = Integ(
+    lambda: managed_plantation_recovery_stage_2() / current_year_length()
+    - managed_plantation_recovery_stage_3() / current_year_length(),
+    lambda: 0,
+    "_integ_managed_plantation_recovery_stage_3",
+)
+
+
+@component.add(
+    name="Managed plantation recovery stage 4",
+    units="ha",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_managed_plantation_recovery_stage_4": 1},
+    other_deps={
+        "_integ_managed_plantation_recovery_stage_4": {
+            "initial": {},
+            "step": {"managed_plantation_recovery_stage_3": 1, "current_year_length": 1},
+        }
+    },
+)
+def managed_plantation_recovery_stage_4():
+    return _integ_managed_plantation_recovery_stage_4()
+
+
+_integ_managed_plantation_recovery_stage_4 = Integ(
+    lambda: managed_plantation_recovery_stage_3() / current_year_length()
+    - managed_plantation_recovery_stage_4() / current_year_length(),
+    lambda: 0,
+    "_integ_managed_plantation_recovery_stage_4",
+)
+
+
+@component.add(
+    name="Managed plantation recovery stage 5",
+    units="ha",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_managed_plantation_recovery_stage_5": 1},
+    other_deps={
+        "_integ_managed_plantation_recovery_stage_5": {
+            "initial": {},
+            "step": {"managed_plantation_recovery_stage_4": 1, "current_year_length": 1},
+        }
+    },
+)
+def managed_plantation_recovery_stage_5():
+    return _integ_managed_plantation_recovery_stage_5()
+
+
+_integ_managed_plantation_recovery_stage_5 = Integ(
+    lambda: managed_plantation_recovery_stage_4() / current_year_length()
+    - managed_plantation_recovery_stage_5() / current_year_length(),
+    lambda: 0,
+    "_integ_managed_plantation_recovery_stage_5",
+)
+
+
+@component.add(
+    name="Managed plantation forest area",
+    units="ha",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "initial_managed_plantation_forest_area": 1,
+        "managed_plantation_recovery_stage_0": 1,
+        "managed_plantation_recovery_stage_1": 1,
+        "managed_plantation_recovery_stage_2": 1,
+        "managed_plantation_recovery_stage_3": 1,
+        "managed_plantation_recovery_stage_4": 1,
+        "managed_plantation_recovery_stage_5": 1,
+        "managed_plantation_forest_mature_area": 1,
+    },
+)
+def managed_plantation_forest_area():
+    return (
+        initial_managed_plantation_forest_area()
+        + managed_plantation_recovery_stage_0()
+        + managed_plantation_recovery_stage_1()
+        + managed_plantation_recovery_stage_2()
+        + managed_plantation_recovery_stage_3()
+        + managed_plantation_recovery_stage_4()
+        + managed_plantation_recovery_stage_5()
+        + managed_plantation_forest_mature_area()
+    )
+
+
+@component.add(
+    name="Managed plantation forest mature area",
+    units="ha",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_managed_plantation_forest_mature_area": 1},
+    other_deps={
+        "_integ_managed_plantation_forest_mature_area": {
+            "initial": {},
+            "step": {
+                "managed_plantation_recovery_stage_5": 1,
+                "current_year_length": 1,
+            },
+        }
+    },
+)
+def managed_plantation_forest_mature_area():
+    return _integ_managed_plantation_forest_mature_area()
+
+
+_integ_managed_plantation_forest_mature_area = Integ(
+    lambda: managed_plantation_recovery_stage_5() / current_year_length(),
+    lambda: 0,
+    "_integ_managed_plantation_forest_mature_area",
+)
 
 
 @component.add(
     name="Managed plantation forest coef",
     comp_type="Auxiliary",
     comp_subtype="Normal",
+    depends_on={"managed_plantation_forest_area": 1},
 )
 def managed_plantation_forest_coef():
-    """
-    現時点では管理状態を固定し、将来の管理率変更拡張のための定義だけ残す。
-    """
-    return 1.0
+    managed_area = managed_plantation_forest_area()
+    if managed_area <= 0:
+        return 1.0
+    recovering_functional_area = (
+        managed_plantation_recovery_stage_0() * 0.70
+        + managed_plantation_recovery_stage_1() * 0.75
+        + managed_plantation_recovery_stage_2() * 0.80
+        + managed_plantation_recovery_stage_3() * 0.85
+        + managed_plantation_recovery_stage_4() * 0.90
+        + managed_plantation_recovery_stage_5() * 0.95
+    )
+    return (
+        initial_managed_plantation_forest_area()
+        + managed_plantation_forest_mature_area()
+        + recovering_functional_area
+    ) / managed_area
 
 
 @component.add(
     name="Unmanaged plantation forest coef",
-    comp_type="Auxiliary",
+    # This is an externally configurable uncertainty parameter, not a
+    # calculated model variable. Keeping it constant allows PySD to accept
+    # scenario and sensitivity-study values without replacing an auxiliary.
+    comp_type="Constant",
     comp_subtype="Normal",
 )
 def unmanaged_plantation_forest_coef():
@@ -2624,11 +3073,25 @@ def forest_area_ratio():
         "daily_crop_production": 1,
         "financial_damage_by_innundation": 1,
         "financial_damage_by_flood": 1,
+        "flood_only_risk_houses": 1,
+        "innundation_only_risk_houses": 1,
+        "overlapping_risk_houses": 1,
+        "elevated_houses": 1,
     },
 )
 def daily_total_gdp():
+    # Flood and inner-flood damages are intentionally additive. A household
+    # exposed to both hazards may incur compounded damage, so no overlap
+    # adjustment is applied to these two loss terms.
     return (
-        (houses_in_inundation_risk() + houses_in_nonrisky_area()) * gdp_per_resident()
+        (
+            flood_only_risk_houses()
+            + innundation_only_risk_houses()
+            + overlapping_risk_houses()
+            + houses_in_nonrisky_area()
+            + elevated_houses()
+        )
+        * gdp_per_resident()
         + daily_crop_production()
         - financial_damage_by_innundation()
         - financial_damage_by_flood()
@@ -3053,6 +3516,17 @@ def flood_risky_area_ratio():
 
 
 @component.add(
+    name="Flood risk policy share",
+    limits=(0.0, 1.0, 0.1),
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def flood_risk_policy_share():
+    """Fixed half-share of migration and elevation capacity for flood risk."""
+    return 0.5
+
+
+@component.add(
     name="Inflow of houses in flood risk", comp_type="Constant", comp_subtype="Normal"
 )
 def inflow_of_houses_in_flood_risk():
@@ -3078,31 +3552,14 @@ def flood_water_level():
 
 @component.add(
     name="Houses in flood risk",
-    comp_type="Stateful",
-    comp_subtype="Integ",
-    depends_on={"_integ_houses_in_flood_risk": 1},
-    other_deps={
-        "_integ_houses_in_flood_risk": {
-            "initial": {},
-            "step": {
-                "inflow_of_houses_in_flood_risk": 1,
-                "outflow_of_houses_in_flood_risk": 1,
-            },
-        }
-    },
+    units="house",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"flood_only_risk_houses": 1, "overlapping_risk_houses": 1},
 )
 def houses_in_flood_risk():
-    """
-    2026/04/06 282000世帯から、以下リンクの値を考慮して、50000世帯に 更。 https://www.qsr.mlit.go.jp/chikugo/site_files/file/bousai/ryuikichisuikyogi kai/r6/pro2.0chi-2.pdf
-    """
-    return _integ_houses_in_flood_risk()
-
-
-_integ_houses_in_flood_risk = Integ(
-    lambda: inflow_of_houses_in_flood_risk() - outflow_of_houses_in_flood_risk(),
-    lambda: 50000,
-    "_integ_houses_in_flood_risk",
-)
+    """Flood-risk households, including households exposed to both hazards."""
+    return flood_only_risk_houses() + overlapping_risk_houses()
 
 
 @component.add(
@@ -3171,10 +3628,22 @@ def houses_damaged_by_flood():
 
 
 @component.add(
-    name="Outflow of houses in flood risk", comp_type="Constant", comp_subtype="Normal"
+    name="Outflow of houses in flood risk",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "flood_risk_policy_share": 1,
+        "number_of_house_elevation": 1,
+        "number_of_migration": 1,
+        "current_year_length": 1,
+        "flood_only_policy_outflow": 1,
+        "overlapping_risk_policy_outflow_from_flood": 1,
+    },
 )
 def outflow_of_houses_in_flood_risk():
-    return 0
+    """Policy outflow from flood-risk households, including shared households."""
+    return flood_only_policy_outflow() + overlapping_risk_policy_outflow_from_flood()
 
 
 @component.add(
@@ -3769,6 +4238,17 @@ def current_highwater_discharge():
 
 
 @component.add(
+    name="Future high-water discharge",
+    units="m3/s",
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def future_highwater_discharge():
+    """Reference long-term channel allocation target; not a hard model ceiling."""
+    return 7200
+
+
+@component.add(
     name="Paddy field capacity per area",
     units="m3/ha",
     limits=(0.0, 2000.0, 100.0),
@@ -3793,15 +4273,44 @@ def paddy_field_productivity():
 
 
 @component.add(
+    name="Paddy field recovery years to 90 percent",
+    units="Year",
+    limits=(0.1, 10.0, 0.1),
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def paddy_field_recovery_years_to_90_percent():
+    """Recovery duration for flood-damaged paddy after the following year starts."""
+    return 2.0
+
+
+@component.add(
+    name="Paddy field recovery rate per day",
+    units="1/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"paddy_field_recovery_years_to_90_percent": 1},
+)
+def paddy_field_recovery_rate_per_day():
+    """Daily geometric rate that restores 90% over the configured duration."""
+    return 1 - 0.1 ** (1 / (365 * paddy_field_recovery_years_to_90_percent()))
+
+
+@component.add(
     name="Outflow of damaged paddy field",
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"carryover_damaged_paddy_field": 1, "day_of_year": 1},
+    depends_on={
+        "carryover_damaged_paddy_field": 1,
+        "paddy_field_recovery_rate_per_day": 1,
+        "day_of_year": 1,
+    },
 )
 def outflow_of_damaged_paddy_field():
     return if_then_else(
         day_of_year() > 0,
-        lambda: carryover_damaged_paddy_field() * 0.1,
+        lambda: carryover_damaged_paddy_field()
+        * paddy_field_recovery_rate_per_day(),
         lambda: 0,
     )
 
@@ -3825,14 +4334,14 @@ def upstream_area():
 
 
 @component.add(
-    name="Erosion control dam capacity",
+    name="Landslide design daily precipitation",
     units="mm/day",
     limits=(0.0, 1000.0, 100.0),
     comp_type="Constant",
     comp_subtype="Normal",
 )
-def erosion_control_dam_capacity():
-    return 200
+def landslide_design_daily_precipitation():
+    return 322
 
 
 @component.add(
@@ -3879,13 +4388,14 @@ def capacity_per_dam_investment():
 
 @component.add(
     name="Erosion control of forest",
-    units="mm/ha",
-    limits=(0.0, 100.0, 1.0),
-    comp_type="Constant",
+    units="mm/day",
+    comp_type="Auxiliary",
     comp_subtype="Normal",
+    depends_on={"waterholding_capacity_of_forest_base": 1},
 )
 def erosion_control_of_forest():
-    return 50
+    # Use the same sampled forest capacity for water retention and landslide mitigation.
+    return waterholding_capacity_of_forest_base()
 
 
 @component.add(
@@ -3951,7 +4461,7 @@ _integ_elevated_houses = Integ(
 
 @component.add(
     name="Migration cost",
-    units="Yen",
+    units="Yen/Year",
     comp_type="Auxiliary",
     comp_subtype="Normal",
     depends_on={"number_of_migration": 1, "unit_cost_of_migration": 1},
@@ -3973,7 +4483,7 @@ def number_of_house_elevation():
 
 @component.add(
     name="House elevation cost",
-    units="Yen",
+    units="Yen/Year",
     comp_type="Auxiliary",
     comp_subtype="Normal",
     depends_on={"number_of_house_elevation": 1, "unit_cost_of_elevation": 1},
@@ -4115,24 +4625,36 @@ def trees_per_area():
         "houses_in_nonrisky_area": 1,
         "inflow_rate_of_residents": 1,
         "number_of_migration": 1,
+        "current_year_length": 1,
     },
 )
 def inflow_of_houses_in_nonrisky_area():
     return (
         houses_in_nonrisky_area() * inflow_rate_of_residents()
-        + number_of_migration() / 365
+        # The two risk-area migration outflows sum to this total.
+        + number_of_migration() / current_year_length()
     )
 
 
 @component.add(
     name="Inflow of elevated houses",
-    units="house",
+    units="house/day",
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"number_of_house_elevation": 1},
+    depends_on={
+        "number_of_house_elevation": 1,
+        "current_year_length": 1,
+        "elevated_houses": 1,
+        "inflow_rate_of_residents": 1,
+    },
 )
 def inflow_of_elevated_houses():
-    return number_of_house_elevation() / 365
+    # Keep the normal resident inflow/outflow balance after elevation so that
+    # elevation changes exposure, not the number of economically active people.
+    return (
+        number_of_house_elevation() / current_year_length()
+        + elevated_houses() * inflow_rate_of_residents()
+    )
 
 
 @component.add(
@@ -4158,15 +4680,29 @@ def outflow_of_houses_in_nonrisky_area():
 
 
 @component.add(
-    name='"Water-holding Capacity of Forest"',
+    name="Waterholding capacity of forest base",
     units="mm",
-    limits=(200.0, 500.0, 10.0),
+    limits=(200.0, 250.0, 10.0),
     comp_type="Constant",
     comp_subtype="Normal",
-    depends_on={"forest_function_coef": 1},
+)
+def waterholding_capacity_of_forest_base():
+    return 225
+
+
+@component.add(
+    name='"Water-holding Capacity of Forest"',
+    units="mm",
+    limits=(150.0, 250.0, 10.0),
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "waterholding_capacity_of_forest_base": 1,
+        "forest_function_coef": 1,
+    },
 )
 def waterholding_capacity_of_forest():
-    return 200 * forest_function_coef()
+    return waterholding_capacity_of_forest_base() * forest_function_coef()
 
 
 @component.add(
@@ -4338,31 +4874,296 @@ def innundation_damage_per_resident():
     return 10000000.0 / 365
 
 
+@component.add(name="Initial total risk households", units="house", comp_type="Constant", comp_subtype="Normal")
+def initial_total_risk_households():
+    """Unique households exposed to at least one of flood or inner flooding."""
+    return 50000
+
+
+@component.add(name="Risk household overlap ratio", units="Dmnl", comp_type="Constant", comp_subtype="Normal")
+def risk_household_overlap_ratio():
+    """Share of unique risk households exposed to both flood and inner flooding."""
+    return 0.5
+
+
 @component.add(
-    name="Houses in inundation risk",
+    name="Flood only risk houses",
     units="house",
     comp_type="Stateful",
     comp_subtype="Integ",
-    depends_on={"_integ_houses_in_inundation_risk": 1},
+    depends_on={"_integ_flood_only_risk_houses": 1},
     other_deps={
-        "_integ_houses_in_inundation_risk": {
-            "initial": {},
+        "_integ_flood_only_risk_houses": {
+            "initial": {
+                "initial_total_risk_households": 1,
+                "risk_household_overlap_ratio": 1,
+            },
+            "step": {"flood_only_policy_outflow": 1},
+        }
+    },
+)
+def flood_only_risk_houses():
+    return _integ_flood_only_risk_houses()
+
+
+_integ_flood_only_risk_houses = Integ(
+    lambda: -flood_only_policy_outflow(),
+    lambda: initial_total_risk_households() * (1 - risk_household_overlap_ratio()) / 2,
+    "_integ_flood_only_risk_houses",
+)
+
+
+@component.add(
+    name="Innundation only risk houses",
+    units="house",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_innundation_only_risk_houses": 1},
+    other_deps={
+        "_integ_innundation_only_risk_houses": {
+            "initial": {
+                "initial_total_risk_households": 1,
+                "risk_household_overlap_ratio": 1,
+            },
             "step": {
-                "inflow_of_houses_in_risky_area": 1,
-                "outflow_of_houses_in_risky_area": 1,
+                "innundation_only_risk_house_inflow": 1,
+                "innundation_only_risk_house_outflow": 1,
             },
         }
     },
 )
-def houses_in_inundation_risk():
-    """
-    2026/04/06 Initial Valueを500000から5000に変更。記録としては最大3000程度（20 23年）で、それに合うように。 2026/04/08 一旦500000に戻してみるか・・・ 洪水の方と合わせて50000にしてみる。
-    """
-    return _integ_houses_in_inundation_risk()
+def innundation_only_risk_houses():
+    return _integ_innundation_only_risk_houses()
 
 
-_integ_houses_in_inundation_risk = Integ(
-    lambda: inflow_of_houses_in_risky_area() - outflow_of_houses_in_risky_area(),
-    lambda: 50000,
-    "_integ_houses_in_inundation_risk",
+_integ_innundation_only_risk_houses = Integ(
+    lambda: innundation_only_risk_house_inflow() - innundation_only_risk_house_outflow(),
+    lambda: initial_total_risk_households() * (1 - risk_household_overlap_ratio()) / 2,
+    "_integ_innundation_only_risk_houses",
 )
+
+
+@component.add(
+    name="Overlapping risk houses",
+    units="house",
+    comp_type="Stateful",
+    comp_subtype="Integ",
+    depends_on={"_integ_overlapping_risk_houses": 1},
+    other_deps={
+        "_integ_overlapping_risk_houses": {
+            "initial": {
+                "initial_total_risk_households": 1,
+                "risk_household_overlap_ratio": 1,
+            },
+            "step": {
+                "overlapping_risk_house_inflow": 1,
+                "overlapping_risk_house_outflow": 1,
+            },
+        }
+    },
+)
+def overlapping_risk_houses():
+    return _integ_overlapping_risk_houses()
+
+
+_integ_overlapping_risk_houses = Integ(
+    lambda: overlapping_risk_house_inflow() - overlapping_risk_house_outflow(),
+    lambda: initial_total_risk_households() * risk_household_overlap_ratio(),
+    "_integ_overlapping_risk_houses",
+)
+
+
+@component.add(
+    name="Innundation risk household share",
+    units="Dmnl",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"innundation_only_risk_houses": 1, "houses_in_inundation_risk": 1},
+)
+def innundation_risk_household_share():
+    return innundation_only_risk_houses() / max(houses_in_inundation_risk(), 1e-12)
+
+
+@component.add(
+    name="Overlapping risk household share",
+    units="Dmnl",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"overlapping_risk_houses": 1, "houses_in_inundation_risk": 1},
+)
+def overlapping_risk_household_share():
+    return overlapping_risk_houses() / max(houses_in_inundation_risk(), 1e-12)
+
+
+@component.add(
+    name="Flood only policy outflow",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "flood_risk_policy_share": 1,
+        "number_of_migration": 1,
+        "number_of_house_elevation": 1,
+        "current_year_length": 1,
+        "flood_only_risk_houses": 1,
+        "houses_in_flood_risk": 1,
+    },
+)
+def flood_only_policy_outflow():
+    return (
+        flood_risk_policy_share()
+        * (number_of_migration() + number_of_house_elevation())
+        / current_year_length()
+        * flood_only_risk_houses()
+        / max(houses_in_flood_risk(), 1e-12)
+    )
+
+
+@component.add(
+    name="Innundation only policy outflow",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "innundation_risk_policy_share": 1,
+        "number_of_migration": 1,
+        "number_of_house_elevation": 1,
+        "current_year_length": 1,
+        "innundation_only_risk_houses": 1,
+        "houses_in_inundation_risk": 1,
+    },
+)
+def innundation_only_policy_outflow():
+    return (
+        innundation_risk_policy_share()
+        * (number_of_migration() + number_of_house_elevation())
+        / current_year_length()
+        * innundation_only_risk_houses()
+        / max(houses_in_inundation_risk(), 1e-12)
+    )
+
+
+@component.add(
+    name="Overlapping risk policy outflow from flood",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "flood_risk_policy_share": 1,
+        "number_of_migration": 1,
+        "number_of_house_elevation": 1,
+        "current_year_length": 1,
+        "overlapping_risk_houses": 1,
+        "houses_in_flood_risk": 1,
+    },
+)
+def overlapping_risk_policy_outflow_from_flood():
+    return (
+        flood_risk_policy_share()
+        * (number_of_migration() + number_of_house_elevation())
+        / current_year_length()
+        * overlapping_risk_houses()
+        / max(houses_in_flood_risk(), 1e-12)
+    )
+
+
+@component.add(
+    name="Overlapping risk policy outflow from innundation",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "innundation_risk_policy_share": 1,
+        "number_of_migration": 1,
+        "number_of_house_elevation": 1,
+        "current_year_length": 1,
+        "overlapping_risk_houses": 1,
+        "houses_in_inundation_risk": 1,
+    },
+)
+def overlapping_risk_policy_outflow_from_inundation():
+    return (
+        innundation_risk_policy_share()
+        * (number_of_migration() + number_of_house_elevation())
+        / current_year_length()
+        * overlapping_risk_houses()
+        / max(houses_in_inundation_risk(), 1e-12)
+    )
+
+
+@component.add(
+    name="Innundation only risk house inflow",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"innundation_risk_household_share": 1, "inflow_of_houses_in_risky_area": 1},
+)
+def innundation_only_risk_house_inflow():
+    return innundation_risk_household_share() * inflow_of_houses_in_risky_area()
+
+
+@component.add(
+    name="Innundation only risk house outflow",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "innundation_risk_household_share": 1,
+        "houses_in_inundation_risk": 1,
+        "outflow_rate_of_residents": 1,
+        "houses_damaged_by_inundation": 1,
+        "innundation_only_policy_outflow": 1,
+    },
+)
+def innundation_only_risk_house_outflow():
+    return (
+        innundation_risk_household_share()
+        * (houses_in_inundation_risk() * outflow_rate_of_residents() + houses_damaged_by_inundation())
+        + innundation_only_policy_outflow()
+    )
+
+
+@component.add(
+    name="Overlapping risk house inflow",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"overlapping_risk_household_share": 1, "inflow_of_houses_in_risky_area": 1},
+)
+def overlapping_risk_house_inflow():
+    return overlapping_risk_household_share() * inflow_of_houses_in_risky_area()
+
+
+@component.add(
+    name="Overlapping risk house outflow",
+    units="house/day",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={
+        "overlapping_risk_household_share": 1,
+        "houses_in_inundation_risk": 1,
+        "outflow_rate_of_residents": 1,
+        "houses_damaged_by_inundation": 1,
+        "overlapping_risk_policy_outflow_from_flood": 1,
+        "overlapping_risk_policy_outflow_from_inundation": 1,
+    },
+)
+def overlapping_risk_house_outflow():
+    return (
+        overlapping_risk_household_share()
+        * (houses_in_inundation_risk() * outflow_rate_of_residents() + houses_damaged_by_inundation())
+        + overlapping_risk_policy_outflow_from_flood()
+        + overlapping_risk_policy_outflow_from_inundation()
+    )
+
+
+@component.add(
+    name="Houses in inundation risk",
+    units="house",
+    comp_type="Auxiliary",
+    comp_subtype="Normal",
+    depends_on={"innundation_only_risk_houses": 1, "overlapping_risk_houses": 1},
+)
+def houses_in_inundation_risk():
+    """Inner-flood-risk households, including households exposed to both hazards."""
+    return innundation_only_risk_houses() + overlapping_risk_houses()
