@@ -192,7 +192,7 @@ def solar_radiation_down():
 
 
 _ext_data_solar_radiation_down = ExtData(
-    r"data\jma_asakura_2009_2023.xlsx",
+    r"data/jma_asakura_2009_2023.xlsx",
     "input",
     "A",
     "F2",
@@ -219,7 +219,7 @@ def daily_ave_temp_down():
 
 
 _ext_data_daily_ave_temp_down = ExtData(
-    r"data\jma_asakura_2009_2023.xlsx",
+    r"data/jma_asakura_2009_2023.xlsx",
     "input",
     "A",
     "C2",
@@ -247,7 +247,7 @@ def daily_precip_down():
 
 
 _ext_data_daily_precip_down = ExtData(
-    r"data\jma_asakura_2009_2023.xlsx",
+    r"data/jma_asakura_2009_2023.xlsx",
     "input",
     "A",
     "B2",
@@ -274,7 +274,7 @@ def daily_min_temp_down():
 
 
 _ext_data_daily_min_temp_down = ExtData(
-    r"data\jma_asakura_2009_2023.xlsx",
+    r"data/jma_asakura_2009_2023.xlsx",
     "input",
     "A",
     "E2",
@@ -301,7 +301,7 @@ def daily_max_temp_down():
 
 
 _ext_data_daily_max_temp_down = ExtData(
-    r"data\jma_asakura_2009_2023.xlsx",
+    r"data/jma_asakura_2009_2023.xlsx",
     "input",
     "A",
     "D2",
@@ -1122,7 +1122,7 @@ def daily_min_temp_up():
 
 
 _ext_data_daily_min_temp_up = ExtData(
-    r"data\jma_hita_2009_2023.xlsx",
+    r"data/jma_hita_2009_2023.xlsx",
     "input",
     "A",
     "E2",
@@ -1153,7 +1153,7 @@ def solar_radiation_up():
 
 
 _ext_data_solar_radiation_up = ExtData(
-    r"data\jma_hita_2009_2023.xlsx",
+    r"data/jma_hita_2009_2023.xlsx",
     "input",
     "A",
     "F2",
@@ -1180,7 +1180,7 @@ def daily_ave_temp_up():
 
 
 _ext_data_daily_ave_temp_up = ExtData(
-    r"data\jma_hita_2009_2023.xlsx",
+    r"data/jma_hita_2009_2023.xlsx",
     "input",
     "A",
     "C2",
@@ -1207,7 +1207,7 @@ def daily_max_temp_up():
 
 
 _ext_data_daily_max_temp_up = ExtData(
-    r"data\jma_hita_2009_2023.xlsx",
+    r"data/jma_hita_2009_2023.xlsx",
     "input",
     "A",
     "D2",
@@ -1235,7 +1235,7 @@ def daily_precip_up():
 
 
 _ext_data_daily_precip_up = ExtData(
-    r"data\jma_hita_2009_2023.xlsx",
+    r"data/jma_hita_2009_2023.xlsx",
     "input",
     "A",
     "B2",

@@ -6,7 +6,7 @@ Translated using PySD
 from pathlib import Path
 import numpy as np
 
-from pysd.py_backend.functions import if_then_else, pulse
+from pysd.py_backend.functions import pulse, if_then_else
 from pysd.py_backend.statefuls import Integ, Delay
 from pysd.py_backend.external import ExtData
 from pysd import Component
@@ -186,10 +186,10 @@ def wild_animal_damage():
     depends_on={
         "daily_precip": 1,
         "daily_precipitation_future_ratio": 1,
-        "erosion_control_of_forest": 1,
-        "upstream_area": 1,
         "forest_area": 1,
+        "upstream_area": 1,
         "erosion_control_dam_capacity": 2,
+        "erosion_control_of_forest": 1,
     },
 )
 def landslide_disaster_risk():
@@ -713,7 +713,7 @@ def upstream_percolation():
     limits=(0.0, 1.0, 0.05),
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"paddy_dam_area": 1, "paddy_field_ratio": 1, "downstream_area": 1},
+    depends_on={"paddy_dam_area": 1, "downstream_area": 1, "paddy_field_ratio": 1},
 )
 def paddy_dam_ratio():
     return paddy_dam_area() / (paddy_field_ratio() * downstream_area())
@@ -751,9 +751,9 @@ def downstream_percolation():
     depends_on={
         "drainage_capacity": 1,
         "downstream_storage": 1,
-        "evaporation_downstream": 1,
-        "downstream_outflow": 1,
         "downstream_percolation": 1,
+        "downstream_outflow": 1,
+        "evaporation_downstream": 1,
     },
 )
 def drainage():
@@ -781,8 +781,8 @@ def drainage():
     depends_on={
         "downstream_outflow_ratio": 1,
         "downstream_storage": 2,
-        "evaporation_downstream": 1,
         "downstream_percolation": 1,
+        "evaporation_downstream": 1,
     },
 )
 def downstream_outflow():
@@ -1601,8 +1601,8 @@ def inflow_of_houses_in_flood_risk():
     comp_subtype="Normal",
     depends_on={
         "flood_water_amount": 1,
-        "flood_risky_area_ratio": 1,
         "downstream_area": 1,
+        "flood_risky_area_ratio": 1,
     },
 )
 def flood_water_level():
@@ -1770,8 +1770,8 @@ def houses_damaged_by_inundation():
     comp_subtype="Normal",
     depends_on={
         "inside_water_innundation_level": 1,
-        "innundation_risky_area_ratio": 1,
         "downstream_area": 1,
+        "innundation_risky_area_ratio": 1,
     },
 )
 def innundation_level():
@@ -1829,15 +1829,15 @@ def excessive_surface_flow():
             "initial": {
                 "current_planting_trees": 1,
                 "trees_per_area": 1,
-                "planting_start_time": 1,
                 "tree_growth_time": 1,
+                "planting_start_time": 1,
             },
             "step": {
                 "number_of_planting_trees": 1,
                 "trees_per_area": 2,
                 "current_planting_trees": 1,
-                "planting_start_time": 1,
                 "tree_growth_time": 1,
+                "planting_start_time": 1,
             },
         }
     },
@@ -2017,8 +2017,8 @@ def number_of_planting_trees():
     comp_subtype="Normal",
     depends_on={
         "innundation_level": 1,
-        "ratio_of_paddy_field_in_risky_area": 1,
         "paddy_field": 1,
+        "ratio_of_paddy_field_in_risky_area": 1,
     },
 )
 def inflow_of_damaged_paddy_field():
