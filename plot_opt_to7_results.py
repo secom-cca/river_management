@@ -20,6 +20,10 @@ FIG_DIR = Path("figures/opt_to7")
 SCENARIO_ORDER = ["present", "2C", "4C"]
 SCENARIO_LABELS = {"present": "Present", "2C": "2℃", "4C": "4℃"}
 SCENARIO_COLORS = {"present": "#1f77b4", "2C": "#ff7f0e", "4C": "#d62728"}
+# A single scenario-comparison figure must use one objective pattern. The
+# optimisation CSV has one row for each scenario/pattern combination.
+OBJECTIVE_PATTERN = "balanced"
+ACTIVE_SCENARIOS = []
 BUDGET_LIMIT = 5_000_000_000
 
 
@@ -49,7 +53,7 @@ def input_paths():
 
 
 def ordered(frame):
-    return frame.set_index("scenario").reindex(SCENARIO_ORDER).reset_index()
+    return frame.set_index("scenario").reindex(ACTIVE_SCENARIOS).reset_index()
 
 
 def save(fig, output_dir, name):
@@ -69,17 +73,17 @@ def plot_objective_changes(summary, output_dir):
     ]
     data = ordered(summary)
     x = np.arange(len(metrics))
-    width = 0.23
+    width = 0.75 / len(ACTIVE_SCENARIOS)
     fig, ax = plt.subplots(figsize=(11, 5.4))
 
-    for index, scenario in enumerate(SCENARIO_ORDER):
+    for index, scenario in enumerate(ACTIVE_SCENARIOS):
         row = data[data["scenario"] == scenario].iloc[0]
         values = []
         for column, label in metrics:
             ratio = float(row[column])
             values.append((1 - ratio) * 100 if "reduction" in label else (ratio - 1) * 100)
         ax.bar(
-            x + (index - 1) * width,
+            x + (index - (len(ACTIVE_SCENARIOS) - 1) / 2) * width,
             values,
             width=width,
             color=SCENARIO_COLORS[scenario],
@@ -96,8 +100,10 @@ def plot_objective_changes(summary, output_dir):
 
 def plot_annual_budget(yearly, output_dir):
     """Annual policy costs separated into known cost categories."""
-    fig, axes = plt.subplots(3, 1, figsize=(11, 9), sharex=True, sharey=True)
-    for ax, scenario in zip(axes, SCENARIO_ORDER):
+    fig, axes = plt.subplots(len(ACTIVE_SCENARIOS), 1, figsize=(11, 3 * len(ACTIVE_SCENARIOS)), sharex=True, sharey=True)
+    if len(ACTIVE_SCENARIOS) == 1:
+        axes = [axes]
+    for ax, scenario in zip(axes, ACTIVE_SCENARIOS):
         data = yearly[yearly["scenario"] == scenario].copy()
         data = data.sort_values("year")
         breeding = data["breeding_actual_cost"].to_numpy(dtype=float)
@@ -118,7 +124,7 @@ def plot_annual_budget(yearly, output_dir):
         ax.bar(years, breeding / scale, bottom=(other + paddy + forest) / scale, label="Breeding", color="#9b59b6")
         ax.axhline(BUDGET_LIMIT / scale, color="black", linestyle="--", linewidth=1, label="Annual budget limit")
         ax.set_title(SCENARIO_LABELS[scenario], loc="left", fontsize=11)
-        ax.set_ylabel("Annual cost (100 million Yen)")
+        ax.set_ylabel("Annual cost (100 M Yen)")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.06), frameon=False)
@@ -141,8 +147,10 @@ def plot_policy_schedule(decisions, output_dir):
         ("Breeding", "breeding_start_year", "breeding_end_year", "breeding_enabled", "#b279a2"),
         ("Forest management", "forest_management_start_year", "forest_management_end_year", "annual_forest_management_conversion_area", "#2f6f4e"),
     ]
-    fig, axes = plt.subplots(3, 1, figsize=(11, 10), sharex=True)
-    for ax, scenario in zip(axes, SCENARIO_ORDER):
+    fig, axes = plt.subplots(len(ACTIVE_SCENARIOS), 1, figsize=(11, 3.4 * len(ACTIVE_SCENARIOS)), sharex=True)
+    if len(ACTIVE_SCENARIOS) == 1:
+        axes = [axes]
+    for ax, scenario in zip(axes, ACTIVE_SCENARIOS):
         decision = decisions[decisions["scenario"] == scenario].iloc[0]
         for position, (label, start_col, end_col, value_col, color) in enumerate(rows):
             start = int(decision[start_col])
@@ -158,9 +166,9 @@ def plot_policy_schedule(decisions, output_dir):
                 end = int(decision[end_col])
                 ax.barh(position, end - start + 1, left=start, height=0.52, color=color, alpha=0.85)
                 if label == "Breeding":
-                    text = "50 million Yen/year"
+                    text = "50 M Yen/year"
                 elif "investment" in value_col:
-                    text = f"{value / 1e9:.1f} billion Yen/year"
+                    text = f"{value / 1e9:.1f} B Yen/year"
                 elif "area" in value_col:
                     text = f"{value:,.0f} ha/year"
                 else:
@@ -190,24 +198,27 @@ def plot_policy_schedule(decisions, output_dir):
 def plot_yearly_outcomes(yearly, output_dir):
     """Optimised annual trajectories; baseline annual trajectories were not saved."""
     metrics = [
-        ("flood_damage", "Flood damage (Yen)", 1e8),
-        ("innundation_damage", "Innundation damage (Yen)", 1e8),
+        ("flood_damage", "Flood damage", 1e8),
+        ("innundation_damage", "Innundation damage", 1e8),
         ("landslide_risk", "Landslide risk", 1),
-        ("crop_revenue", "Crop revenue (Yen)", 1e9),
+        ("crop_revenue", "Crop revenue", 1e9),
         ("biodiversity", "Biodiversity", 1),
     ]
-    fig, axes = plt.subplots(len(metrics), 1, figsize=(11, 12), sharex=True)
+    fig, axes = plt.subplots(len(metrics), 1, figsize=(12.5, 14), sharex=True)
     for ax, (column, label, scale) in zip(axes, metrics):
-        for scenario in SCENARIO_ORDER:
+        for scenario in ACTIVE_SCENARIOS:
             data = yearly[yearly["scenario"] == scenario].sort_values("year")
             ax.plot(data["year"], data[column] / scale, color=SCENARIO_COLORS[scenario], linewidth=2, label=SCENARIO_LABELS[scenario])
-        suffix = " (100 million Yen)" if scale == 1e8 else " (billion Yen)" if scale == 1e9 else ""
+        suffix = " (100 M Yen)" if scale == 1e8 else " (B Yen)" if scale == 1e9 else ""
         ax.set_ylabel(label + suffix)
         ax.grid(alpha=0.25)
     axes[0].legend(title="Climate scenario", ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.42), frameon=False)
     axes[-1].set_xlabel("Year")
     fig.suptitle("Annual outcomes for optimised policy portfolios", y=0.995)
-    save(fig, output_dir, "04_yearly_optimised_outcomes.png")
+    # Reserve room for long outcome labels and separate the five panels.
+    fig.tight_layout(rect=[0.22, 0.02, 0.99, 0.96], h_pad=1.2)
+    fig.savefig(output_dir / "04_yearly_optimised_outcomes.png", dpi=220, bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_policy_mechanisms(yearly, output_dir):
@@ -217,17 +228,17 @@ def plot_policy_mechanisms(yearly, output_dir):
         ("forest_function_coef", "Forest function coefficient", 1),
         ("managed_plantation_forest_area", "Managed plantation forest area (ha)", 1),
         ("unmanaged_plantation_forest_area", "Unmanaged plantation forest area (ha)", 1),
-        ("accumulated_breeding_investment", "Cumulative breeding investment (100 million Yen)", 1e8),
+        ("accumulated_breeding_investment", "Cumulative breeding investment (100 M Yen)", 1e8),
     ]
-    fig, axes = plt.subplots(len(metrics), 1, figsize=(11, 12), sharex=True)
+    fig, axes = plt.subplots(len(metrics), 1, figsize=(12.5, 14), sharex=True)
     for ax, (column, label, scale) in zip(axes, metrics):
-        for scenario in SCENARIO_ORDER:
+        for scenario in ACTIVE_SCENARIOS:
             data = yearly[yearly["scenario"] == scenario].sort_values("year")
             ax.plot(data["year"], data[column] / scale, color=SCENARIO_COLORS[scenario], linewidth=2, label=SCENARIO_LABELS[scenario])
             if column == "accumulated_breeding_investment":
                 success = data["breeding_success"].astype(float) > 0
                 ax.scatter(data.loc[success, "year"], data.loc[success, column] / scale, color=SCENARIO_COLORS[scenario], marker="*", s=60, zorder=3)
-        ax.set_ylabel(label)
+        ax.set_ylabel(label, fontsize=9)
         ax.grid(alpha=0.25)
     axes[0].legend(title="Climate scenario", ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.42), frameon=False)
     axes[-1].legend(
@@ -239,7 +250,7 @@ def plot_policy_mechanisms(yearly, output_dir):
                 linestyle="None",
                 color="#555555",
                 markersize=10,
-                label="Breeding success (cumulative investment >= 500 million Yen)",
+                label="Breeding success (cumulative investment >= 500 M Yen)",
             )
         ],
         loc="upper left",
@@ -247,14 +258,17 @@ def plot_policy_mechanisms(yearly, output_dir):
     )
     axes[-1].set_xlabel("Year")
     fig.suptitle("Policy mechanisms in the optimised portfolios", y=0.995)
-    save(fig, output_dir, "05_policy_mechanisms.png")
+    # Long state-variable labels need a wide left margin and panel spacing.
+    fig.tight_layout(rect=[0.22, 0.02, 0.99, 0.96], h_pad=1.2)
+    fig.savefig(output_dir / "05_policy_mechanisms.png", dpi=220, bbox_inches="tight")
+    plt.close(fig)
 
 
 def plot_cost_gdp_tradeoff(summary, output_dir):
     """Diagnostic trade-off: costs are constrained, not an optimisation objective."""
     data = ordered(summary)
     fig, ax = plt.subplots(figsize=(7.5, 5.5))
-    for scenario in SCENARIO_ORDER:
+    for scenario in ACTIVE_SCENARIOS:
         row = data[data["scenario"] == scenario].iloc[0]
         x = float(row["total_budget_utilisation"]) * 100
         y = (float(row["daily_total_gdp_vs_baseline_ratio"]) - 1) * 100
@@ -270,13 +284,22 @@ def plot_cost_gdp_tradeoff(summary, output_dir):
 
 
 def main():
+    global ACTIVE_SCENARIOS
     run_stamp, summary_path, decisions_path, yearly_path = input_paths()
-    output_dir = FIG_DIR / run_stamp
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     summary = pd.read_csv(summary_path, encoding="utf-8-sig")
     decisions = pd.read_csv(decisions_path, encoding="utf-8-sig")
     yearly = pd.read_csv(yearly_path, encoding="utf-8-sig")
+
+    summary = summary[summary["pattern"] == OBJECTIVE_PATTERN].copy()
+    decisions = decisions[decisions["pattern"] == OBJECTIVE_PATTERN].copy()
+    yearly = yearly[yearly["pattern"] == OBJECTIVE_PATTERN].copy()
+    if summary.empty:
+        raise ValueError(f"Objective pattern not found: {OBJECTIVE_PATTERN}")
+    ACTIVE_SCENARIOS = [
+        scenario for scenario in SCENARIO_ORDER if scenario in set(summary["scenario"])
+    ]
+    output_dir = FIG_DIR / run_stamp / OBJECTIVE_PATTERN
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     plot_objective_changes(summary, output_dir)
     plot_annual_budget(yearly, output_dir)
@@ -284,7 +307,10 @@ def main():
     plot_yearly_outcomes(yearly, output_dir)
     plot_policy_mechanisms(yearly, output_dir)
     plot_cost_gdp_tradeoff(summary, output_dir)
-    print(f"Saved six figures to: {output_dir}")
+    print(
+        f"Saved six figures for pattern '{OBJECTIVE_PATTERN}' and scenarios "
+        f"{ACTIVE_SCENARIOS} to: {output_dir}"
+    )
 
 
 if __name__ == "__main__":

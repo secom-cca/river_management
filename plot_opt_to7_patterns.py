@@ -60,7 +60,7 @@ def save(fig, output_dir, name):
     plt.close(fig)
 
 
-def plot_outcome_changes(summary, output_dir):
+def plot_outcome_changes(summary, output_dir, scenario):
     metrics = [
         ("flood_damage_vs_baseline_ratio", "Flood damage reduction"),
         ("innundation_damage_vs_baseline_ratio", "Innundation damage reduction"),
@@ -87,11 +87,11 @@ def plot_outcome_changes(summary, output_dir):
         ax.set_ylabel("Change from baseline (%)")
         ax.grid(axis="y", alpha=0.25)
 
-    fig.suptitle("Optimisation outcomes by objective pattern", y=1.03)
+    fig.suptitle(f"{scenario}: optimisation outcomes by objective pattern", y=1.03)
     save(fig, output_dir, "01_pattern_outcome_changes.png")
 
 
-def plot_budget_and_gdp(summary, output_dir):
+def plot_budget_and_gdp(summary, output_dir, scenario):
     data = ordered(summary)
     x = np.arange(len(data))
     labels = [PATTERN_LABELS[pattern] for pattern in data["pattern"]]
@@ -113,11 +113,11 @@ def plot_budget_and_gdp(summary, output_dir):
     axes[1].set_title("Total GDP diagnostic")
     axes[1].grid(axis="y", alpha=0.25)
 
-    fig.suptitle("Budget use and GDP diagnostic by objective pattern", y=1.02)
+    fig.suptitle(f"{scenario}: budget use and GDP diagnostic by objective pattern", y=1.02)
     save(fig, output_dir, "02_pattern_budget_and_gdp.png")
 
 
-def plot_policy_schedules(decisions, output_dir):
+def plot_policy_schedules(decisions, output_dir, scenario):
     policies = [
         ("Drainage", "drainage_start_year", None, "drainage_investment_amount"),
         ("Dam", "dam_start_year", None, "dam_investment_amount"),
@@ -158,24 +158,27 @@ def plot_policy_schedules(decisions, output_dir):
         ax.invert_yaxis()
 
     axes[-1].set_xlabel("Model year index (0 = 2009)")
-    fig.suptitle("Policy timing by objective pattern", y=0.995)
+    fig.suptitle(f"{scenario}: policy timing by objective pattern", y=0.995)
     save(fig, output_dir, "03_pattern_policy_schedules.png")
 
 
 def main():
     stem, summary_path, decisions_path, yearly_path = input_paths()
     run_stamp = "_".join(stem.rsplit("_", 2)[-2:])
-    output_dir = FIG_DIR / run_stamp
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     summary = pd.read_csv(summary_path, encoding="utf-8-sig")
     decisions = pd.read_csv(decisions_path, encoding="utf-8-sig")
     _ = pd.read_csv(yearly_path, encoding="utf-8-sig")
 
-    plot_outcome_changes(summary, output_dir)
-    plot_budget_and_gdp(summary, output_dir)
-    plot_policy_schedules(decisions, output_dir)
-    print(f"Saved pattern-comparison figures to: {output_dir}")
+    scenarios = list(summary["scenario"].drop_duplicates())
+    for scenario in scenarios:
+        scenario_summary = summary[summary["scenario"] == scenario].copy()
+        scenario_decisions = decisions[decisions["scenario"] == scenario].copy()
+        output_dir = FIG_DIR / run_stamp / "patterns" / scenario
+        output_dir.mkdir(parents=True, exist_ok=True)
+        plot_outcome_changes(scenario_summary, output_dir, scenario)
+        plot_budget_and_gdp(scenario_summary, output_dir, scenario)
+        plot_policy_schedules(scenario_decisions, output_dir, scenario)
+        print(f"Saved {scenario} pattern-comparison figures to: {output_dir}")
 
 
 if __name__ == "__main__":
