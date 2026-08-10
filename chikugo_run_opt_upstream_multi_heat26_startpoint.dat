@@ -1,0 +1,142 @@
+Upstream outflow ratio
+0 0.5
+Direct discharge ratio
+0 0.97
+Upstream percolation ratio
+0 0.2
+Upstream middle flow ratio
+0 0.5
+Upstream deep percolation ratio
+0 0.5
+Payoff
+0 -2095.25
+Best_Payoff
+0 -2095.25
+Simulations
+0 1
+Upstream outflow ratio
+1 0.322676
+Direct discharge ratio
+1 0.373779
+Upstream percolation ratio
+1 0.321243
+Upstream middle flow ratio
+1 0.6685
+Upstream deep percolation ratio
+1 0.757244
+Payoff
+1 -1319.27
+Simulations
+1 217
+Upstream outflow ratio
+2 0.229212
+Direct discharge ratio
+2 0.98944
+Upstream percolation ratio
+2 0.177125
+Upstream middle flow ratio
+2 0.706286
+Upstream deep percolation ratio
+2 0.270104
+Payoff
+2 -1215.78
+Simulations
+2 479
+Upstream outflow ratio
+3 0.552146
+Direct discharge ratio
+3 0.262116
+Upstream percolation ratio
+3 0.118678
+Upstream middle flow ratio
+3 0.178647
+Upstream deep percolation ratio
+3 0.869066
+Payoff
+3 -2488.31
+Simulations
+3 713
+Upstream outflow ratio
+4 0.442959
+Direct discharge ratio
+4 0.765328
+Upstream percolation ratio
+4 0.019595
+Upstream middle flow ratio
+4 0.504571
+Upstream deep percolation ratio
+4 0.960811
+Payoff
+4 -1909.99
+Simulations
+4 972
+Upstream outflow ratio
+5 0.146183
+Direct discharge ratio
+5 0.44564
+Upstream percolation ratio
+5 0.272778
+Upstream middle flow ratio
+5 0.210962
+Upstream deep percolation ratio
+5 0.15138
+Payoff
+5 -1069.55
+Simulations
+5 1261
+Upstream outflow ratio
+6 0.478632
+Direct discharge ratio
+6 0.312029
+Upstream percolation ratio
+6 0.395284
+Upstream middle flow ratio
+6 0.0742268
+Upstream deep percolation ratio
+6 0.415241
+Payoff
+6 -1979
+Simulations
+6 1731
+Upstream outflow ratio
+7 0.516859
+Direct discharge ratio
+7 0.965621
+Upstream percolation ratio
+7 0.0932324
+Upstream middle flow ratio
+7 0.901413
+Upstream deep percolation ratio
+7 0.429442
+Payoff
+7 -2334.4
+Simulations
+7 2255
+Upstream outflow ratio
+8 0.897392
+Direct discharge ratio
+8 0.431342
+Upstream percolation ratio
+8 0.452338
+Upstream middle flow ratio
+8 0.615136
+Upstream deep percolation ratio
+8 0.174543
+Payoff
+8 -2635.08
+Simulations
+8 2521
+Upstream outflow ratio
+9 0.515256
+Direct discharge ratio
+9 0.0975119
+Upstream percolation ratio
+9 0.276293
+Upstream middle flow ratio
+9 0.403663
+Upstream deep percolation ratio
+9 0.492724
+Payoff
+9 -2128.47
+Simulations
+9 2921

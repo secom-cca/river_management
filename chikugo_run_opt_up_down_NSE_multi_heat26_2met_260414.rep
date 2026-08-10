@@ -1,0 +1,23 @@
+The total payoff is	-5477.51
+   Policy elements	0
+   Calibration elements	-5477.51
+   Prior elements	0
+
+The following are the components of the payoff:
+Type	Component	Contribution	Percent	Values	Params&Data	Used	Skipped	Source	RSquare	DW	Autocor1	Autocor2	Autocor3	Autocor4	(TimeGap)	RMSE	Um	Us	Uc	MAE	MAPE	MAEoM
+*CG	NSE target|Zero/1	-2738.81	50.001	-2738.81	0	5479	0	
+*CG	NSE target d|Zero/1	-2738.7	49.999	-2738.7	0	5479	0	
+
+Sources for exogenous variables
+Daily ave temp down	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+Daily ave temp up	C:\Users\tomus\Documents\GitHub\river_management\data\jma_asakura_2009_2023.xlsx.vdfx
+Daily max temp down	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+Daily max temp up	C:\Users\tomus\Documents\GitHub\river_management\data\jma_asakura_2009_2023.xlsx.vdfx
+Daily min temp down	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+Daily min temp up	C:\Users\tomus\Documents\GitHub\river_management\data\jma_asakura_2009_2023.xlsx.vdfx
+Daily precip down	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+Daily precip up	C:\Users\tomus\Documents\GitHub\river_management\data\jma_asakura_2009_2023.xlsx.vdfx
+flow	C:\Users\tomus\Documents\GitHub\river_management\data\flow_arase_2009_2023_x100000_0to364_utf8.csv.vdfx
+flow d	C:\Users\tomus\Documents\GitHub\river_management\data\flow_senoshita_2009_2023_x100000_0to364_utf8.csv.vdfx
+Solar radiation down	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+Solar radiation up	C:\Users\tomus\Documents\GitHub\river_management\data\jma_asakura_2009_2023.xlsx.vdfx

@@ -18,7 +18,8 @@ time = list(range(0, 365, 1))
 
 # ---- パラメータ上書き（必要な場合のみ）----
 # opt_mode を切り替えると最適化済みパラメータを自動適用
-opt_mode = "opt_riv_dis_down"  # None or "opt_riv_dis_down"
+#opt_mode = "opt_riv_dis_down"  # None or "opt_riv_dis_down" #2026/01/07 以降、基本使わない. 
+opt_mode = "opt_riv_dis_up"  # None or "opt_riv_dis_up" #2026/01/07. 今後はこっちを使う. 
 
 params = {
     "daily_precipitation_future_ratio": 1,
@@ -41,6 +42,19 @@ if opt_mode == "opt_riv_dis_down":
             "upstream_deep_percolation_ratio": 0.922893,
         }
     )
+
+
+if opt_mode == "opt_riv_dis_up":#2026/01/07追加. 今後はこれを使う. 
+    params.update(
+        {
+            "upstream_outflow_ratio": 0.189252,
+            "direct_discharge_ratio": 0.663718,
+            "upstream_percolation_ratio": 0.499523,
+            "upstream_middle_flow_ratio": 0.400464,
+            "upstream_deep_percolation_ratio": 0.648598,
+        }
+    )
+
 
 # ---- 取得したい出力（スネークケース）----
 return_cols = [

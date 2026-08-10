@@ -1,0 +1,557 @@
+INFO:        Initial point of search.
+INFO:          Upstream outflow ratio = 0.5.
+INFO:          Downstream outflow ratio = 0.5.
+INFO:          Direct discharge ratio = 0.97.
+INFO:          Upstream percolation ratio = 0.2.
+INFO:          Downstream deep percolation ratio = 0.2.
+INFO:          Upstream middle flow ratio = 0.5.
+INFO:          Downstream percolation ratio = 0.2.
+INFO:          Downstream middle flow ratio = 0.5.
+INFO:          "Water-holding Capacity of Forest" = 200.
+INFO:          Upstream deep percolation ratio = 0.5.
+INFO:        Simulations = 1.
+INFO:        Optimizations = 1.
+INFO:        Pass = 0.
+INFO:        Payoff = -4732.05.
+INFO:        ---------------------------------.
+INFO:        NOTE Payoff (-307.367) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 250.
+INFO:        NOTE Payoff (-307.367) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 250 and 242.315.
+INFO:        NOTE Payoff (-287.849) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-287.849) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-274.683) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-274.683) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-273.057) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-273.057) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-271.8) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-271.8) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-267.549) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-267.549) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-267.211) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-267.211) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-264.058) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-264.058) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-263.913) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-263.913) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-258.975) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-258.975) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-254.436) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-254.436) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-251.158) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-251.158) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-248.336) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-248.336) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-245.75) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-245.75) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-245.426) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 242.315.
+INFO:        NOTE Payoff (-245.426) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 242.315 and 250.
+INFO:        NOTE Payoff (-243.575) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-243.575) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-242.574) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-242.574) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-241.071) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-241.071) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-240.822) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-240.822) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-240.496) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-240.496) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-240.435) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-240.435) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-240.289) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-240.289) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-240.221) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-240.221) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-239.997) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-239.997) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-239.859) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-239.859) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-239.807) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-239.807) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-239.783) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-239.783) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-239.778) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-239.778) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-239.776) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-239.776) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        NOTE Payoff (-239.775) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 234.63 and 237.15.
+INFO:        NOTE Payoff (-239.775) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 237.15 and 241.227.
+INFO:        Maximum payoff found at:.
+INFO:         *Upstream outflow ratio = 0.222756.
+INFO:         *Downstream outflow ratio = 0.0173758.
+INFO:          Direct discharge ratio = 0.958134.
+INFO:         *Upstream percolation ratio = 0.358005.
+INFO:          Downstream deep percolation ratio = 0.01.
+INFO:         *Upstream middle flow ratio = 0.177748.
+INFO:         *Downstream percolation ratio = 0.334569.
+INFO:         *Downstream middle flow ratio = 0.249528.
+INFO:          "Water-holding Capacity of Forest" = 234.63.
+INFO:          Upstream deep percolation ratio = 0.01.
+INFO:        Simulations = 1526.
+INFO:        Optimizations = 1.
+INFO:        Pass = 3.
+INFO:        Payoff = -239.775.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	815         	1526        .
+INFO:        Iterations                    	18          	33          .
+INFO:         Upstream outflow ratio       	0.41113013  	0.2227559   .
+INFO:         Downstream outflow ratio     	0.01        	0.017375833 .
+INFO:         Direct discharge ratio       	0.95813415  	0.95813415  .
+INFO:         Upstream percolation ratio   	0.38919565  	0.35800481  .
+INFO:         Downstream deep percolation ratio	0.01        	0.01        .
+INFO:         Upstream middle flow ratio   	0.038025823 	0.17774751  .
+INFO:         Downstream percolation ratio 	0.33378037  	0.33456914  .
+INFO:         Downstream middle flow ratio 	0.24495304  	0.24952809  .
+INFO:         "Water-holding Capacity of Forest"	234.62965   	234.62965   .
+INFO:         Upstream deep percolation ratio	0.01        	0.01        .
+INFO:        Payoff                        	-245.42573  	-239.77481  .
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:         *Upstream outflow ratio = 0.322676.
+INFO:         *Downstream outflow ratio = 0.373779.
+INFO:          Direct discharge ratio = 0.632486.
+INFO:         *Upstream percolation ratio = 0.33925.
+INFO:          Downstream deep percolation ratio = 0.383622.
+INFO:         *Upstream middle flow ratio = 0.229212.
+INFO:         *Downstream percolation ratio = 0.49972.
+INFO:         *Downstream middle flow ratio = 0.34425.
+INFO:          "Water-holding Capacity of Forest" = 221.05.
+INFO:          Upstream deep percolation ratio = 0.270104.
+INFO:        Simulations = 1527.
+INFO:        Optimizations = 2.
+INFO:        Pass = 3.
+INFO:        Payoff = -665.12.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Upstream outflow ratio = 0.222756.
+INFO:          Downstream outflow ratio = 0.0173758.
+INFO:          Direct discharge ratio = 0.958134.
+INFO:          Upstream percolation ratio = 0.358005.
+INFO:          Downstream deep percolation ratio = 0.01.
+INFO:          Upstream middle flow ratio = 0.177748.
+INFO:         *Downstream percolation ratio = 0.334569.
+INFO:         *Downstream middle flow ratio = 0.249528.
+INFO:          "Water-holding Capacity of Forest" = 234.63.
+INFO:          Upstream deep percolation ratio = 0.01.
+INFO:        Simulations = 2690.
+INFO:        Optimizations = 2.
+INFO:        Pass = 3.
+INFO:        Payoff = -239.775.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	2131        	2690        .
+INFO:        Iterations                    	12          	57          .
+INFO:         Upstream outflow ratio       	0.22654944  	0.22655233  .
+INFO:         Downstream outflow ratio     	0.12163056  	0.017316568 .
+INFO:         Direct discharge ratio       	0.68793124  	0.68793124  .
+INFO:         Upstream percolation ratio   	0.36922171  	0.36922171  .
+INFO:         Downstream deep percolation ratio	0.01        	0.01        .
+INFO:         Upstream middle flow ratio   	0.089105597 	0.27414256  .
+INFO:         Downstream percolation ratio 	0.24948676  	0.33460128  .
+INFO:         Downstream middle flow ratio 	0.2815863   	0.28125493  .
+INFO:         "Water-holding Capacity of Forest"	233.21803   	233.21803   .
+INFO:         Upstream deep percolation ratio	0.01        	0.01        .
+INFO:        Payoff                        	-247.54503  	-243.12387  .
+INFO:        ==============================.
+INFO:        ------------------.
+INFO:        Floating point error during optimization with.
+INFO:        .
+INFO:         *Upstream outflow ratio = 0.552146.
+INFO:         *Downstream outflow ratio = 0.262116.
+INFO:         *Direct discharge ratio = 0.227355.
+INFO:         *Upstream percolation ratio = 0.0943237.
+INFO:         *Downstream deep percolation ratio = 0.439533.
+INFO:         *Upstream middle flow ratio = 0.442959.
+INFO:         *Downstream percolation ratio = 0.387664.
+INFO:         *Downstream middle flow ratio = 0.0291899.
+INFO:         *"Water-holding Capacity of Forest" = 200.466.
+INFO:         *Upstream deep percolation ratio = 0.960811.
+INFO:        ------------------.
+INFO:        Floating point error - skipping optimization.
+INFO:          Upstream outflow ratio = 0.552146.
+INFO:          Downstream outflow ratio = 0.262116.
+INFO:          Direct discharge ratio = 0.227355.
+INFO:          Upstream percolation ratio = 0.0943237.
+INFO:          Downstream deep percolation ratio = 0.439533.
+INFO:          Upstream middle flow ratio = 0.442959.
+INFO:         *Downstream percolation ratio = 0.387664.
+INFO:         *Downstream middle flow ratio = 0.0291899.
+INFO:          "Water-holding Capacity of Forest" = 200.466.
+INFO:          Upstream deep percolation ratio = 0.960811.
+INFO:        Simulations = 2691.
+INFO:        NOTE 1 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 3.
+INFO:        Pass = 3.
+INFO:        Payoff = -1.29807e+33.
+INFO:        ---------------------------------.
+INFO:        Initial point of search.
+INFO:          Upstream outflow ratio = 0.146183.
+INFO:          Downstream outflow ratio = 0.44564.
+INFO:          Direct discharge ratio = 0.535557.
+INFO:          Upstream percolation ratio = 0.110481.
+INFO:          Downstream deep percolation ratio = 0.0806899.
+INFO:          Upstream middle flow ratio = 0.478632.
+INFO:         *Downstream percolation ratio = 0.161015.
+INFO:         *Downstream middle flow ratio = 0.780569.
+INFO:          "Water-holding Capacity of Forest" = 156.554.
+INFO:          Upstream deep percolation ratio = 0.415241.
+INFO:        Simulations = 2692.
+INFO:        NOTE 1 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 4.
+INFO:        Pass = 3.
+INFO:        Payoff = -4721.36.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Upstream outflow ratio = 0.222756.
+INFO:          Downstream outflow ratio = 0.0173758.
+INFO:         *Direct discharge ratio = 0.958134.
+INFO:          Upstream percolation ratio = 0.358005.
+INFO:          Downstream deep percolation ratio = 0.01.
+INFO:          Upstream middle flow ratio = 0.177748.
+INFO:          Downstream percolation ratio = 0.334569.
+INFO:          Downstream middle flow ratio = 0.249528.
+INFO:          "Water-holding Capacity of Forest" = 234.63.
+INFO:          Upstream deep percolation ratio = 0.01.
+INFO:        Simulations = 2854.
+INFO:        NOTE 28 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 4.
+INFO:        Pass = 3.
+INFO:        Payoff = -239.775.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	2838        	2854        .
+INFO:        Iterations                    	3           	61          .
+INFO:         Upstream outflow ratio       	0.37833287  	0.37833287  .
+INFO:         Downstream outflow ratio     	0.017858088 	0.017858088 .
+INFO:         Direct discharge ratio       	0.1546901   	0.1546901   .
+INFO:         Upstream percolation ratio   	0.47611151  	0.47611151  .
+INFO:         Downstream deep percolation ratio	0.01        	0.01        .
+INFO:         Upstream middle flow ratio   	0.50155941  	0.50155941  .
+INFO:         Downstream percolation ratio 	0.15719882  	0.15719882  .
+INFO:         Downstream middle flow ratio 	0.3478734   	0.3478734   .
+INFO:         "Water-holding Capacity of Forest"	156.55375   	156.55375   .
+INFO:         Upstream deep percolation ratio	0.57930191  	0.57930191  .
+INFO:        Payoff                        	-274.58976  	-274.58976  .
+INFO:        ==============================.
+INFO:        Floating point error - skipping optimization.
+INFO:          Upstream outflow ratio = 0.516859.
+INFO:          Downstream outflow ratio = 0.965621.
+INFO:         *Direct discharge ratio = 0.176465.
+INFO:          Upstream percolation ratio = 0.455706.
+INFO:          Downstream deep percolation ratio = 0.219721.
+INFO:          Upstream middle flow ratio = 0.897392.
+INFO:          Downstream percolation ratio = 0.220671.
+INFO:          Downstream middle flow ratio = 0.894676.
+INFO:          "Water-holding Capacity of Forest" = 211.749.
+INFO:          Upstream deep percolation ratio = 0.174543.
+INFO:        Simulations = 2855.
+INFO:        NOTE 29 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 5.
+INFO:        Pass = 3.
+INFO:        Payoff = -1.29807e+33.
+INFO:        ---------------------------------.
+INFO:        Floating point error - skipping optimization.
+INFO:          Upstream outflow ratio = 0.515256.
+INFO:          Downstream outflow ratio = 0.0975119.
+INFO:         *Direct discharge ratio = 0.542585.
+INFO:          Upstream percolation ratio = 0.206831.
+INFO:          Downstream deep percolation ratio = 0.251362.
+INFO:          Upstream middle flow ratio = 0.577567.
+INFO:          Downstream percolation ratio = 0.384521.
+INFO:          Downstream middle flow ratio = 0.654259.
+INFO:          "Water-holding Capacity of Forest" = 215.943.
+INFO:          Upstream deep percolation ratio = 0.952623.
+INFO:        Simulations = 2856.
+INFO:        NOTE 30 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 6.
+INFO:        Pass = 3.
+INFO:        Payoff = -1.29807e+33.
+INFO:        ---------------------------------.
+INFO:        Initial point of search.
+INFO:          Upstream outflow ratio = 0.977318.
+INFO:          Downstream outflow ratio = 0.53243.
+INFO:         *Direct discharge ratio = 0.936959.
+INFO:          Upstream percolation ratio = 0.325511.
+INFO:          Downstream deep percolation ratio = 0.0107548.
+INFO:          Upstream middle flow ratio = 0.733988.
+INFO:          Downstream percolation ratio = 0.296524.
+INFO:          Downstream middle flow ratio = 0.344698.
+INFO:          "Water-holding Capacity of Forest" = 241.014.
+INFO:          Upstream deep percolation ratio = 0.169468.
+INFO:        Simulations = 2857.
+INFO:        NOTE 30 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 7.
+INFO:        Pass = 3.
+INFO:        Payoff = -12746.1.
+INFO:        ---------------------------------.
+INFO:        NOTE Payoff (-239.522) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 244.794.
+INFO:        NOTE Payoff (-239.522) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 244.794 and 246.833.
+INFO:        NOTE Payoff (-239.509) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 244.794.
+INFO:        NOTE Payoff (-239.509) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 244.794 and 246.833.
+INFO:        NOTE Payoff (-238.967) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 244.794.
+INFO:        NOTE Payoff (-238.967) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 244.794 and 246.833.
+INFO:        NOTE Payoff (-238.649) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 244.794.
+INFO:        NOTE Payoff (-238.649) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 244.794 and 246.833.
+INFO:        NOTE Payoff (-238.638) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 244.794.
+INFO:        NOTE Payoff (-238.638) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 244.794 and 246.833.
+INFO:        NOTE Payoff (-238.378) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 246.054.
+INFO:        NOTE Payoff (-238.378) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 246.054 and 250.
+INFO:        NOTE Payoff (-238.218) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 246.054.
+INFO:        NOTE Payoff (-238.218) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 246.054 and 250.
+INFO:        NOTE Payoff (-238.218) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 250 and 246.054.
+INFO:        NOTE Payoff (-238.218) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 246.054 and 250.
+INFO:        NOTE Payoff (-238.204) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 246.054.
+INFO:        NOTE Payoff (-238.204) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 246.054 and 250.
+INFO:        NOTE Payoff (-238.202) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 246.054.
+INFO:        NOTE Payoff (-238.202) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 246.054 and 250.
+INFO:        NOTE Payoff (-238.202) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 250 and 246.054.
+INFO:        NOTE Payoff (-238.202) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 246.054 and 250.
+INFO:        NOTE Payoff (-238.202) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 243.534 and 246.054.
+INFO:        NOTE Payoff (-238.202) realized at multiple parameter values.
+INFO:        With "Water-holding Capacity of Forest" = 246.054 and 250.
+INFO:        Maximum payoff found at:.
+INFO:          Upstream outflow ratio = 0.23586.
+INFO:         *Downstream outflow ratio = 0.0155935.
+INFO:          Direct discharge ratio = 0.946392.
+INFO:          Upstream percolation ratio = 0.320578.
+INFO:          Downstream deep percolation ratio = 0.01.
+INFO:         *Upstream middle flow ratio = 0.157446.
+INFO:          Downstream percolation ratio = 0.335111.
+INFO:          Downstream middle flow ratio = 0.245451.
+INFO:          "Water-holding Capacity of Forest" = 250.
+INFO:          Upstream deep percolation ratio = 0.01.
+INFO:        Simulations = 3836.
+INFO:        NOTE 30 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 7.
+INFO:        Pass = 3.
+INFO:        Payoff = -238.202.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	3503        	3836        .
+INFO:        Iterations                    	13          	81          .
+INFO:         Upstream outflow ratio       	0.23586039  	0.23586039  .
+INFO:         Downstream outflow ratio     	0.016836563 	0.01559345  .
+INFO:         Direct discharge ratio       	0.94639201  	0.94639201  .
+INFO:         Upstream percolation ratio   	0.32057818  	0.32057818  .
+INFO:         Downstream deep percolation ratio	0.01        	0.01        .
+INFO:         Upstream middle flow ratio   	0.14275859  	0.15744578  .
+INFO:         Downstream percolation ratio 	0.28686653  	0.33511053  .
+INFO:         Downstream middle flow ratio 	0.29458909  	0.24545076  .
+INFO:         "Water-holding Capacity of Forest"	243.53448   	243.53448   .
+INFO:         Upstream deep percolation ratio	0.01        	0.01        .
+INFO:        Payoff                        	-238.6376   	-238.20204  .
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Upstream outflow ratio = 0.347455.
+INFO:         *Downstream outflow ratio = 0.400081.
+INFO:          Direct discharge ratio = 0.247667.
+INFO:          Upstream percolation ratio = 0.0613706.
+INFO:          Downstream deep percolation ratio = 0.413967.
+INFO:         *Upstream middle flow ratio = 0.0593178.
+INFO:          Downstream percolation ratio = 0.130059.
+INFO:          Downstream middle flow ratio = 0.28513.
+INFO:          "Water-holding Capacity of Forest" = 232.762.
+INFO:          Upstream deep percolation ratio = 0.352835.
+INFO:        Simulations = 3837.
+INFO:        NOTE 30 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 8.
+INFO:        Pass = 3.
+INFO:        Payoff = -787.236.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Upstream outflow ratio = 0.23586.
+INFO:          Downstream outflow ratio = 0.0155935.
+INFO:          Direct discharge ratio = 0.946392.
+INFO:          Upstream percolation ratio = 0.320578.
+INFO:          Downstream deep percolation ratio = 0.01.
+INFO:         *Upstream middle flow ratio = 0.157446.
+INFO:          Downstream percolation ratio = 0.335111.
+INFO:          Downstream middle flow ratio = 0.245451.
+INFO:          "Water-holding Capacity of Forest" = 250.
+INFO:          Upstream deep percolation ratio = 0.01.
+INFO:        Simulations = 4004.
+INFO:        NOTE 50 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 8.
+INFO:        Pass = 3.
+INFO:        Payoff = -238.202.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	3976        	4004        .
+INFO:        Iterations                    	3           	85          .
+INFO:         Upstream outflow ratio       	0.3570251   	0.3570251   .
+INFO:         Downstream outflow ratio     	0.12984951  	0.12001164  .
+INFO:         Direct discharge ratio       	0.26934839  	0.32845862  .
+INFO:         Upstream percolation ratio   	0.26415053  	0.26692883  .
+INFO:         Downstream deep percolation ratio	0.01        	0.01        .
+INFO:         Upstream middle flow ratio   	0.22708928  	0.22708928  .
+INFO:         Downstream percolation ratio 	0.096043364 	0.096043364 .
+INFO:         Downstream middle flow ratio 	0.24619797  	0.24619797  .
+INFO:         "Water-holding Capacity of Forest"	250         	250         .
+INFO:         Upstream deep percolation ratio	0.96082554  	0.96082554  .
+INFO:        Payoff                        	-281.84192  	-280.36449  .
+INFO:        ==============================.
+INFO:        Floating point error - skipping optimization.
+INFO:          Upstream outflow ratio = 0.26965.
+INFO:          Downstream outflow ratio = 0.62033.
+INFO:          Direct discharge ratio = 0.662755.
+INFO:          Upstream percolation ratio = 0.333443.
+INFO:          Downstream deep percolation ratio = 0.481722.
+INFO:         *Upstream middle flow ratio = 0.550835.
+INFO:          Downstream percolation ratio = 0.402499.
+INFO:          Downstream middle flow ratio = 0.638187.
+INFO:          "Water-holding Capacity of Forest" = 222.006.
+INFO:          Upstream deep percolation ratio = 0.831377.
+INFO:        Simulations = 4005.
+INFO:        NOTE 51 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 9.
+INFO:        Pass = 3.
+INFO:        Payoff = -1.29807e+33.
+INFO:        ---------------------------------.
+INFO:        Initial point of search.
+INFO:          Upstream outflow ratio = 0.81014.
+INFO:          Downstream outflow ratio = 0.874566.
+INFO:          Direct discharge ratio = 0.675417.
+INFO:          Upstream percolation ratio = 0.37438.
+INFO:          Downstream deep percolation ratio = 0.0399468.
+INFO:         *Upstream middle flow ratio = 0.30349.
+INFO:          Downstream percolation ratio = 0.279332.
+INFO:          Downstream middle flow ratio = 0.609794.
+INFO:          "Water-holding Capacity of Forest" = 154.435.
+INFO:          Upstream deep percolation ratio = 0.51133.
+INFO:        Simulations = 4006.
+INFO:        NOTE 51 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 10.
+INFO:        Pass = 3.
+INFO:        Payoff = -6405.22.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Upstream outflow ratio = 0.23586.
+INFO:          Downstream outflow ratio = 0.0155935.
+INFO:          Direct discharge ratio = 0.946392.
+INFO:          Upstream percolation ratio = 0.320578.
+INFO:          Downstream deep percolation ratio = 0.01.
+INFO:          Upstream middle flow ratio = 0.157446.
+INFO:          Downstream percolation ratio = 0.335111.
+INFO:          Downstream middle flow ratio = 0.245451.
+INFO:          "Water-holding Capacity of Forest" = 250.
+INFO:         *Upstream deep percolation ratio = 0.01.
+INFO:        Simulations = 4460.
+INFO:        NOTE 62 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 10.
+INFO:        Pass = 3.
+INFO:        Payoff = -238.202.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	4377        	4460        .
+INFO:        Iterations                    	9           	96          .
+INFO:         Upstream outflow ratio       	0.13904642  	0.13904642  .
+INFO:         Downstream outflow ratio     	0.87456592  	0.87456592  .
+INFO:         Direct discharge ratio       	0.01        	0.01        .
+INFO:         Upstream percolation ratio   	0.40846923  	0.40846923  .
+INFO:         Downstream deep percolation ratio	0.01        	0.01        .
+INFO:         Upstream middle flow ratio   	0.01        	0.01        .
+INFO:         Downstream percolation ratio 	0.5         	0.5         .
+INFO:         Downstream middle flow ratio 	0.026849781 	0.026849781 .
+INFO:         "Water-holding Capacity of Forest"	250         	250         .
+INFO:         Upstream deep percolation ratio	0.99        	0.99        .
+INFO:        Payoff                        	-343.74369  	-343.74369  .
+INFO:        ==============================.
+INFO:        Maximum of simulations/optimizations found at:.
+INFO:          Upstream outflow ratio = 0.23586.
+INFO:          Downstream outflow ratio = 0.0155935.
+INFO:          Direct discharge ratio = 0.946392.
+INFO:          Upstream percolation ratio = 0.320578.
+INFO:          Downstream deep percolation ratio = 0.01.
+INFO:          Upstream middle flow ratio = 0.157446.
+INFO:          Downstream percolation ratio = 0.335111.
+INFO:          Downstream middle flow ratio = 0.245451.
+INFO:          "Water-holding Capacity of Forest" = 250.
+INFO:         *Upstream deep percolation ratio = 0.01.
+INFO:        Simulations = 4460.
+INFO:        NOTE 62 of the simulations caused floating point errors (first was reported).
+INFO:        Optimizations = 10.
+INFO:        Pass = 3.
+INFO:        Payoff = -238.202.
+INFO:        ---------------------------------.

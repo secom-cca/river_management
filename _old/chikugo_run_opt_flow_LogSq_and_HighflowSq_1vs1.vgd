@@ -1,0 +1,22 @@
+:GRAPH 1 flow log error sq|Zero/0.5
+:TITLE 1 -747.655 flow log error sq|Zero/0.5
+:DOTS
+:SCALE
+:VAR flow log error sq
+:DATASET #3
+:SHAPE CROSS,5
+:VAR Zero
+:DATASET *1
+:SHAPE SOLID-CIRCLE,5
+
+:GRAPH 2 high flow error|Zero/0.5
+:TITLE 2 214.964 high flow error|Zero/0.5
+:DOTS
+:SCALE
+:VAR high flow error
+:DATASET #3
+:SHAPE CROSS,5
+:VAR Zero
+:DATASET *1
+:SHAPE SOLID-CIRCLE,5
+

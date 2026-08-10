@@ -23,7 +23,8 @@ INPUT_XLSX_PATH = Path("input.xlsx")
 INPUT_SHEET     = "input"
 
 # NIES 未来気候ファイルディレクトリ候補（どちらかに置いてあればOK）
-NIES_DIR_CANDIDATES = [Path("data/nies2020"), Path("data/nies")]
+#NIES_DIR_CANDIDATES = [Path("data/nies2020"), Path("data/nies")]
+NIES_DIR_CANDIDATES = [Path(f"C:/Users/tomus/Documents/GitHub/river_management/data/nies2020"), Path("C:/Users/tomus/Documents/GitHub/river_management/data/nies")]
 
 
 # ==== 流域プリセット（代表値セット） ====

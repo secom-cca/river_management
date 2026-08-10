@@ -6,3 +6,5 @@ sde-prep
 *.3vmfx
 data
 out_metrics
+__pycache__/
+*.pyc

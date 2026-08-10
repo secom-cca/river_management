@@ -1,0 +1,150 @@
+Upstream outflow ratio
+0 0.0633417
+Downstream outflow ratio
+0 0.01
+Direct discharge ratio
+0 0.954639
+Upstream percolation ratio
+0 0.5
+Downstream deep percolation ratio
+0 0.5
+Upstream middle flow ratio
+0 0.01
+Downstream percolation ratio
+0 0.5
+Downstream middle flow ratio
+0 0.01
+"Water-holding Capacity of Forest"
+0 250
+Upstream deep percolation ratio
+0 0.99
+Payoff
+0 -6090.39
+Best_Payoff
+0 -6090.39
+Simulations
+0 522
+Upstream outflow ratio
+1 0.0527724
+Downstream outflow ratio
+1 0.01
+Direct discharge ratio
+1 0.305718
+Upstream percolation ratio
+1 0.5
+Downstream deep percolation ratio
+1 0.5
+Upstream middle flow ratio
+1 0.01
+Downstream percolation ratio
+1 0.5
+Downstream middle flow ratio
+1 0.01
+"Water-holding Capacity of Forest"
+1 250
+Upstream deep percolation ratio
+1 0.99
+Payoff
+1 -5386.08
+Best_Payoff
+1 -5386.08
+Simulations
+1 1028
+Upstream outflow ratio
+3 0.0519095
+Downstream outflow ratio
+3 0.01
+Direct discharge ratio
+3 0.450347
+Upstream percolation ratio
+3 0.5
+Downstream deep percolation ratio
+3 0.5
+Upstream middle flow ratio
+3 0.01
+Downstream percolation ratio
+3 0.5
+Downstream middle flow ratio
+3 0.01
+"Water-holding Capacity of Forest"
+3 250
+Upstream deep percolation ratio
+3 0.99
+Payoff
+3 -5469.19
+Simulations
+3 1485
+Upstream outflow ratio
+6 0.0659005
+Downstream outflow ratio
+6 0.01
+Direct discharge ratio
+6 0.985011
+Upstream percolation ratio
+6 0.5
+Downstream deep percolation ratio
+6 0.5
+Upstream middle flow ratio
+6 0.01
+Downstream percolation ratio
+6 0.5
+Downstream middle flow ratio
+6 0.01
+"Water-holding Capacity of Forest"
+6 250
+Upstream deep percolation ratio
+6 0.99
+Payoff
+6 -6066.35
+Simulations
+6 1893
+Upstream outflow ratio
+7 0.0556383
+Downstream outflow ratio
+7 0.01
+Direct discharge ratio
+7 0.242445
+Upstream percolation ratio
+7 0.5
+Downstream deep percolation ratio
+7 0.5
+Upstream middle flow ratio
+7 0.01
+Downstream percolation ratio
+7 0.5
+Downstream middle flow ratio
+7 0.01
+"Water-holding Capacity of Forest"
+7 250
+Upstream deep percolation ratio
+7 0.99
+Payoff
+7 -5365.29
+Best_Payoff
+7 -5365.29
+Simulations
+7 2252
+Upstream outflow ratio
+9 0.0647818
+Downstream outflow ratio
+9 0.874566
+Direct discharge ratio
+9 0.652836
+Upstream percolation ratio
+9 0.5
+Downstream deep percolation ratio
+9 0.5
+Upstream middle flow ratio
+9 0.01
+Downstream percolation ratio
+9 0.5
+Downstream middle flow ratio
+9 0.01
+"Water-holding Capacity of Forest"
+9 250
+Upstream deep percolation ratio
+9 0.99
+Payoff
+9 -24962.4
+Simulations
+9 2707

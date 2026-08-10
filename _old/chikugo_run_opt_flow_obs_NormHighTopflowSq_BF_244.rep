@@ -1,0 +1,18 @@
+The total payoff is	-1298.7
+   Policy elements	0
+   Calibration elements	-1298.7
+   Prior elements	0
+
+The following are the components of the payoff:
+Type	Component	Contribution	Percent	Values	Params&Data	Used	Skipped	Source	RSquare	DW	Autocor1	Autocor2	Autocor3	Autocor4	(TimeGap)	RMSE	Um	Us	Uc	MAE	MAPE	MAEoM
+*CG	high flow error|Zero/4	-526.821	40.5653	-19.4375	-507.384	366	0	
+*CG	top flow error|Zero/4	-507.507	39.0781	-0.123249	-507.384	366	0	
+*CG	flow log error sq|Zero/2	-264.37	20.3565	-10.6778	-253.692	366	0	
+
+Sources for exogenous variables
+Daily ave temp	jma_kurume_2023.xlsx.vdfx
+Daily max temp	jma_kurume_2023.xlsx.vdfx
+Daily min temp	jma_kurume_2023.xlsx.vdfx
+Daily precip	jma_kurume_2023.xlsx.vdfx
+flow	C:\Users\tomus\Documents\GitHub\river_management\data\flow_arase_2023_x100000_0to364.csv.vdfx
+Solar radiation time	jma_kurume_2023.xlsx.vdfx

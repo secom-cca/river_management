@@ -1,0 +1,11 @@
+:GRAPH 1 River discharge downstream|flow log error sq/1
+:TITLE 1 -1.20462e+16 River discharge downstream|flow log error sq/1
+:DOTS
+:SCALE
+:VAR River discharge downstream
+:DATASET #3
+:SHAPE CROSS,5
+:VAR flow log error sq
+:DATASET *1
+:SHAPE SOLID-CIRCLE,5
+

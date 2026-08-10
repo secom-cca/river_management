@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0">
+	<header>
+		<product version="1.0" lang="en">Vensim</product>
+		<vendor>Ventana Systems, Inc.</vendor>
+		<created>
+		</created>
+		<modified>
+		</modified>
+		<name>
+		</name>
+		<caption>
+		</caption>
+	</header>
+	<sim_specs method="RK4" time_units="day">
+		<start>0</start>
+		<stop>364</stop>
+		<dt>1</dt>
+	</sim_specs>
+	<model>
+		<variables>
+			<stock name="Accumulated_flood_damage">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>
+					0
+					</eqn>
+					<inflow>
+					Financial damage by flood
+					</inflow>
+			</stock>
+			<stock name="Accumulated_innundation_damage">
+				<units></units>
+				<doc></doc>
+					<eqn>
+					0
+					</eqn>
+					<inflow>
+					Financial damage by innundation
+					</inflow>
+			</stock>
+			<stock name="Dam_capacity">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>
+					Initial_dam_capacity
+					</eqn>
+					<inflow>
+					Dam capacity increase
+					</inflow>
+			</stock>
+			<stock name="Dam_storage">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>
+					Initial_dam_capacity*0.6
+					</eqn>
+					<inflow>
+					Dam inflow
+					</inflow>
+					<outflow>
+					Dam outflow
+					</outflow>
+			</stock>
+			<stock name="Damaged_houses">
+				<units></units>
+				<doc></doc>
+					<eqn>
+					0
+					</eqn>
+					<inflow>
+					Inflow of damaged houses
+					</inflow>
+					<outflow>
+					Outflow of damaged houses
+					</outflow>
+			</stock>
+			<stock name="Damaged_paddy_field">
+				<units></units>
+				<doc></doc>
+					<eqn>
+					0
+					</eqn>
+					<inflow>
+					Inflow of damaged paddy field
+					</inflow>
+					<outflow>
+					Outflow of damaged paddy field
+					</outflow>
+			</stock>
+			<stock name="Discharge_allowance">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>
+					"Current_high-water_discharge" * 60 * 60 * 24
+					</eqn>
+					<inflow>
+					Levee level increase
+					</inflow>
+			</stock>
+			<stock name="Downstream_storage">
+				<units>m3</units>
+				<doc>2025/11/20　initial value: 5000000</doc>
+					<eqn>
+					5e+06
+					</eqn>
+					<inflow>
+					Downstream inflow
+					</inflow>
+					<outflow>
+					Downstream outflow
+					</outflow>
+					<outflow>
+					Downstream percolation
+					</outflow>
+					<outflow>
+					Drainage
+					</outflow>
+					<outflow>
+					Evaporation downstream
+					</outflow>
+			</stock>
+			<stock name="Downstream_underground">
+				<units></units>
+				<doc>2025/11/20　initial value 45000000</doc>
+					<eqn>
+					4.5e+07
+					</eqn>
+					<inflow>
+					Downstream percolation
+					</inflow>
+					<outflow>
+					Downstream deep percolation
+					</outflow>
+					<outflow>
+					Downstream middle flow
+					</outflow>
+			</stock>
+			<stock name="Drainage_capacity">
+				<units>m3/s</units>
+				<doc></doc>
+					<eqn>
+					Initial_drainage_capacity
+					</eqn>
+					<inflow>
+					Drainage investment
+					</inflow>
+			</stock>
+			<stock name="Elevated_houses">
+				<units></units>
+				<doc></doc>
+					<eqn>
+					0
+					</eqn>
+					<inflow>
+					Inflow of elevated houses
+					</inflow>
+					<outflow>
+					Outflow of elevated houses
+					</outflow>
+			</stock>
+			<stock name="Forest_area">
+				<units>ha</units>
+				<doc></doc>
+					<eqn>
+					Upstream_area * Forest_area_ratio
+					</eqn>
+					<inflow>
+					Inflow of forest area
+					</inflow>
+					<outflow>
+					Outflow of forest area
+					</outflow>
+			</stock>
+			<stock name="Houses_in_flood_risk">
+				<units></units>
+				<doc></doc>
+					<eqn>
+					282000
+					</eqn>
+					<inflow>
+					Inflow of houses in flood risk
+					</inflow>
+					<outflow>
+					Outflow of houses in flood risk
+					</outflow>
+			</stock>
+			<stock name="Houses_in_inundation_risk">
+				<units>house</units>
+				<doc></doc>
+					<eqn>
+					500000
+					</eqn>
+					<inflow>
+					Inflow of houses in risky area
+					</inflow>
+					<outflow>
+					Outflow of houses in risky area
+					</outflow>
+			</stock>
+			<stock name="Houses_in_non-risky_area">
+				<units>house</units>
+				<doc></doc>
+					<eqn>
+					10000
+					</eqn>
+					<inflow>
+					"Inflow of houses in non-risky area"
+					</inflow>
+					<outflow>
+					"Outflow of houses in non-risky area"
+					</outflow>
+			</stock>
+			<stock name="Paddy_dam_area">
+				<units>ha</units>
+				<doc></doc>
+					<eqn>
+					Downstream_area*Paddy_field_ratio*Initial_paddy_dam_ratio
+					</eqn>
+					<inflow>
+					Paddy dam investment
+					</inflow>
+			</stock>
+			<stock name="Paddy_field">
+				<units>ha</units>
+				<doc></doc>
+					<eqn>
+					Downstream_area * Paddy_field_ratio
+					</eqn>
+					<inflow>
+					Inflow of paddy field
+					</inflow>
+					<outflow>
+					Outflow of paddy field
+					</outflow>
+			</stock>
+			<stock name="Upstream_storage">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>
+					1.5e+07
+					</eqn>
+					<inflow>
+					Upstream inflow
+					</inflow>
+					<outflow>
+					Evaporation upstream
+					</outflow>
+					<outflow>
+					Upstream percolation
+					</outflow>
+					<outflow>
+					Upstream outflow
+					</outflow>
+			</stock>
+			<stock name="Upstream_underground">
+				<units></units>
+				<doc></doc>
+					<eqn>
+					1.35e+08
+					</eqn>
+					<inflow>
+					Upstream percolation
+					</inflow>
+					<outflow>
+					Middle flow
+					</outflow>
+					<outflow>
+					Upstream deep Percolation
+					</outflow>
+			</stock>
+			<aux name="Biodiversity">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	1 - Coefficient_for_ecosystem * Dam_capacity / Forest_area_storage_capacity					</eqn>
+			</aux>
+			<aux name="CO2_absorption">
+				<units>CO2ton/day</units>
+				<doc></doc>
+					<eqn>Forest_area*CO2_absorption_per_area/365					</eqn>
+			</aux>
+			<aux name="Daily_crop_production">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>
+	Paddy_field * Paddy_field_productivity * (1 - Deterioration_ratio_by_heat) * Crop_price * 
+	((1 - Paddy_dam_ratio) + Paddy_dam_ratio * (1 - Degradation_of_paddy_dam))					</eqn>
+			</aux>
+			<aux name="Daily_Total_GDP">
+				<units>Yen/day</units>
+				<doc></doc>
+					<eqn>(Houses_in_inundation_risk + "Houses_in_non-risky_area") * GDP_per_resident + Daily_crop_production - Financial_damage_by_innundation
+	 - Financial_damage_by_flood					</eqn>
+			</aux>
+			<aux name="Dam_capacity_increase">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>DELAY3I( Dam_investment * Capacity_per_dam_investment , Dam_construction_time * 365 , 0 )					</eqn>
+			</aux>
+			<aux name="Dam_inflow">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Upstream_outflow * (1 - Direct_discharge_ratio)					</eqn>
+			</aux>
+			<aux name="Dam_investment">
+				<units>Yen/Year</units>
+				<doc></doc>
+					<eqn>Dam_investment_amount * PULSE ( Dam_investment_start_time * 365 , 365 ) / 365					</eqn>
+			</aux>
+			<aux name="Dam_outflow">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Predischarge_control + Dam_spill					</eqn>
+			</aux>
+			<aux name="Dam_spill">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	MAX(Dam_storage - Dam_capacity, 0)					</eqn>
+			</aux>
+			<aux name="Deterioration_ratio_by_heat">
+				<units></units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE( Daily_ave_temp < 25 , 0 , (Daily_ave_temp - 25)/25 )					</eqn>
+			</aux>
+			<aux name="Discharge_amount_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	River_discharge_downstream/Discharge_allowance					</eqn>
+			</aux>
+			<aux name="Downstream_deep_percolation">
+				<units></units>
+				<doc></doc>
+					<eqn>Downstream_underground * Downstream_deep_percolation_ratio					</eqn>
+			</aux>
+			<aux name="Downstream_inflow">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>Daily_precip * Downstream_area * 10000 / 1000 * Daily_precipitation_future_ratio					</eqn>
+			</aux>
+			<aux name="Downstream_middle_flow">
+				<units></units>
+				<doc></doc>
+					<eqn>Downstream_underground * Downstream_middle_flow_ratio					</eqn>
+			</aux>
+			<aux name="Downstream_outflow">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>MAX(MIN(Downstream_outflow_ratio * Downstream_storage,Downstream_storage-Evaporation_downstream-Downstream_percolation),600000)					</eqn>
+			</aux>
+			<aux name="Downstream_percolation">
+				<units></units>
+				<doc></doc>
+					<eqn>MAX(MIN(Downstream_storage * Downstream_percolation_ratio,Downstream_storage-Evaporation_downstream),0)					</eqn>
+			</aux>
+			<aux name="Downstream_storage_capacity">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>
+	Downstream_area * 10000 * Downstream_storage_depth + Paddyfield_storage_capacity					</eqn>
+			</aux>
+			<aux name="Drainage">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>MAX(MIN(Drainage_capacity*3600*24, Downstream_storage-Evaporation_downstream-Downstream_percolation-Downstream_outflow),0)					</eqn>
+			</aux>
+			<aux name="Drainage_investment">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>Drainage_investment_amount * PULSE ( 0 , 365 ) / 365					</eqn>
+			</aux>
+			<aux name="Evacuation_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	(1 - Eldery_people_ratio) * Capacity_Building					</eqn>
+			</aux>
+			<aux name="Evaporation_downstream">
+				<units></units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE(Evaporation_ratio * Downstream_area * 0.001 * 100 * 100 < Downstream_storage,
+	Evaporation_ratio * Downstream_area * 0.001 * 100 * 100,
+	Downstream_storage) * 0.01					</eqn>
+			</aux>
+			<aux name="Evaporation_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.0023*(Daily_ave_temp+17.8)
+	*(Daily_max_temp-Daily_min_temp)^0.5
+	*Solar_radiation_time					</eqn>
+			</aux>
+			<aux name="Evaporation_upstream">
+				<units></units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE(Evaporation_ratio * Upstream_area * 0.001 * 100 * 100 < Upstream_storage, 
+	Evaporation_ratio * Upstream_area * 0.001 * 100 * 100, 
+	Upstream_storage
+	) * 0.01					</eqn>
+			</aux>
+			<aux name="Excessive_surface_flow">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	MAX (Upstream_storage - Upstream_storage_capacity, 0)					</eqn>
+			</aux>
+			<aux name="Financial_damage_by_flood">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Flood_damage_per_resident * Houses_damaged_by_flood					</eqn>
+			</aux>
+			<aux name="Financial_damage_by_innundation">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Innundation_damage_per_resident * Houses_damaged_by_inundation					</eqn>
+			</aux>
+			<aux name="Flood_damage_per_resident">
+				<units></units>
+				<doc></doc>
+					<eqn>1e+07 / 365					</eqn>
+			</aux>
+			<aux name="Flood_damage_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn> WITH LOOKUP (
+	Flood_water_level,
+		   ([(0,0)-(10,1)],(0,0),(0.5,0.2),(1,0.4),(1.8,0.5),(10,1) ))					</eqn>
+			</aux>
+			<aux name="Flood_water_amount">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>
+	MAX(River_discharge_downstream - Discharge_allowance, 0)					</eqn>
+			</aux>
+			<aux name="Flood_water_level">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Flood_water_amount / (Downstream_area * 10000 * Flood_risky_area_ratio) * 1000					</eqn>
+			</aux>
+			<aux name="flow_flag">
+				<units></units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE(flow > 1.23e+08, 1, 0)					</eqn>
+			</aux>
+			<aux name="flow_log_error_sq">
+				<units></units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE ( Time < 10 , 0 , ( LN (flow)  - LN (River_discharge_downstream) )^2 )					</eqn>
+			</aux>
+			<aux name="Forest_area_storage_capacity">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>
+	Forest_area * "Water-holding_Capacity_of_Forest" * 10000 / 1000					</eqn>
+			</aux>
+			<aux name="GDP_per_resident">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>3e+06/365					</eqn>
+			</aux>
+			<aux name="Green_infrastructure_cost">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>Number_of_planting_trees / 365 / Trees_per_area * Unit_cost_of_planting_trees					</eqn>
+			</aux>
+			<aux name="high_flow_error">
+				<units></units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE(flow > 3.6e+07, ((flow - River_discharge_downstream)/3.6e+07)^2, 0)					</eqn>
+			</aux>
+			<aux name="House_elevation_cost">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>
+	Number_of_house_elevation * Unit_cost_of_elevation					</eqn>
+			</aux>
+			<aux name="Houses_damaged_by_flood">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Houses_in_flood_risk * Flood_damage_ratio * (1 - Evacuation_ratio)					</eqn>
+			</aux>
+			<aux name="Houses_damaged_by_inundation">
+				<units>house</units>
+				<doc></doc>
+					<eqn>
+	Houses_in_inundation_risk * Inundation_damage_ratio * (1 - Evacuation_ratio)					</eqn>
+			</aux>
+			<aux name="Inflow_of_damaged_houses">
+				<units>house</units>
+				<doc></doc>
+					<eqn>Houses_damaged_by_inundation					</eqn>
+			</aux>
+			<aux name="Inflow_of_damaged_paddy_field">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	IF_THEN_ELSE( Innundation_level , Ratio_of_paddy_field_in_risky_area * Paddy_field, 0)					</eqn>
+			</aux>
+			<aux name="Inflow_of_elevated_houses">
+				<units>house</units>
+				<doc></doc>
+					<eqn>
+	Number_of_house_elevation / 365					</eqn>
+			</aux>
+			<aux name="Inflow_of_forest_area">
+				<units>ha</units>
+				<doc></doc>
+					<eqn>DELAY3I( Number_of_planting_trees / 365 / Trees_per_area + current_planting_trees / 365 / Trees_per_area , (Tree_growth_time + Planting_start_time) * 365 , current_planting_trees / Trees_per_area / 365 )					</eqn>
+			</aux>
+			<aux name="Inflow_of_houses_in_non-risky_area">
+				<units>house</units>
+				<doc></doc>
+					<eqn>
+	"Houses_in_non-risky_area" * Inflow_rate_of_residents + Number_of_migration / 365					</eqn>
+			</aux>
+			<aux name="Inflow_of_houses_in_risky_area">
+				<units>house</units>
+				<doc></doc>
+					<eqn>Houses_in_inundation_risk * Inflow_rate_of_residents
+	+ Outflow_of_damaged_houses					</eqn>
+			</aux>
+			<aux name="Inflow_of_paddy_field">
+				<units>ha</units>
+				<doc></doc>
+					<eqn>
+	Outflow_of_damaged_paddy_field					</eqn>
+			</aux>
+			<aux name="Inflow_rate_of_residents">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.01 / 365					</eqn>
+			</aux>
+			<aux name="Infrastructure_Cost">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Dam_investment +
+	Levee_investment					</eqn>
+			</aux>
+			<aux name="Innundation_damage_per_resident">
+				<units>Yen/person</units>
+				<doc></doc>
+					<eqn>1e+07 / 365					</eqn>
+			</aux>
+			<aux name="Innundation_level">
+				<units>m</units>
+				<doc></doc>
+					<eqn>
+	(Inside_water_innundation_level) / (Downstream_area * 10000 * Innundation_risky_area_ratio)					</eqn>
+			</aux>
+			<aux name="Inside_water_innundation_level">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>
+	MAX(Downstream_storage - Downstream_storage_capacity, 0)					</eqn>
+			</aux>
+			<aux name="Inundation_damage_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn> WITH LOOKUP (
+	Innundation_level,
+		  ([(0,0)-(10,1)],(0,0),(0.5,0.2),(1,0.4),(1.8,0.5),(10,1) ))					</eqn>
+			</aux>
+			<aux name="Landslide_disaster_risk">
+				<units></units>
+				<doc></doc>
+					<eqn>MAX((Daily_precip * Daily_precipitation_future_ratio - (Erosion_control_dam_capacity + Forest_area/Upstream_area
+	 * Erosion_control_of_forest))/Erosion_control_dam_capacity
+	 , 0)					</eqn>
+			</aux>
+			<aux name="Levee_investment">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>Levee_investment_amount * PULSE ( Levee_investment_start_time * 365 , 365 ) / 365					</eqn>
+			</aux>
+			<aux name="Levee_level_increase">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>DELAY3I( Levee_investment * Level_per_levee_investment , Levee_construction_time * 365 , 0 )					</eqn>
+			</aux>
+			<aux name="Middle_flow">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Upstream_underground * Upstream_middle_flow_ratio					</eqn>
+			</aux>
+			<aux name="Migration_cost">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>
+	Number_of_migration*Unit_cost_of_migration					</eqn>
+			</aux>
+			<aux name="Municipality_cost">
+				<units></units>
+				<doc></doc>
+					<eqn>Green_infrastructure_cost +
+	Infrastructure_Cost + 
+	House_elevation_cost +
+	Migration_cost + 
+	Drainage_investment +
+	Paddy_dam_investment					</eqn>
+			</aux>
+			<aux name="Outflow_of_damaged_houses">
+				<units>house</units>
+				<doc></doc>
+					<eqn>
+	MAX(0, MIN(DELAY3(Damaged_houses*Recovery_ratio,Delay_of_recovery),Damaged_houses))					</eqn>
+			</aux>
+			<aux name="Outflow_of_damaged_paddy_field">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Damaged_paddy_field * 0.1					</eqn>
+			</aux>
+			<aux name="Outflow_of_elevated_houses">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	Elevated_houses * Outflow_rate_of_residents					</eqn>
+			</aux>
+			<aux name="Outflow_of_forest_area">
+				<units>ha/day</units>
+				<doc></doc>
+					<eqn>Forest_area * Tree_die_ratio / 365 + Number_of_lumbering_trees / Trees_per_area / 365 + Wild_animal_damage * 0					</eqn>
+			</aux>
+			<aux name="Outflow_of_houses_in_non-risky_area">
+				<units>house/Year</units>
+				<doc></doc>
+					<eqn>
+	"Houses_in_non-risky_area"*Outflow_rate_of_residents					</eqn>
+			</aux>
+			<aux name="Outflow_of_houses_in_risky_area">
+				<units>house</units>
+				<doc></doc>
+					<eqn>Houses_in_inundation_risk * Outflow_rate_of_residents + Number_of_house_elevation / 365 + Number_of_migration / 365
+	+ Houses_damaged_by_inundation					</eqn>
+			</aux>
+			<aux name="Outflow_of_paddy_field">
+				<units>ha</units>
+				<doc></doc>
+					<eqn>
+	Inflow_of_damaged_paddy_field					</eqn>
+			</aux>
+			<aux name="Outflow_rate_of_residents">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.01 / 365					</eqn>
+			</aux>
+			<aux name="Paddy_dam_cost_per_area">
+				<units>Yen/ha</units>
+				<doc></doc>
+					<eqn>2.5e+06/30 + 140000*260/100/0.3					</eqn>
+			</aux>
+			<aux name="Paddy_dam_investment">
+				<units></units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE ( Paddy_dam_ratio < 1 , Annual_Paddy_dam_investment , 0 )					</eqn>
+			</aux>
+			<aux name="Paddy_dam_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>Paddy_dam_area/(Paddy_field_ratio*Downstream_area)					</eqn>
+			</aux>
+			<aux name="Paddy_field_productivity">
+				<units>kg/(ha*day)</units>
+				<doc></doc>
+					<eqn>5400/365					</eqn>
+			</aux>
+			<aux name="Paddyfield_storage_capacity">
+				<units>m2</units>
+				<doc></doc>
+					<eqn>Paddy_field * Paddy_dam_ratio * Paddy_field_capacity_per_area					</eqn>
+			</aux>
+			<aux name="Predischarge_control">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	IF_THEN_ELSE (Dam_storage/Dam_capacity > 0.6,
+	IF_THEN_ELSE (Dam_storage/Dam_capacity < 0.9, MAX(Predischarge_capacity, Dam_storage * 0.1), 0),
+	0
+	)					</eqn>
+			</aux>
+			<aux name="River_discharge_downstream">
+				<units></units>
+				<doc></doc>
+					<eqn>MAX( River_discharge_upstream + Downstream_outflow + Downstream_middle_flow , 2.5e+06 )					</eqn>
+			</aux>
+			<aux name="River_discharge_upstream">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>
+	Upstream_outflow * Direct_discharge_ratio + Dam_outflow + Middle_flow					</eqn>
+			</aux>
+			<aux name="River_water_level_downstream">
+				<units></units>
+				<doc></doc>
+					<eqn>10 + SQRT(River_discharge_downstream)/ 1000					</eqn>
+			</aux>
+			<aux name="River_water_level_upstream">
+				<units></units>
+				<doc></doc>
+					<eqn>10+SQRT(River_discharge_upstream)/1000					</eqn>
+			</aux>
+			<aux name="Sales_of_forestry">
+				<units>Yen/day</units>
+				<doc></doc>
+					<eqn>
+	Number_of_lumbering_trees * Price_per_tree / 365					</eqn>
+			</aux>
+			<aux name="top_flow_error">
+				<units></units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE(flow > 1.23e+08, ((flow - River_discharge_downstream)/1.23e+08)^2, 0)					</eqn>
+			</aux>
+			<aux name="Upstream_deep_Percolation">
+				<units></units>
+				<doc></doc>
+					<eqn>Upstream_underground * Upstream_deep_percolation_ratio					</eqn>
+			</aux>
+			<aux name="Upstream_inflow">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>Daily_precip * Upstream_area * 10000 / 1000 *Daily_precipitation_future_ratio					</eqn>
+			</aux>
+			<aux name="Upstream_outflow">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>MAX(Upstream_storage * Upstream_outflow_ratio + Excessive_surface_flow, 1.9e+06)					</eqn>
+			</aux>
+			<aux name="Upstream_percolation">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>Upstream_percolation_ratio * Upstream_inflow					</eqn>
+			</aux>
+			<aux name="Upstream_storage_capacity">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>
+	Forest_area_storage_capacity					</eqn>
+			</aux>
+			<aux name="Wild_animal_damage">
+				<units>ha/day</units>
+				<doc></doc>
+					<eqn>IF_THEN_ELSE(Daily_ave_temp > 25, 150*2 / 365, 150 / 365)					</eqn>
+			</aux>
+			<aux name="Annual_Paddy_dam_investment">
+				<units>Yen/Year</units>
+				<doc></doc>
+					<eqn>1e+06					</eqn>
+			</aux>
+			<aux name="Capacity_Building">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.5					</eqn>
+			</aux>
+			<aux name="Capacity_per_dam_investment">
+				<units>m3/Yen</units>
+				<doc></doc>
+					<eqn>
+	0.0002					</eqn>
+			</aux>
+			<aux name="CO2_absorption_per_area">
+				<units>CO2ton/(ha*Year)</units>
+				<doc></doc>
+					<eqn>8.8					</eqn>
+			</aux>
+			<aux name="Coefficient_for_ecosystem">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	1					</eqn>
+			</aux>
+			<aux name="Cost_for_unit_drainage_increase">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>1e+08					</eqn>
+			</aux>
+			<aux name="Crop_price">
+				<units>Yen/kg</units>
+				<doc></doc>
+					<eqn>4000					</eqn>
+			</aux>
+			<aux name="Current_high-water_discharge">
+				<units>m3/s</units>
+				<doc></doc>
+					<eqn>11500					</eqn>
+			</aux>
+			<aux name="current_planting_trees">
+				<units>tree/Year</units>
+				<doc></doc>
+					<eqn>10000					</eqn>
+			</aux>
+			<aux name="Daily_precipitation_future_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>1					</eqn>
+			</aux>
+			<aux name="Dam_construction_time">
+				<units></units>
+				<doc></doc>
+					<eqn>10					</eqn>
+			</aux>
+			<aux name="Dam_investment_amount">
+				<units></units>
+				<doc></doc>
+					<eqn>0					</eqn>
+			</aux>
+			<aux name="Dam_investment_start_time">
+				<units>Year</units>
+				<doc></doc>
+					<eqn>0					</eqn>
+			</aux>
+			<aux name="Degradation_of_paddy_dam">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.05					</eqn>
+			</aux>
+			<aux name="Delay_of_recovery">
+				<units>day</units>
+				<doc></doc>
+					<eqn>
+	365					</eqn>
+			</aux>
+			<aux name="Direct_discharge_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.97					</eqn>
+			</aux>
+			<aux name="Downstream_area">
+				<units>ha</units>
+				<doc></doc>
+					<eqn>143951					</eqn>
+			</aux>
+			<aux name="Downstream_deep_percolation_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.2					</eqn>
+			</aux>
+			<aux name="Downstream_middle_flow_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.5					</eqn>
+			</aux>
+			<aux name="Downstream_outflow_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.5					</eqn>
+			</aux>
+			<aux name="Downstream_percolation_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.2					</eqn>
+			</aux>
+			<aux name="Downstream_storage_depth">
+				<units>m</units>
+				<doc></doc>
+					<eqn>0.03					</eqn>
+			</aux>
+			<aux name="Drainage_investment_amount">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>0					</eqn>
+			</aux>
+			<aux name="Eldery_people_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.6					</eqn>
+			</aux>
+			<aux name="Erosion_control_dam_capacity">
+				<units>mm/day</units>
+				<doc></doc>
+					<eqn>
+	200					</eqn>
+			</aux>
+			<aux name="Erosion_control_of_forest">
+				<units>mm/ha</units>
+				<doc></doc>
+					<eqn>
+	50					</eqn>
+			</aux>
+			<aux name="Flood_risky_area_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.05					</eqn>
+			</aux>
+			<aux name="Forest_area_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.92					</eqn>
+			</aux>
+			<aux name="Inflow_of_houses_in_flood_risk">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0					</eqn>
+			</aux>
+			<aux name="Initial_dam_capacity">
+				<units>m3</units>
+				<doc></doc>
+					<eqn>7.42e+07					</eqn>
+			</aux>
+			<aux name="Initial_drainage_capacity">
+				<units>m3/s</units>
+				<doc></doc>
+					<eqn>50					</eqn>
+			</aux>
+			<aux name="Initial_paddy_dam_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.1					</eqn>
+			</aux>
+			<aux name="Innundation_risky_area_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.2					</eqn>
+			</aux>
+			<aux name="Levee_construction_time">
+				<units>Year</units>
+				<doc></doc>
+					<eqn>5					</eqn>
+			</aux>
+			<aux name="Levee_investment_amount">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>0					</eqn>
+			</aux>
+			<aux name="Levee_investment_start_time">
+				<units>Year</units>
+				<doc></doc>
+					<eqn>0					</eqn>
+			</aux>
+			<aux name="Level_per_levee_investment">
+				<units>m3/(Yen*day)</units>
+				<doc></doc>
+					<eqn>1000					</eqn>
+			</aux>
+			<aux name="Number_of_house_elevation">
+				<units>house/Year</units>
+				<doc></doc>
+					<eqn>10					</eqn>
+			</aux>
+			<aux name="Number_of_lumbering_trees">
+				<units>tree/Year</units>
+				<doc></doc>
+					<eqn>100000					</eqn>
+			</aux>
+			<aux name="Number_of_migration">
+				<units>house</units>
+				<doc></doc>
+					<eqn>10					</eqn>
+			</aux>
+			<aux name="Number_of_planting_trees">
+				<units>tree/Year</units>
+				<doc></doc>
+					<eqn>1e+06					</eqn>
+			</aux>
+			<aux name="Outflow_of_houses_in_flood_risk">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0					</eqn>
+			</aux>
+			<aux name="Paddy_field_capacity_per_area">
+				<units>m3/ha</units>
+				<doc></doc>
+					<eqn>
+	1000					</eqn>
+			</aux>
+			<aux name="Paddy_field_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.12					</eqn>
+			</aux>
+			<aux name="Planting_start_time">
+				<units>Year</units>
+				<doc></doc>
+					<eqn>5					</eqn>
+			</aux>
+			<aux name="Predischarge_capacity">
+				<units>m3/day</units>
+				<doc></doc>
+					<eqn>
+	10000					</eqn>
+			</aux>
+			<aux name="Price_per_tree">
+				<units>Yen/tree</units>
+				<doc></doc>
+					<eqn>
+	10000					</eqn>
+			</aux>
+			<aux name="Ratio_of_paddy_field_in_risky_area">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.01					</eqn>
+			</aux>
+			<aux name="Recovery_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.9					</eqn>
+			</aux>
+			<aux name="Tree_die_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.01					</eqn>
+			</aux>
+			<aux name="Tree_growth_time">
+				<units>Year</units>
+				<doc></doc>
+					<eqn>40					</eqn>
+			</aux>
+			<aux name="Trees_per_area">
+				<units>tree/ha</units>
+				<doc></doc>
+					<eqn>900					</eqn>
+			</aux>
+			<aux name="Unit_cost_of_elevation">
+				<units>Yen/house</units>
+				<doc></doc>
+					<eqn>
+	3e+06					</eqn>
+			</aux>
+			<aux name="Unit_cost_of_migration">
+				<units>Yen</units>
+				<doc></doc>
+					<eqn>
+	3e+06					</eqn>
+			</aux>
+			<aux name="Unit_cost_of_planting_trees">
+				<units>Yen/ha</units>
+				<doc></doc>
+					<eqn>
+	2.31e+06					</eqn>
+			</aux>
+			<aux name="Upstream_area">
+				<units>ha</units>
+				<doc></doc>
+					<eqn>157585					</eqn>
+			</aux>
+			<aux name="Upstream_deep_percolation_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.5					</eqn>
+			</aux>
+			<aux name="Upstream_middle_flow_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.5					</eqn>
+			</aux>
+			<aux name="Upstream_outflow_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>0.5					</eqn>
+			</aux>
+			<aux name="Upstream_percolation_ratio">
+				<units></units>
+				<doc></doc>
+					<eqn>
+	0.2					</eqn>
+			</aux>
+			<aux name="Water-holding_Capacity_of_Forest">
+				<units>mm</units>
+				<doc></doc>
+					<eqn>
+	200					</eqn>
+			</aux>
+		</variables>
+	</model>
+</xmile>

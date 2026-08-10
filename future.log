@@ -1,0 +1,20 @@
+INFO:        Initial point of search.
+INFO:          Downstream area = 143951.
+INFO:          Upstream outflow ratio = 0.5.
+INFO:          Downstream outflow ratio = 0.5.
+INFO:          Upstream area = 157585.
+INFO:          Direct discharge ratio = 0.97.
+INFO:        Simulations = 1.
+INFO:        Pass = 0.
+INFO:        Payoff = -5.6803e+17.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Downstream area = 100766.
+INFO:          Upstream outflow ratio = 0.35.
+INFO:          Downstream outflow ratio = 0.35.
+INFO:          Upstream area = 110315.
+INFO:         *Direct discharge ratio = 0.952173.
+INFO:        Simulations = 159.
+INFO:        Pass = 3.
+INFO:        Payoff = -2.29934e+17.
+INFO:        ---------------------------------.

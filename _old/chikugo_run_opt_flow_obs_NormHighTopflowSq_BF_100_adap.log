@@ -1,0 +1,397 @@
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 10.
+INFO:          Number of migration = 10.
+INFO:          Number of planting trees = 1000.
+INFO:          Annual Paddy dam investment = 0.
+INFO:        Simulations = 1.
+INFO:        Optimizations = 1.
+INFO:        Pass = 0.
+INFO:        Payoff = -1.02307e+19.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 103.
+INFO:        Optimizations = 1.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	61          	103         .
+INFO:        Iterations                    	3           	5           .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	0           	0           .
+INFO:        Payoff                        	-9.5720837e+18	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 3.19057e+09.
+INFO:          Dam investment amount = 3.71203e+09.
+INFO:          Levee investment amount = 6.3519e+09.
+INFO:          Number of house elevation = 671.939.
+INFO:          Number of migration = 762.494.
+INFO:          Number of planting trees = 22368.6.
+INFO:         *Annual Paddy dam investment = 9.99428e+09.
+INFO:        Simulations = 104.
+INFO:        Optimizations = 2.
+INFO:        Pass = 3.
+INFO:        Payoff = -3.73772e+21.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 219.
+INFO:        Optimizations = 2.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	177         	219         .
+INFO:        Iterations                    	3           	10          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	0           	0           .
+INFO:        Payoff                        	-9.5720837e+18	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 3.41071e+09.
+INFO:          Dam investment amount = 7.10496e+09.
+INFO:          Levee investment amount = 2.65412e+09.
+INFO:          Number of house elevation = 553.211.
+INFO:          Number of migration = 257.261.
+INFO:          Number of planting trees = 22179.1.
+INFO:         *Annual Paddy dam investment = 1.72089e+09.
+INFO:        Simulations = 220.
+INFO:        Optimizations = 3.
+INFO:        Pass = 3.
+INFO:        Payoff = -1.19336e+21.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 334.
+INFO:        Optimizations = 3.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	292         	334         .
+INFO:        Iterations                    	3           	15          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	0           	0           .
+INFO:        Payoff                        	-9.5720837e+18	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 8.76598e+09.
+INFO:          Dam investment amount = 4.41795e+09.
+INFO:          Levee investment amount = 7.70743e+09.
+INFO:          Number of house elevation = 19.5815.
+INFO:          Number of migration = 504.665.
+INFO:          Number of planting trees = 97021.5.
+INFO:         *Annual Paddy dam investment = 1.38962e+09.
+INFO:        Simulations = 335.
+INFO:        Optimizations = 4.
+INFO:        Pass = 3.
+INFO:        Payoff = -5.4548e+20.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 445.
+INFO:        Optimizations = 4.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	403         	445         .
+INFO:        Iterations                    	3           	20          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	0           	0           .
+INFO:        Payoff                        	-9.5720837e+18	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 4.44531e+09.
+INFO:          Dam investment amount = 5.36282e+09.
+INFO:          Levee investment amount = 2.05063e+09.
+INFO:          Number of house elevation = 144.265.
+INFO:          Number of migration = 478.196.
+INFO:          Number of planting trees = 30819.3.
+INFO:         *Annual Paddy dam investment = 7.86295e+09.
+INFO:        Simulations = 446.
+INFO:        Optimizations = 5.
+INFO:        Pass = 3.
+INFO:        Payoff = -8.08854e+20.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 558.
+INFO:        Optimizations = 5.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	516         	558         .
+INFO:        Iterations                    	3           	25          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	0           	0           .
+INFO:        Payoff                        	-9.5720837e+18	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 6.55375e+08.
+INFO:          Dam investment amount = 4.13511e+09.
+INFO:          Levee investment amount = 5.17203e+09.
+INFO:          Number of house elevation = 975.124.
+INFO:          Number of migration = 169.862.
+INFO:          Number of planting trees = 90960.5.
+INFO:         *Annual Paddy dam investment = 4.28002e+09.
+INFO:        Simulations = 559.
+INFO:        Optimizations = 6.
+INFO:        Pass = 3.
+INFO:        Payoff = -2.32464e+21.
+INFO:        ---------------------------------.
+INFO:        NOTE Payoff (-9.57208e+18) realized at multiple parameter values.
+INFO:        With Dam investment amount = 0 and 4.76837e-07.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 4.76837e-07.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 779.
+INFO:        Optimizations = 6.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	684         	779         .
+INFO:        Iterations                    	5           	34          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	4.7683716e-07	4.7683716e-07.
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	4.0322809e+09	0           .
+INFO:        Payoff                        	-5.0801621e+19	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 9.05502e+09.
+INFO:          Dam investment amount = 4.29941e+09.
+INFO:          Levee investment amount = 9.02731e+09.
+INFO:          Number of house elevation = 617.486.
+INFO:          Number of migration = 167.901.
+INFO:          Number of planting trees = 51556.7.
+INFO:         *Annual Paddy dam investment = 8.92979e+08.
+INFO:        Simulations = 780.
+INFO:        Optimizations = 7.
+INFO:        Pass = 3.
+INFO:        Payoff = -1.13942e+21.
+INFO:        ---------------------------------.
+INFO:        NOTE Payoff (-9.57208e+18) realized at multiple parameter values.
+INFO:        With Dam investment amount = 4.76837e-07 and 0.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 892.
+INFO:        Optimizations = 7.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	850         	892         .
+INFO:        Iterations                    	3           	39          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	0           	0           .
+INFO:        Payoff                        	-9.5720837e+18	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 5.43454e+09.
+INFO:          Dam investment amount = 4.01697e+09.
+INFO:          Levee investment amount = 4.92576e+09.
+INFO:          Number of house elevation = 579.15.
+INFO:          Number of migration = 764.329.
+INFO:          Number of planting trees = 65740.8.
+INFO:         *Annual Paddy dam investment = 6.5943e+09.
+INFO:        Simulations = 893.
+INFO:        Optimizations = 8.
+INFO:        Pass = 3.
+INFO:        Payoff = -3.23701e+21.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 1068.
+INFO:        Optimizations = 8.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	1019        	1068        .
+INFO:        Iterations                    	5           	46          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	6.7203011e+09	6.7203011e+09.
+INFO:        Payoff                        	-7.7897667e+19	-7.7897667e+19.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 9.6186e+09.
+INFO:          Dam investment amount = 9.87059e+09.
+INFO:          Levee investment amount = 5.33092e+09.
+INFO:          Number of house elevation = 945.877.
+INFO:          Number of migration = 643.899.
+INFO:          Number of planting trees = 154.048.
+INFO:         *Annual Paddy dam investment = 7.38763e+09.
+INFO:        Simulations = 1069.
+INFO:        Optimizations = 9.
+INFO:        Pass = 3.
+INFO:        Payoff = -4.48171e+21.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 1180.
+INFO:        Optimizations = 9.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	1138        	1180        .
+INFO:        Iterations                    	3           	51          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	0           	0           .
+INFO:        Payoff                        	-9.5720837e+18	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Initial point of search.
+INFO:          Drainage investment amount = 5.84743e+09.
+INFO:          Dam investment amount = 3.41528e+09.
+INFO:          Levee investment amount = 9.10145e+09.
+INFO:          Number of house elevation = 162.722.
+INFO:          Number of migration = 344.342.
+INFO:          Number of planting trees = 39804.2.
+INFO:         *Annual Paddy dam investment = 2.42517e+09.
+INFO:        Simulations = 1181.
+INFO:        Optimizations = 10.
+INFO:        Pass = 3.
+INFO:        Payoff = -5.23339e+20.
+INFO:        ---------------------------------.
+INFO:        Maximum payoff found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 1295.
+INFO:        Optimizations = 10.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.
+INFO:        This Search                   	Pass 1      	Final       .
+INFO:        Simulations                   	1253        	1295        .
+INFO:        Iterations                    	3           	56          .
+INFO:         Drainage investment amount   	0           	0           .
+INFO:         Dam investment amount        	0           	0           .
+INFO:         Levee investment amount      	0           	0           .
+INFO:         Number of house elevation    	0           	0           .
+INFO:         Number of migration          	0           	0           .
+INFO:         Number of planting trees     	0           	0           .
+INFO:         Annual Paddy dam investment  	0           	0           .
+INFO:        Payoff                        	-9.5720837e+18	-9.5720837e+18.
+INFO:        ==============================.
+INFO:        Maximum of simulations/optimizations found at:.
+INFO:          Drainage investment amount = 0.
+INFO:          Dam investment amount = 0.
+INFO:          Levee investment amount = 0.
+INFO:          Number of house elevation = 0.
+INFO:          Number of migration = 0.
+INFO:          Number of planting trees = 0.
+INFO:         *Annual Paddy dam investment = 0.
+INFO:        Simulations = 1295.
+INFO:        Optimizations = 10.
+INFO:        Pass = 3.
+INFO:        Payoff = -9.57208e+18.
+INFO:        ---------------------------------.

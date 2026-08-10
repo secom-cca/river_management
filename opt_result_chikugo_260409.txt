@@ -1,0 +1,461 @@
+INFO:        Initial point of search
+INFO:          Upstream outflow ratio = 0.5
+INFO:          Downstream outflow ratio = 0.5
+INFO:          Direct discharge ratio = 0.97
+INFO:          Upstream percolation ratio = 0.2
+INFO:          Downstream deep percolation ratio = 0.2
+INFO:          Upstream middle flow ratio = 0.5
+INFO:          Downstream percolation ratio = 0.2
+INFO:          Downstream middle flow ratio = 0.5
+INFO:          Upstream deep percolation ratio = 0.5
+INFO:        Simulations = 1
+INFO:        Optimizations = 1
+INFO:        Pass = 0
+INFO:        Payoff = -5478.82
+INFO:        ---------------------------------
+INFO:        NOTE Payoff (-5477.52) realized at multiple parameter values
+INFO:        With Downstream middle flow ratio = 0.01 and 0.01
+INFO:        NOTE Payoff (-5477.48) realized at multiple parameter values
+INFO:        With Downstream deep percolation ratio = 0.01 and 0.01
+INFO:        Maximum payoff found at:
+INFO:         *Upstream outflow ratio = 0.181624
+INFO:         *Downstream outflow ratio = 0.262096
+INFO:         *Direct discharge ratio = 0.662124
+INFO:         *Upstream percolation ratio = 0.5
+INFO:         *Downstream deep percolation ratio = 0.0274112
+INFO:         *Upstream middle flow ratio = 0.398987
+INFO:         *Downstream percolation ratio = 0.5
+INFO:         *Downstream middle flow ratio = 0.0302352
+INFO:         *Upstream deep percolation ratio = 0.66405
+INFO:        Simulations = 580
+INFO:        Optimizations = 1
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	443         	580         
+INFO:        Iterations                    	9           	12          
+INFO:         Upstream outflow ratio       	0.18162356  	0.18162356  
+INFO:         Downstream outflow ratio     	0.24665282  	0.26209606  
+INFO:         Direct discharge ratio       	0.66212389  	0.66212389  
+INFO:         Upstream percolation ratio   	0.5         	0.5         
+INFO:         Downstream deep percolation ratio	0.02721522  	0.027411169 
+INFO:         Upstream middle flow ratio   	0.40478128  	0.39898742  
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.030499764 	0.030235164 
+INFO:         Upstream deep percolation ratio	0.6585876   	0.66405002  
+INFO:        Payoff                        	-5477.4773  	-5477.4771  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:         *Upstream outflow ratio = 0.322676
+INFO:         *Downstream outflow ratio = 0.373779
+INFO:         *Direct discharge ratio = 0.632486
+INFO:         *Upstream percolation ratio = 0.33925
+INFO:         *Downstream deep percolation ratio = 0.383622
+INFO:         *Upstream middle flow ratio = 0.229212
+INFO:         *Downstream percolation ratio = 0.49972
+INFO:         *Downstream middle flow ratio = 0.34425
+INFO:         *Upstream deep percolation ratio = 0.706286
+INFO:        Simulations = 581
+INFO:        Optimizations = 2
+INFO:        Pass = 3
+INFO:        Payoff = -5477.68
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:          Upstream outflow ratio = 0.181624
+INFO:          Downstream outflow ratio = 0.262096
+INFO:          Direct discharge ratio = 0.662124
+INFO:          Upstream percolation ratio = 0.5
+INFO:          Downstream deep percolation ratio = 0.0274112
+INFO:          Upstream middle flow ratio = 0.398987
+INFO:          Downstream percolation ratio = 0.5
+INFO:          Downstream middle flow ratio = 0.0302352
+INFO:         *Upstream deep percolation ratio = 0.66405
+INFO:        Simulations = 1062
+INFO:        Optimizations = 2
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	975         	1062        
+INFO:        Iterations                    	9           	23          
+INFO:         Upstream outflow ratio       	0.20600352  	0.20600352  
+INFO:         Downstream outflow ratio     	0.26192219  	0.26192219  
+INFO:         Direct discharge ratio       	0.71414329  	0.71414329  
+INFO:         Upstream percolation ratio   	0.496913    	0.496913    
+INFO:         Downstream deep percolation ratio	0.02493675  	0.02506905  
+INFO:         Upstream middle flow ratio   	0.3798179   	0.3798179   
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.030040062 	0.030040062 
+INFO:         Upstream deep percolation ratio	0.6984081   	0.6984081   
+INFO:        Payoff                        	-5477.4783  	-5477.4783  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:          Upstream outflow ratio = 0.270104
+INFO:          Downstream outflow ratio = 0.552146
+INFO:          Direct discharge ratio = 0.262116
+INFO:          Upstream percolation ratio = 0.118678
+INFO:          Downstream deep percolation ratio = 0.0943237
+INFO:          Upstream middle flow ratio = 0.869066
+INFO:          Downstream percolation ratio = 0.22648
+INFO:          Downstream middle flow ratio = 0.765328
+INFO:         *Upstream deep percolation ratio = 0.0291899
+INFO:        Simulations = 1063
+INFO:        Optimizations = 3
+INFO:        Pass = 3
+INFO:        Payoff = -5479.04
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:          Upstream outflow ratio = 0.181624
+INFO:          Downstream outflow ratio = 0.262096
+INFO:          Direct discharge ratio = 0.662124
+INFO:          Upstream percolation ratio = 0.5
+INFO:          Downstream deep percolation ratio = 0.0274112
+INFO:          Upstream middle flow ratio = 0.398987
+INFO:          Downstream percolation ratio = 0.5
+INFO:          Downstream middle flow ratio = 0.0302352
+INFO:         *Upstream deep percolation ratio = 0.66405
+INFO:        Simulations = 1602
+INFO:        Optimizations = 3
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	1509        	1602        
+INFO:        Iterations                    	9           	34          
+INFO:         Upstream outflow ratio       	0.16607277  	0.16607277  
+INFO:         Downstream outflow ratio     	0.26327672  	0.26252733  
+INFO:         Direct discharge ratio       	0.61912744  	0.61912744  
+INFO:         Upstream percolation ratio   	0.5         	0.5         
+INFO:         Downstream deep percolation ratio	0.027221876 	0.02779755  
+INFO:         Upstream middle flow ratio   	0.41143863  	0.41170323  
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.029558341 	0.029942815 
+INFO:         Upstream deep percolation ratio	0.65315477  	0.65315477  
+INFO:        Payoff                        	-5477.4787  	-5477.4787  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:          Upstream outflow ratio = 0.504571
+INFO:          Downstream outflow ratio = 0.960811
+INFO:          Direct discharge ratio = 0.146183
+INFO:          Upstream percolation ratio = 0.22782
+INFO:          Downstream deep percolation ratio = 0.272778
+INFO:          Upstream middle flow ratio = 0.210962
+INFO:          Downstream percolation ratio = 0.0806899
+INFO:          Downstream middle flow ratio = 0.478632
+INFO:         *Upstream deep percolation ratio = 0.312029
+INFO:        Simulations = 1603
+INFO:        Optimizations = 4
+INFO:        Pass = 3
+INFO:        Payoff = -5479.31
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:          Upstream outflow ratio = 0.181624
+INFO:          Downstream outflow ratio = 0.262096
+INFO:          Direct discharge ratio = 0.662124
+INFO:          Upstream percolation ratio = 0.5
+INFO:          Downstream deep percolation ratio = 0.0274112
+INFO:          Upstream middle flow ratio = 0.398987
+INFO:          Downstream percolation ratio = 0.5
+INFO:          Downstream middle flow ratio = 0.0302352
+INFO:         *Upstream deep percolation ratio = 0.66405
+INFO:        Simulations = 2220
+INFO:        Optimizations = 4
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	2002        	2220        
+INFO:        Iterations                    	9           	48          
+INFO:         Upstream outflow ratio       	0.022202169 	0.021937569 
+INFO:         Downstream outflow ratio     	0.960811    	0.960811    
+INFO:         Direct discharge ratio       	0.87545926  	0.7267883   
+INFO:         Upstream percolation ratio   	0.49928662  	0.49311262  
+INFO:         Downstream deep percolation ratio	0.14127126  	0.10512727  
+INFO:         Upstream middle flow ratio   	0.05668899  	0.05525528  
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.034838831 	0.022163117 
+INFO:         Upstream deep percolation ratio	0.038848385 	0.038848385 
+INFO:        Payoff                        	-5477.513   	-5477.4994  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:          Upstream outflow ratio = 0.780569
+INFO:          Downstream outflow ratio = 0.0742268
+INFO:          Direct discharge ratio = 0.415241
+INFO:          Upstream percolation ratio = 0.263429
+INFO:          Downstream deep percolation ratio = 0.487811
+INFO:          Upstream middle flow ratio = 0.176465
+INFO:          Downstream percolation ratio = 0.455706
+INFO:          Downstream middle flow ratio = 0.429442
+INFO:         *Upstream deep percolation ratio = 0.897392
+INFO:        Simulations = 2221
+INFO:        Optimizations = 5
+INFO:        Pass = 3
+INFO:        Payoff = -5478.21
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:          Upstream outflow ratio = 0.181624
+INFO:          Downstream outflow ratio = 0.262096
+INFO:          Direct discharge ratio = 0.662124
+INFO:          Upstream percolation ratio = 0.5
+INFO:          Downstream deep percolation ratio = 0.0274112
+INFO:          Upstream middle flow ratio = 0.398987
+INFO:          Downstream percolation ratio = 0.5
+INFO:          Downstream middle flow ratio = 0.0302352
+INFO:         *Upstream deep percolation ratio = 0.66405
+INFO:        Simulations = 2751
+INFO:        Optimizations = 5
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	2654        	2751        
+INFO:        Iterations                    	9           	59          
+INFO:         Upstream outflow ratio       	0.12918148  	0.12918148  
+INFO:         Downstream outflow ratio     	0.2602283   	0.2602283   
+INFO:         Direct discharge ratio       	0.7320889   	0.7320889   
+INFO:         Upstream percolation ratio   	0.47926357  	0.47926357  
+INFO:         Downstream deep percolation ratio	0.036076431 	0.036076431 
+INFO:         Upstream middle flow ratio   	0.37692349  	0.37692349  
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.035083549 	0.035083549 
+INFO:         Upstream deep percolation ratio	0.62448959  	0.62448959  
+INFO:        Payoff                        	-5477.4844  	-5477.4844  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:          Upstream outflow ratio = 0.431342
+INFO:          Downstream outflow ratio = 0.894676
+INFO:          Direct discharge ratio = 0.615136
+INFO:          Upstream percolation ratio = 0.0922716
+INFO:          Downstream deep percolation ratio = 0.262628
+INFO:          Upstream middle flow ratio = 0.0975119
+INFO:          Downstream percolation ratio = 0.276293
+INFO:          Downstream middle flow ratio = 0.403663
+INFO:         *Upstream deep percolation ratio = 0.492724
+INFO:        Simulations = 2752
+INFO:        Optimizations = 6
+INFO:        Pass = 3
+INFO:        Payoff = -5478.72
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:         *Upstream outflow ratio = 0.181624
+INFO:         *Downstream outflow ratio = 0.262096
+INFO:         *Direct discharge ratio = 0.662124
+INFO:         *Upstream percolation ratio = 0.5
+INFO:         *Downstream deep percolation ratio = 0.0274112
+INFO:         *Upstream middle flow ratio = 0.398987
+INFO:         *Downstream percolation ratio = 0.5
+INFO:         *Downstream middle flow ratio = 0.0302352
+INFO:         *Upstream deep percolation ratio = 0.66405
+INFO:        Simulations = 3290
+INFO:        Optimizations = 6
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	3192        	3290        
+INFO:        Iterations                    	9           	70          
+INFO:         Upstream outflow ratio       	0.1267498   	0.1267498   
+INFO:         Downstream outflow ratio     	0.89467604  	0.89467604  
+INFO:         Direct discharge ratio       	0.73947714  	0.73947714  
+INFO:         Upstream percolation ratio   	0.46599837  	0.46599837  
+INFO:         Downstream deep percolation ratio	0.047845318 	0.048349069 
+INFO:         Upstream middle flow ratio   	0.27507253  	0.27538284  
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.027913573 	0.028178173 
+INFO:         Upstream deep percolation ratio	0.62173248  	0.62275516  
+INFO:        Payoff                        	-5477.5272  	-5477.5272  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:         *Upstream outflow ratio = 0.577567
+INFO:         *Downstream outflow ratio = 0.759042
+INFO:         *Direct discharge ratio = 0.654259
+INFO:         *Upstream percolation ratio = 0.333121
+INFO:         *Downstream deep percolation ratio = 0.481312
+INFO:         *Upstream middle flow ratio = 0.977318
+INFO:         *Downstream percolation ratio = 0.271215
+INFO:         *Downstream middle flow ratio = 0.936959
+INFO:         *Upstream deep percolation ratio = 0.641021
+INFO:        Simulations = 3291
+INFO:        Optimizations = 7
+INFO:        Pass = 3
+INFO:        Payoff = -5479.29
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:         *Upstream outflow ratio = 0.181624
+INFO:         *Downstream outflow ratio = 0.262096
+INFO:         *Direct discharge ratio = 0.662124
+INFO:         *Upstream percolation ratio = 0.5
+INFO:         *Downstream deep percolation ratio = 0.0274112
+INFO:         *Upstream middle flow ratio = 0.398987
+INFO:         *Downstream percolation ratio = 0.5
+INFO:         *Downstream middle flow ratio = 0.0302352
+INFO:         *Upstream deep percolation ratio = 0.66405
+INFO:        Simulations = 3791
+INFO:        Optimizations = 7
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	3700        	3791        
+INFO:        Iterations                    	9           	81          
+INFO:         Upstream outflow ratio       	0.17893224  	0.17547392  
+INFO:         Downstream outflow ratio     	0.7590422   	0.7590422   
+INFO:         Direct discharge ratio       	0.58294054  	0.58294054  
+INFO:         Upstream percolation ratio   	0.5         	0.5         
+INFO:         Downstream deep percolation ratio	0.036853451 	0.036985751 
+INFO:         Upstream middle flow ratio   	0.33188337  	0.33260515  
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.025281467 	0.025016867 
+INFO:         Upstream deep percolation ratio	0.70886194  	0.7040955   
+INFO:        Payoff                        	-5477.522   	-5477.5219  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:         *Upstream outflow ratio = 0.0115097
+INFO:         *Downstream outflow ratio = 0.733988
+INFO:         *Direct discharge ratio = 0.583048
+INFO:         *Upstream percolation ratio = 0.177349
+INFO:         *Downstream deep percolation ratio = 0.455971
+INFO:         *Upstream middle flow ratio = 0.169468
+INFO:         *Downstream percolation ratio = 0.178728
+INFO:         *Downstream middle flow ratio = 0.400081
+INFO:         *Upstream deep percolation ratio = 0.247667
+INFO:        Simulations = 3792
+INFO:        Optimizations = 8
+INFO:        Pass = 3
+INFO:        Payoff = -5479.05
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:          Upstream outflow ratio = 0.181624
+INFO:          Downstream outflow ratio = 0.262096
+INFO:         *Direct discharge ratio = 0.662124
+INFO:         *Upstream percolation ratio = 0.5
+INFO:          Downstream deep percolation ratio = 0.0274112
+INFO:          Upstream middle flow ratio = 0.398987
+INFO:          Downstream percolation ratio = 0.5
+INFO:          Downstream middle flow ratio = 0.0302352
+INFO:         *Upstream deep percolation ratio = 0.66405
+INFO:        Simulations = 4630
+INFO:        Optimizations = 8
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	4283        	4630        
+INFO:        Iterations                    	9           	99          
+INFO:         Upstream outflow ratio       	0.19197071  	0.18540471  
+INFO:         Downstream outflow ratio     	0.1637801   	0.26275162  
+INFO:         Direct discharge ratio       	0.65418642  	0.64142643  
+INFO:         Upstream percolation ratio   	0.48414888  	0.5         
+INFO:         Downstream deep percolation ratio	0.010147484 	0.025887967 
+INFO:         Upstream middle flow ratio   	0.43285519  	0.40346136  
+INFO:         Downstream percolation ratio 	0.44374447  	0.5         
+INFO:         Downstream middle flow ratio 	0.01977886  	0.028991428 
+INFO:         Upstream deep percolation ratio	0.67253019  	0.67147978  
+INFO:        Payoff                        	-5477.4898  	-5477.4779  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:          Upstream outflow ratio = 0.112741
+INFO:          Downstream outflow ratio = 0.817933
+INFO:         *Direct discharge ratio = 0.0593178
+INFO:         *Upstream percolation ratio = 0.130059
+INFO:          Downstream deep percolation ratio = 0.147565
+INFO:          Upstream middle flow ratio = 0.821063
+INFO:          Downstream percolation ratio = 0.181418
+INFO:          Downstream middle flow ratio = 0.26965
+INFO:         *Upstream deep percolation ratio = 0.62033
+INFO:        Simulations = 4631
+INFO:        Optimizations = 9
+INFO:        Pass = 3
+INFO:        Payoff = -5479.24
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:         *Upstream outflow ratio = 0.182832
+INFO:         *Downstream outflow ratio = 0.261853
+INFO:         *Direct discharge ratio = 0.662478
+INFO:         *Upstream percolation ratio = 0.5
+INFO:         *Downstream deep percolation ratio = 0.0286054
+INFO:         *Upstream middle flow ratio = 0.398981
+INFO:         *Downstream percolation ratio = 0.5
+INFO:         *Downstream middle flow ratio = 0.0308935
+INFO:         *Upstream deep percolation ratio = 0.664968
+INFO:        Simulations = 5238
+INFO:        Optimizations = 9
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	5065        	5238        
+INFO:        Iterations                    	9           	112         
+INFO:         Upstream outflow ratio       	0.18283168  	0.18283168  
+INFO:         Downstream outflow ratio     	0.20253692  	0.26185316  
+INFO:         Direct discharge ratio       	0.66247826  	0.66247826  
+INFO:         Upstream percolation ratio   	0.5         	0.5         
+INFO:         Downstream deep percolation ratio	0.027591762 	0.028605435 
+INFO:         Upstream middle flow ratio   	0.41979969  	0.39898147  
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.031800782 	0.03089351  
+INFO:         Upstream deep percolation ratio	0.64320188  	0.66496833  
+INFO:        Payoff                        	-5477.48    	-5477.4771  
+INFO:        ==============================
+INFO:        Initial point of search
+INFO:         *Upstream outflow ratio = 0.662755
+INFO:         *Downstream outflow ratio = 0.656885
+INFO:         *Direct discharge ratio = 0.953444
+INFO:         *Upstream percolation ratio = 0.280418
+INFO:         *Downstream deep percolation ratio = 0.402499
+INFO:         *Upstream middle flow ratio = 0.638187
+INFO:         *Downstream percolation ratio = 0.362829
+INFO:         *Downstream middle flow ratio = 0.831377
+INFO:         *Upstream deep percolation ratio = 0.81014
+INFO:        Simulations = 5239
+INFO:        Optimizations = 10
+INFO:        Pass = 3
+INFO:        Payoff = -5479.53
+INFO:        ---------------------------------
+INFO:        Maximum payoff found at:
+INFO:          Upstream outflow ratio = 0.182832
+INFO:          Downstream outflow ratio = 0.261853
+INFO:          Direct discharge ratio = 0.662478
+INFO:         *Upstream percolation ratio = 0.5
+INFO:         *Downstream deep percolation ratio = 0.0286054
+INFO:          Upstream middle flow ratio = 0.398981
+INFO:          Downstream percolation ratio = 0.5
+INFO:          Downstream middle flow ratio = 0.0308935
+INFO:         *Upstream deep percolation ratio = 0.664968
+INFO:        Simulations = 5846
+INFO:        Optimizations = 10
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        This Search                   	Pass 1      	Final       
+INFO:        Simulations                   	5671        	5846        
+INFO:        Iterations                    	9           	125         
+INFO:         Upstream outflow ratio       	0.16860606  	0.16553377  
+INFO:         Downstream outflow ratio     	0.65688541  	0.65688541  
+INFO:         Direct discharge ratio       	0.64409453  	0.64409453  
+INFO:         Upstream percolation ratio   	0.43844686  	0.45079486  
+INFO:         Downstream deep percolation ratio	0.035782746 	0.035091689 
+INFO:         Upstream middle flow ratio   	0.30252632  	0.30691648  
+INFO:         Downstream percolation ratio 	0.5         	0.5         
+INFO:         Downstream middle flow ratio 	0.021579858 	0.022482509 
+INFO:         Upstream deep percolation ratio	0.89329647  	0.84315545  
+INFO:        Payoff                        	-5477.5285  	-5477.527   
+INFO:        ==============================
+INFO:        Maximum of simulations/optimizations found at:
+INFO:          Upstream outflow ratio = 0.182832
+INFO:          Downstream outflow ratio = 0.261853
+INFO:          Direct discharge ratio = 0.662478
+INFO:         *Upstream percolation ratio = 0.5
+INFO:         *Downstream deep percolation ratio = 0.0286054
+INFO:          Upstream middle flow ratio = 0.398981
+INFO:          Downstream percolation ratio = 0.5
+INFO:          Downstream middle flow ratio = 0.0308935
+INFO:         *Upstream deep percolation ratio = 0.664968
+INFO:        Simulations = 5846
+INFO:        Optimizations = 10
+INFO:        Pass = 3
+INFO:        Payoff = -5477.48
+INFO:        ---------------------------------
+INFO:        The final payoff is -5477.4770653152755
+INFO:        Simulation and save took 80.594 seconds

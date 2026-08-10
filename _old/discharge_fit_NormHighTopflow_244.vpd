@@ -1,0 +1,6 @@
+*CG
+flow log error sq|Zero/2
+*CG
+high flow error|Zero/4
+*CG
+top flow error|Zero/4

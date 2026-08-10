@@ -1,0 +1,21 @@
+The total payoff is	-9.57208e+18
+   Policy elements	0
+   Calibration elements	-9.57208e+18
+   Prior elements	0
+
+The following are the components of the payoff:
+Type	Component	Contribution	Percent	Values	Params&Data	Used	Skipped	Source	RSquare	DW	Autocor1	Autocor2	Autocor3	Autocor4	(TimeGap)	RMSE	Um	Us	Uc	MAE	MAPE	MAEoM
+*CG	Financial damage by innundation|Zero/1	-8.31647e+18	86.8825	-8.31647e+18	0	366	0	
+*CG	Daily crop production|One Billion/1	-1.25562e+18	13.1175	-1.25562e+18	0	366	0	
+*CG	Biodiversity|One/1	-19.5359	2.04092e-16	-19.5359	0	366	0	
+*CG	Landslide disaster risk|Zero/1	0	-0	0	0	366	0	
+*CG	Financial damage by flood|Zero/1	0	-0	0	0	366	0	
+*CG	Municipality cost|Zero/1	0	-0	0	0	366	0	
+
+Sources for exogenous variables
+Daily ave temp	jma_kurume_2023.xlsx.vdfx
+Daily max temp	jma_kurume_2023.xlsx.vdfx
+Daily min temp	jma_kurume_2023.xlsx.vdfx
+Daily precip	jma_kurume_2023.xlsx.vdfx
+flow	C:\Users\tomus\Documents\GitHub\river_management\data\flow_arase_2023_x100000_0to364.csv.vdfx
+Solar radiation time	jma_kurume_2023.xlsx.vdfx

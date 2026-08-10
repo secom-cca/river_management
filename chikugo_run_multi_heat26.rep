@@ -1,0 +1,17 @@
+The total payoff is	0
+   Policy elements	0
+   Calibration elements	0
+   Prior elements	0
+
+The following are the components of the payoff:
+Type	Component	Contribution	Percent	Values	Params&Data	Used	Skipped
+*P	Houses damaged by flood/1	0	0	0	0	5478	0
+
+Sources for exogenous variables
+Daily ave temp	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+Daily max temp	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+Daily min temp	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+Daily precip	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx
+flow	C:\Users\tomus\Documents\GitHub\river_management\data\flow_arase_2009_2023_x100000_0to364.csv.vdfx
+flow d	C:\Users\tomus\Documents\GitHub\river_management\data\flow_senoshita_2009_2023_x100000_0to364_utf8.csv.vdfx
+Solar radiation	C:\Users\tomus\Documents\GitHub\river_management\data\jma_kurume_saga_2009_2023.xlsx.vdfx

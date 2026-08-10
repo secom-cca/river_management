@@ -1,0 +1,71 @@
+Annual Paddy dam investment = 1e+06
+Capacity Building = 0.5
+Capacity per dam investment = 0.0002
+CO2 absorption per area = 8.8
+Coefficient for ecosystem = 1
+Cost for unit drainage increase = 1e+08
+Crop price = 4000
+"Current high-water discharge" = 11500
+current planting trees = 10000
+Daily precipitation future ratio = 1
+Dam construction time = 10
+Dam investment amount = 0
+Dam investment start time = 0
+Degradation of paddy dam = 0.05
+Delay of recovery = 365
+Direct discharge ratio = 0.227355
+Downstream area = 143951
+Downstream deep percolation ratio = 0.439533
+Downstream middle flow ratio = 0.0291899
+Downstream outflow ratio = 0.262116
+Downstream percolation ratio = 0.387664
+Downstream storage depth = 0.03
+Drainage investment amount = 0
+Eldery people ratio = 0.6
+Erosion control dam capacity = 200
+Erosion control of forest = 50
+FINAL TIME = 364
+Flood risky area ratio = 0.05
+Forest area ratio = 0.92
+Heading day = 213
+Inflow of houses in flood risk = 0
+Initial dam capacity = 7.42e+07
+Initial drainage capacity = 50
+Initial paddy dam ratio = 0.1
+INITIAL TIME = 0
+Innundation risky area ratio = 0.2
+Levee construction time = 5
+Levee investment amount = 0
+Levee investment start time = 0
+Level per levee investment = 1000
+Number of house elevation = 10
+Number of lumbering trees = 100000
+Number of migration = 10
+Number of planting trees = 1e+06
+Outflow of houses in flood risk = 0
+Paddy field capacity per area = 1000
+Paddy field ratio = 0.12
+Planting start time = 5
+Predischarge capacity = 10000
+Price per tree = 10000
+Ratio of paddy field in risky area = 0.01
+Recovery ratio = 0.9
+TIME STEP = 1
+Tree die ratio = 0.01
+Tree growth time = 40
+Trees per area = 900
+Unit cost of elevation = 3e+06
+Unit cost of migration = 3e+06
+Unit cost of planting trees = 2.31e+06
+Upstream area = 157585
+Upstream deep percolation ratio = 0.960811
+Upstream middle flow ratio = 0.442959
+Upstream outflow ratio = 0.552146
+Upstream percolation ratio = 0.0943237
+"Water-holding Capacity of Forest" = 200.466
+#Flood damage ratio#(
+(0,0),(0.5,0.2),(1,0.4),(1.8,0.5),
+(10,1))
+#Inundation damage ratio#(
+(0,0),(0.5,0.2),(1,0.4),(1.8,0.5),
+(10,1))

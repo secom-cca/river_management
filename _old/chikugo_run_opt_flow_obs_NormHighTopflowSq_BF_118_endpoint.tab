@@ -1,0 +1,7 @@
+Start	Simulations	Message	PAYOFF	Upstream outflow ratio	Downstream outflow ratio	Direct discharge ratio	Upstream percolation ratio	Downstream deep percolation ratio	Upstream middle flow ratio	Downstream percolation ratio	Downstream middle flow ratio	"Water-holding Capacity of Forest"	Upstream deep percolation ratio
+0	1808	BEST	            -1107.32		    0.379664	   0.0337319	    0.965592	    0.250731	    0.115478	        0.01	    0.188281	    0.156981	     228.946	   0.0349207
+1	2069	OK	            -1116.11		    0.256279	    0.128173	    0.681878	    0.363946	    0.138502	    0.253908	   0.0803507	   0.0898436	      223.57	    0.934259
+3	2241	OK	            -1122.58		    0.362774	   0.0275347	    0.237504	    0.492117	    0.222271	    0.533034	    0.106922	    0.375537	     156.554	    0.543982
+6	2457	BEST	            -1101.53		    0.243246	   0.0261401	    0.936959	    0.322732	    0.275558	    0.475401	    0.119703	    0.293538	     241.014	    0.631277
+7	2610	OK	            -1130.11		    0.280376	    0.141724	    0.204089	    0.399591	         0.5	     0.28758	   0.0134676	    0.215835	     235.282	    0.848546
+9	3019	OK	            -1176.71		     0.17377	    0.874566	        0.01	    0.400392	   0.0501787	        0.01	         0.5	        0.01	         250	        0.99

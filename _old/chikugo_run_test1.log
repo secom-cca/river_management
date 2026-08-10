@@ -1,0 +1,32 @@
+INFO:        Initial point of search.
+INFO:          Upstream outflow ratio = 0.5.
+INFO:          Downstream outflow ratio = 0.5.
+INFO:          Direct discharge ratio = 0.97.
+INFO:        Simulations = 1.
+INFO:        Pass = 0.
+INFO:        Payoff = -7e+12.
+INFO:        ---------------------------------.
+INFO:        ------------------.
+INFO:        Floating point error during optimization with.
+INFO:        .
+INFO:         *Upstream outflow ratio = 1.
+INFO:         *Downstream outflow ratio = 0.5.
+INFO:         *Direct discharge ratio = 0.97.
+INFO:        ------------------.
+INFO:        NOTE Payoff (-7e+12) realized at multiple parameter values.
+INFO:        With Downstream outflow ratio = 0.963993 and 1.
+INFO:        NOTE Payoff (-7e+12) realized at multiple parameter values.
+INFO:        With Downstream outflow ratio = 1 and 0.981997.
+INFO:        NOTE Payoff (-7e+12) realized at multiple parameter values.
+INFO:        With Downstream outflow ratio = 0.963993 and 0.981997.
+INFO:        NOTE Payoff (-7e+12) realized at multiple parameter values.
+INFO:        With Downstream outflow ratio = 0.981997 and 1.
+INFO:        Maximum payoff found at:.
+INFO:         *Upstream outflow ratio = 0.98988.
+INFO:          Downstream outflow ratio = 0.963993.
+INFO:          Direct discharge ratio = 1.
+INFO:        Simulations = 44.
+INFO:        NOTE 9 of the simulations caused floating point errors (first was reported).
+INFO:        Pass = 3.
+INFO:        Payoff = -7e+12.
+INFO:        ---------------------------------.
