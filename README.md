@@ -144,6 +144,31 @@ RIVER_BASIN=chikugo python visualize_parallel_coordinates.py
 `run_vensim_with_pysd_to7_opt.py` が最適化するのはダム・堤防・排水・移転などの施策です。
 水文パラメータの較正は `calibrate_hydrology.py` が担当します。
 
+## パラメータスタディCSVのPNG化
+
+`plot_parameter_study.py` は計算を再実行せず、保存済みCSV一式を読み込んでPNGを作ります。
+未指定時は選択流域の最新の完全なCSV一式を使用します。
+
+```bash
+RIVER_BASIN=chikugo python plot_parameter_study.py
+
+# 過去の実行を指定
+python plot_parameter_study.py --basin chikugo --run-stamp 260727_1604
+
+# 散布図の目的指標を変更
+python plot_parameter_study.py --target financial_damage_by_flood_year_sum
+```
+
+出力先は `figures/parameter_study/<流域キー>/<実行日時>/` です。
+
+- シナリオ別結果分布
+- パラメータと結果のSpearman順位相関ヒートマップ
+- 影響上位パラメータの散布図
+- 年次中央値と10–90%範囲
+- 現在気候に対するシナリオ変化率
+- サンプリング範囲のカバレッジ
+- 相関値CSVと使用ファイルのmanifest
+
 ## その他のワークフロー
 
 - `app.py`: `River_management_xls.py` を使う旧Streamlit系統
