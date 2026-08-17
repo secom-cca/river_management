@@ -23,6 +23,8 @@ import numpy as np
 import pandas as pd
 from pysd import load
 
+from basin_config import load_active_basin, scenario_maps
+
 try:
     from scipy.optimize import differential_evolution
 except ImportError as exc:
@@ -49,16 +51,23 @@ warnings.filterwarnings(
 
 
 # ---- Model and simulation settings ----
-MODEL_PY = Path("River_management_xls_to6.py")
-OUTPUT_DIR = Path("data")
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PY = BASE_DIR / "River_management_xls_to6.py"
+BASIN_CONFIG = load_active_basin()
+BASIN_KEY = BASIN_CONFIG["key"]
+OUTPUT_DIR = BASE_DIR / "results" / "optimization" / BASIN_KEY
 RUN_STAMP = datetime.now().strftime("%y%m%d_%H%M")
 
-CALENDAR_START_YEAR = 2009
-CALENDAR_NUM_YEARS = 15
-USE_LEAP_YEARS = True
+CALENDAR_START_YEAR = int(BASIN_CONFIG["calendar"]["start_year"])
+CALENDAR_NUM_YEARS = int(BASIN_CONFIG["calendar"]["num_years"])
+USE_LEAP_YEARS = bool(BASIN_CONFIG["calendar"]["use_leap_years"])
 
 #SCENARIOS = ["present"]
-SCENARIOS = ["2C", "4C"]
+SCENARIOS = [
+    name for name in ("2C", "4C") if name in BASIN_CONFIG["climate_scenarios"]
+]
+if not SCENARIOS:
+    SCENARIOS = list(BASIN_CONFIG["climate_scenarios"])
 
 # Present-climate exploration across all objective patterns. Restore all climate
 # scenarios after confirming convergence and policy-pattern behaviour.
@@ -98,37 +107,11 @@ BUDGET_PENALTY = 1_000_000.0
 # in the primary outcome ratios.
 COST_TIEBREAKER_WEIGHT = 1e-3
 
-SCENARIO_TO_PRECIP_RATIO = {"present": 1.0, "2C": 1.1, "4C": 1.3}
-SCENARIO_TO_TEMP_SHIFT = {"present": 0.0, "2C": 1.3, "4C": 4.1}
+SCENARIO_TO_PRECIP_RATIO, SCENARIO_TO_TEMP_SHIFT = scenario_maps(BASIN_CONFIG)
 
-# Fixed values are the central values of the to7 parameter study. Hydrological
-# parameters remain at the separately calibrated values.
-FIXED_ASSUMPTIONS = {
-    "forest_area_ratio": 0.92,
-    "paddy_field_ratio": 0.15,
-    "ratio_of_paddy_field_in_risky_area": 0.10,
-    "innundation_risky_area_ratio": 0.8,
-    "flood_risky_area_ratio": 0.8,
-    "recovery_ratio": 0.9,
-    "crop_price": 250,
-    "waterholding_capacity_of_forest_base": 225,
-    "landslide_design_daily_precipitation": 322,
-    "innundation_damage_per_resident": 1e7 / 365,
-    "flood_damage_per_resident": 1e7 / 365,
-    "gdp_per_resident": 3e6 / 365,
-    "paddy_field_capacity_per_area": 500,
-    "paddy_dam_capacity_per_area": 1500,
-    "unmanaged_plantation_forest_coef": 0.7,
-    "upstream_outflow_ratio": 0.272198,
-    "downstream_outflow_ratio": 0.240634,
-    "direct_discharge_ratio": 0.815126,
-    "upstream_percolation_ratio": 0.5,
-    "downstream_deep_percolation_ratio": 0.0263544,
-    "upstream_middle_flow_ratio": 0.443267,
-    "downstream_percolation_ratio": 0.5,
-    "downstream_middle_flow_ratio": 0.0326612,
-    "upstream_deep_percolation_ratio": 0.540584,
-}
+# Regional, socioeconomic, and calibrated hydrological values are maintained in
+# one basin config and shared with the parameter-study and calibration scripts.
+FIXED_ASSUMPTIONS = dict(BASIN_CONFIG["model_parameters"])
 
 # A compact policy representation avoids optimising a separate value for every
 # year. Start/end years are rounded to calendar-year indices when evaluated.
@@ -638,6 +621,7 @@ def optimise_scenario(scenario, pattern_name, weights, seed):
 
 def _comparison_row(scenario, pattern_name, seed, result, baseline, metrics):
     row = {
+        "basin": BASIN_KEY,
         "scenario": scenario,
         "pattern": pattern_name,
         "seed": seed,
@@ -696,6 +680,7 @@ def save_checkpoint(
         )
         state_rows.append(
             {
+                "basin": BASIN_KEY,
                 "scenario": scenario,
                 "pattern": pattern_name,
                 "seed": seed,
@@ -714,6 +699,8 @@ def save_checkpoint(
         checkpoint_dir / "optimiser_state.csv", index=False, encoding="utf-8-sig"
     )
     metadata = {
+        "basin": BASIN_KEY,
+        "basin_config": str(BASIN_CONFIG["_path"]),
         "decision_variable_order": list(DECISION_BOUNDS),
         "population_size": POPSIZE * len(DECISION_BOUNDS),
         "maxiter": MAXITER,
@@ -728,7 +715,7 @@ def save_checkpoint(
 
 
 def main():
-    OUTPUT_DIR.mkdir(exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     stem = f"opt_to7_{BUDGET_CASE}_{RUN_STAMP}"
     checkpoint_dir = OUTPUT_DIR / "checkpoints" / stem
     summary_rows = []
@@ -754,6 +741,7 @@ def main():
                 )
                 decision_rows.append(
                     {
+                        "basin": BASIN_KEY,
                         "scenario": scenario,
                         "pattern": pattern_name,
                         "seed": seed,
@@ -763,6 +751,7 @@ def main():
                 yearly.insert(0, "seed", seed)
                 yearly.insert(0, "pattern", pattern_name)
                 yearly.insert(0, "scenario", scenario)
+                yearly.insert(0, "basin", BASIN_KEY)
                 yearly_frames.append(yearly)
                 save_checkpoint(
                     checkpoint_dir,

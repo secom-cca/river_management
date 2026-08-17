@@ -1,0 +1,17 @@
+numpy
+openpyxl
+pandas
+pysd==3.14.3
+PyYAML
+scipy
+
+# Visualisation / app workflows
+beautifulsoup4
+dash
+lxml
+matplotlib
+plotly
+requests
+seaborn
+streamlit
+xlrd

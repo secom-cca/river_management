@@ -11,19 +11,27 @@ from pysd.py_backend.statefuls import Integ, SampleIfTrue, Delay
 from pysd.py_backend.external import ExtData
 from pysd import Component
 
+from basin_config import load_active_basin, resolve_input_path
+
 __pysd_version__ = "3.14.3"
 
 __data = {"scope": None, "time": lambda: 0}
 
 _root = Path(__file__).parent
+_BASIN_CONFIG = load_active_basin()
+_BASIN_PARAMETERS = _BASIN_CONFIG["model_parameters"]
+
+
+def _basin_value(name, fallback):
+    return _BASIN_PARAMETERS.get(name, fallback)
 
 
 component = Component()
 
 # ---- Calendar settings (adjust for leap years if data includes Feb 29) ----
-CALENDAR_START_YEAR = 2009
-CALENDAR_NUM_YEARS = 15
-USE_LEAP_YEARS = True  # True if input data includes leap days (366-day years)
+CALENDAR_START_YEAR = int(_BASIN_CONFIG["calendar"]["start_year"])
+CALENDAR_NUM_YEARS = int(_BASIN_CONFIG["calendar"]["num_years"])
+USE_LEAP_YEARS = bool(_BASIN_CONFIG["calendar"]["use_leap_years"])
 
 
 def _is_leap_year(year):
@@ -192,7 +200,7 @@ def solar_radiation_down():
 
 
 _ext_data_solar_radiation_down = ExtData(
-    r"data/jma_asakura_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_down"),
     "input",
     "A",
     "F2",
@@ -219,7 +227,7 @@ def daily_ave_temp_down():
 
 
 _ext_data_daily_ave_temp_down = ExtData(
-    r"data/jma_asakura_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_down"),
     "input",
     "A",
     "C2",
@@ -247,7 +255,7 @@ def daily_precip_down():
 
 
 _ext_data_daily_precip_down = ExtData(
-    r"data/jma_asakura_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_down"),
     "input",
     "A",
     "B2",
@@ -274,7 +282,7 @@ def daily_min_temp_down():
 
 
 _ext_data_daily_min_temp_down = ExtData(
-    r"data/jma_asakura_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_down"),
     "input",
     "A",
     "E2",
@@ -301,7 +309,7 @@ def daily_max_temp_down():
 
 
 _ext_data_daily_max_temp_down = ExtData(
-    r"data/jma_asakura_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_down"),
     "input",
     "A",
     "D2",
@@ -347,7 +355,7 @@ def paddy_dam_capacity_per_area():
     """
     2026/01/16 田んぼと田んぼダムの貯水量を別々にカウントするため 、新たに追加。
     """
-    return 1500
+    return _basin_value("paddy_dam_capacity_per_area", 1500)
 
 
 @component.add(
@@ -442,7 +450,7 @@ def flow_d():
 
 
 _ext_data_flow_d = ExtData(
-    r"data/flow_senoshita_2009_2023_x100000_0to364_utf8.csv",
+    resolve_input_path(_BASIN_CONFIG, "flow_down"),
     ",",
     "A",
     "D2",
@@ -866,7 +874,7 @@ def flow():
 
 
 _ext_data_flow = ExtData(
-    r"data/flow_arase_2009_2023_x100000_0to364_utf8.csv",
+    resolve_input_path(_BASIN_CONFIG, "flow_up"),
     ",",
     "A",
     "D2",
@@ -1122,7 +1130,7 @@ def daily_min_temp_up():
 
 
 _ext_data_daily_min_temp_up = ExtData(
-    r"data/jma_hita_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_up"),
     "input",
     "A",
     "E2",
@@ -1153,7 +1161,7 @@ def solar_radiation_up():
 
 
 _ext_data_solar_radiation_up = ExtData(
-    r"data/jma_hita_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_up"),
     "input",
     "A",
     "F2",
@@ -1180,7 +1188,7 @@ def daily_ave_temp_up():
 
 
 _ext_data_daily_ave_temp_up = ExtData(
-    r"data/jma_hita_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_up"),
     "input",
     "A",
     "C2",
@@ -1207,7 +1215,7 @@ def daily_max_temp_up():
 
 
 _ext_data_daily_max_temp_up = ExtData(
-    r"data/jma_hita_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_up"),
     "input",
     "A",
     "D2",
@@ -1235,7 +1243,7 @@ def daily_precip_up():
 
 
 _ext_data_daily_precip_up = ExtData(
-    r"data/jma_hita_2009_2023.xlsx",
+    resolve_input_path(_BASIN_CONFIG, "weather_up"),
     "input",
     "A",
     "B2",
@@ -1776,7 +1784,7 @@ _delay_outflow_of_damaged_houses = Delay(
     comp_subtype="Normal",
 )
 def recovery_ratio():
-    return 0.9
+    return _basin_value("recovery_ratio", 0.9)
 
 
 @component.add(
@@ -2409,7 +2417,7 @@ _integ_dam_capacity = Integ(
     name="Initial dam capacity", units="m3", comp_type="Constant", comp_subtype="Normal"
 )
 def initial_dam_capacity():
-    return 74200000.0
+    return _basin_value("initial_dam_capacity", 74200000.0)
 
 
 @component.add(
@@ -2454,7 +2462,7 @@ def downstream_deep_percolation():
     comp_subtype="Normal",
 )
 def downstream_deep_percolation_ratio():
-    return 0.2
+    return _basin_value("downstream_deep_percolation_ratio", 0.2)
 
 
 @component.add(
@@ -2464,7 +2472,7 @@ def downstream_deep_percolation_ratio():
     comp_subtype="Normal",
 )
 def downstream_middle_flow_ratio():
-    return 0.5
+    return _basin_value("downstream_middle_flow_ratio", 0.5)
 
 
 @component.add(
@@ -2484,7 +2492,7 @@ def downstream_middle_flow():
     comp_subtype="Normal",
 )
 def downstream_percolation_ratio():
-    return 0.2
+    return _basin_value("downstream_percolation_ratio", 0.2)
 
 
 @component.add(
@@ -2504,7 +2512,7 @@ def upstream_deep_percolation():
     comp_subtype="Normal",
 )
 def upstream_deep_percolation_ratio():
-    return 0.5
+    return _basin_value("upstream_deep_percolation_ratio", 0.5)
 
 
 @component.add(
@@ -2583,7 +2591,7 @@ _integ_paddy_field = Integ(
     comp_subtype="Normal",
 )
 def initial_drainage_capacity():
-    return 50
+    return _basin_value("initial_drainage_capacity", 50)
 
 
 @component.add(
@@ -2678,7 +2686,7 @@ def crop_price_quality_factor():
 )
 def crop_price():
     # 2009-2023 producer-price representative value (Yen/kg).
-    return 250
+    return _basin_value("crop_price", 250)
 
 
 @component.add(
@@ -3027,7 +3035,7 @@ def unmanaged_plantation_forest_coef():
     現時点では未管理人工林を初期値のまま固定する。
     将来的には年次更新で 0.03 刻みの劣化/回復を入れる想定。
     """
-    return 0.7
+    return _basin_value("unmanaged_plantation_forest_coef", 0.7)
 
 
 @component.add(
@@ -3058,7 +3066,7 @@ def forest_function_coef():
     comp_subtype="Normal",
 )
 def forest_area_ratio():
-    return 0.92
+    return _basin_value("forest_area_ratio", 0.92)
 
 
 @component.add(
@@ -3111,7 +3119,7 @@ def paddy_field_ratio():
     それに佐賀県の分を加えて21875になるように、0.15に変更。
     """
     #return 0.4
-    return 0.15
+    return _basin_value("paddy_field_ratio", 0.15)
 
 
 @component.add(
@@ -3128,10 +3136,32 @@ def paddy_dam_cost_per_area():
     name="River water level downstream",
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"river_discharge_downstream": 1},
+    depends_on={
+        "river_discharge_downstream": 1,
+        "river_water_level_base": 1,
+        "river_water_level_discharge_coefficient": 1,
+    },
 )
 def river_water_level_downstream():
-    return 10 + float(np.sqrt(river_discharge_downstream())) / 1000
+    return river_water_level_base() + float(
+        np.sqrt(river_discharge_downstream())
+    ) * river_water_level_discharge_coefficient()
+
+
+@component.add(
+    name="River water level base", comp_type="Constant", comp_subtype="Normal"
+)
+def river_water_level_base():
+    return _basin_value("river_water_level_base", 10)
+
+
+@component.add(
+    name="River water level discharge coefficient",
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def river_water_level_discharge_coefficient():
+    return _basin_value("river_water_level_discharge_coefficient", 0.001)
 
 
 @component.add(
@@ -3141,7 +3171,7 @@ def river_water_level_downstream():
     comp_subtype="Normal",
 )
 def upstream_middle_flow_ratio():
-    return 0.5
+    return _basin_value("upstream_middle_flow_ratio", 0.5)
 
 
 @component.add(
@@ -3162,6 +3192,7 @@ def middle_flow():
         "river_discharge_upstream": 1,
         "downstream_outflow": 1,
         "downstream_middle_flow": 1,
+        "minimum_river_discharge": 1,
     },
 )
 def river_discharge_downstream():
@@ -3173,7 +3204,7 @@ def river_discharge_downstream():
             river_discharge_upstream()
             + downstream_outflow()
             + downstream_middle_flow(),
-            2500000.0,
+            minimum_river_discharge(),
         )
     )
 
@@ -3188,6 +3219,7 @@ def river_discharge_downstream():
         "direct_discharge_ratio": 1,
         "dam_outflow": 1,
         "middle_flow": 1,
+        "minimum_river_discharge": 1,
     },
 )
 def river_discharge_upstream():
@@ -3199,9 +3231,19 @@ def river_discharge_upstream():
             upstream_outflow() * direct_discharge_ratio()
             + dam_outflow()
             + middle_flow(),
-            2500000.0,
+            minimum_river_discharge(),
         )
     )
+
+
+@component.add(
+    name="Minimum river discharge",
+    units="m3/day",
+    comp_type="Constant",
+    comp_subtype="Normal",
+)
+def minimum_river_discharge():
+    return _basin_value("minimum_river_discharge", 2500000.0)
 
 
 @component.add(
@@ -3325,7 +3367,7 @@ def evaporation_upstream():
     comp_subtype="Normal",
 )
 def downstream_outflow_ratio():
-    return 0.5
+    return _basin_value("downstream_outflow_ratio", 0.5)
 
 
 @component.add(
@@ -3372,7 +3414,7 @@ _integ_downstream_storage = Integ(
     comp_subtype="Normal",
 )
 def upstream_outflow_ratio():
-    return 0.5
+    return _basin_value("upstream_outflow_ratio", 0.5)
 
 
 @component.add(
@@ -3434,10 +3476,16 @@ _integ_downstream_underground = Integ(
     name="River water level upstream",
     comp_type="Auxiliary",
     comp_subtype="Normal",
-    depends_on={"river_discharge_upstream": 1},
+    depends_on={
+        "river_discharge_upstream": 1,
+        "river_water_level_base": 1,
+        "river_water_level_discharge_coefficient": 1,
+    },
 )
 def river_water_level_upstream():
-    return 10 + float(np.sqrt(river_discharge_upstream())) / 1000
+    return river_water_level_base() + float(
+        np.sqrt(river_discharge_upstream())
+    ) * river_water_level_discharge_coefficient()
 
 
 @component.add(
@@ -3512,7 +3560,7 @@ def flood_risky_area_ratio():
     """
     2026/04/08 0.05から0.8に変更。 2026/04/14 0.8から0.5に変更。
     """
-    return 0.8
+    return _basin_value("flood_risky_area_ratio", 0.8)
 
 
 @component.add(
@@ -3576,7 +3624,7 @@ def financial_damage_by_flood():
     name="Flood damage per resident", comp_type="Constant", comp_subtype="Normal"
 )
 def flood_damage_per_resident():
-    return 10000000.0 / 365
+    return _basin_value("flood_damage_per_resident", 10000000.0 / 365)
 
 
 @component.add(
@@ -3966,7 +4014,7 @@ def innundation_risky_area_ratio():
     """
     2026/04/08 小さくすると、levelが増える。一旦変更なし。特に根 がないので1にする（無効化する）ほうが良いかも。1 すると1万件ぐらいになる。標高図を見てザクっと入れ みる？ もともと0.2だったが、流域の下流部は概ね河川氾濫の危険域（ 平地）になっていることから、内水氾濫も多くの地域 あり得ると判断して、0.8に変更。 2026/04/14 0.8から0.5に変更。
     """
-    return 0.8
+    return _basin_value("innundation_risky_area_ratio", 0.8)
 
 
 @component.add(
@@ -3976,7 +4024,7 @@ def innundation_risky_area_ratio():
     comp_subtype="Normal",
 )
 def upstream_percolation_ratio():
-    return 0.2
+    return _basin_value("upstream_percolation_ratio", 0.2)
 
 
 @component.add(
@@ -4127,7 +4175,7 @@ def predischarge_control():
     comp_subtype="Normal",
 )
 def direct_discharge_ratio():
-    return 0.97
+    return _basin_value("direct_discharge_ratio", 0.97)
 
 
 @component.add(
@@ -4234,7 +4282,7 @@ def current_highwater_discharge():
     """
     2026/04/08 11500（最新の河川整備基本方針のダムを含む量 ）から5200（現行計画の荒瀬における河川の配分流量） 変更。基本方針によると、将来的には、河道への配分 量も7200にするとのこと。
     """
-    return 5200
+    return _basin_value("current_highwater_discharge", 5200)
 
 
 @component.add(
@@ -4245,7 +4293,7 @@ def current_highwater_discharge():
 )
 def future_highwater_discharge():
     """Reference long-term channel allocation target; not a hard model ceiling."""
-    return 7200
+    return _basin_value("future_highwater_discharge", 7200)
 
 
 @component.add(
@@ -4259,7 +4307,7 @@ def paddy_field_capacity_per_area():
     """
     2026/01/16 1000（高さ10cm）から500（高さ5cm）に変更。
     """
-    return 500
+    return _basin_value("paddy_field_capacity_per_area", 500)
 
 
 @component.add(
@@ -4323,14 +4371,14 @@ def outflow_of_damaged_paddy_field():
     comp_subtype="Normal",
 )
 def downstream_area():
-    return 143951
+    return _basin_value("downstream_area", 143951)
 
 
 @component.add(
     name="Upstream area", units="ha", comp_type="Constant", comp_subtype="Normal"
 )
 def upstream_area():
-    return 157585
+    return _basin_value("upstream_area", 157585)
 
 
 @component.add(
@@ -4341,7 +4389,7 @@ def upstream_area():
     comp_subtype="Normal",
 )
 def landslide_design_daily_precipitation():
-    return 322
+    return _basin_value("landslide_design_daily_precipitation", 322)
 
 
 @component.add(
@@ -4687,7 +4735,7 @@ def outflow_of_houses_in_nonrisky_area():
     comp_subtype="Normal",
 )
 def waterholding_capacity_of_forest_base():
-    return 225
+    return _basin_value("waterholding_capacity_of_forest_base", 225)
 
 
 @component.add(
@@ -4839,7 +4887,7 @@ def financial_damage_by_innundation():
     comp_subtype="Normal",
 )
 def gdp_per_resident():
-    return 3000000.0 / 365
+    return _basin_value("gdp_per_resident", 3000000.0 / 365)
 
 
 @component.add(
@@ -4861,7 +4909,7 @@ def inflow_rate_of_residents():
 def ratio_of_paddy_field_in_risky_area():
 #   return 0.01
 #    return 0.5 #2026/04/17 実際は多くの田んぼは低標高の平地（リスク地域）にあると考えて設定
-    return 0.1 #2026/04/17 被害が極端に出過ぎるので、0.1に変更
+    return _basin_value("ratio_of_paddy_field_in_risky_area", 0.1)
 
 
 @component.add(
@@ -4871,19 +4919,19 @@ def ratio_of_paddy_field_in_risky_area():
     comp_subtype="Normal",
 )
 def innundation_damage_per_resident():
-    return 10000000.0 / 365
+    return _basin_value("innundation_damage_per_resident", 10000000.0 / 365)
 
 
 @component.add(name="Initial total risk households", units="house", comp_type="Constant", comp_subtype="Normal")
 def initial_total_risk_households():
     """Unique households exposed to at least one of flood or inner flooding."""
-    return 50000
+    return _basin_value("initial_total_risk_households", 50000)
 
 
 @component.add(name="Risk household overlap ratio", units="Dmnl", comp_type="Constant", comp_subtype="Normal")
 def risk_household_overlap_ratio():
     """Share of unique risk households exposed to both flood and inner flooding."""
-    return 0.5
+    return _basin_value("risk_household_overlap_ratio", 0.5)
 
 
 @component.add(

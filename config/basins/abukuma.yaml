@@ -1,0 +1,154 @@
+key: abukuma
+name: 阿武隈川流域
+
+calendar:
+  start_year: 2009
+  num_years: 15
+  use_leap_years: true
+
+# Representative points
+#   weather_up   : JMA 郡山
+#   weather_down : JMA 丸森
+#   flow_up      : MLIT 福島（阿武隈川）
+#   flow_down    : MLIT 岩沼（副）（阿武隈川）
+#
+# Input files must use the same sheet/column layout as the current model.
+inputs:
+  weather_up: data/jma_koriyama_2009_2023.xlsx
+  weather_down: data/jma_marumori_2009_2023.xlsx
+  flow_up: data/flow_fukushima_2009_2023_x100000_0to364_utf8.csv
+  flow_down: data/flow_iwanuma_2009_2023_x100000_0to364_utf8.csv
+
+climate_scenarios:
+  present: {precip_ratio: 1.0, temperature_shift: 0.0}
+  2C: {precip_ratio: 1.1, temperature_shift: 1.3}
+  4C: {precip_ratio: 1.3, temperature_shift: 4.1}
+
+# Shared by parameter study, policy optimisation, and calibration.
+model_parameters:
+
+  # Flood-control storage located upstream of Fukushima.
+  # Miharu Dam 28.0 million m3
+  # + Horikawa Dam 1.8 million m3
+  # = 29.8 million m3
+  initial_dam_capacity: 29800000
+
+  # Representative drainage capacity of the downstream agricultural plain.
+  # Ejiri drainage pumping station in Kakuda:
+  # approximately 62 m3/s.
+  initial_drainage_capacity: 62
+
+  # Channel-design/high-water discharge at Fukushima.
+  # The model uses this as channel discharge allowance, rather than
+  # the unregulated "basic high-water peak".
+  #
+  # Fukushima planned channel discharge = 5,800 m3/s.
+  # The revised climate-change basic policy retains 5,800 m3/s
+  # at Fukushima while increasing flood-control requirements.
+  current_highwater_discharge: 5800
+  future_highwater_discharge: 5800
+
+  # Catchment area upstream of Fukushima.
+  # IMPORTANT: code units are ha, not km2.
+  # 3,172 km2 = 317,200 ha
+  upstream_area: 317200
+
+  # Incremental catchment between Fukushima and Iwanuma.
+  # (5,265 - 3,172) km2 = 2,093 km2 = 209,300 ha
+  downstream_area: 209300
+
+  # Proxy threshold for daily rainfall associated with elevated
+  # landslide risk in the upstream block.
+  #
+  # See note below: official warning criteria are NOT based on
+  # daily rainfall alone, so this remains a modelling approximation.
+  landslide_design_daily_precipitation: 150
+
+  # Approximate households potentially exposed to inundation
+  # from MLIT project-evaluation material.
+  initial_total_risk_households: 24700
+
+  risk_household_overlap_ratio: 0.5
+
+  # Model base-flow floor, m3/day.
+  # 2.5e6 m3/day = 28.94 m3/s.
+  # Retained as an initial calibration value; should ultimately
+  # be estimated from the 2009-2023 observed hydrographs.
+  minimum_river_discharge: 2500000
+
+  river_water_level_base: 10
+  river_water_level_discharge_coefficient: 0.001
+
+  # Approximation for the upstream block.
+  # This should ultimately be replaced by GIS-derived forest cover
+  # specifically upstream of Fukushima.
+  forest_area_ratio: 0.80
+
+  # Approximate downstream paddy/irrigated-land fraction.
+  # Lower Abukuma official figures give about 143 km2 irrigated
+  # out of 1,320 km2 lower-basin area (~0.108).
+  # Used here as a practical paddy-field proxy.
+  paddy_field_ratio: 0.108
+
+  ratio_of_paddy_field_in_risky_area: 0.10
+  innundation_risky_area_ratio: 0.8
+  flood_risky_area_ratio: 0.8
+  recovery_ratio: 0.9
+  crop_price: 250
+  waterholding_capacity_of_forest_base: 225
+  innundation_damage_per_resident: 27397.2602739726
+  flood_damage_per_resident: 27397.2602739726
+  gdp_per_resident: 8219.17808219178
+  paddy_field_capacity_per_area: 500
+  paddy_dam_capacity_per_area: 1500
+  unmanaged_plantation_forest_coef: 0.7
+
+  # Hydrological parameters:
+  # retain existing initial guesses and estimate against
+  # Fukushima + Iwanuma observed discharge.
+  upstream_outflow_ratio: 0.272198
+  downstream_outflow_ratio: 0.240634
+  direct_discharge_ratio: 0.815126
+  upstream_percolation_ratio: 0.5
+  downstream_deep_percolation_ratio: 0.0263544
+  upstream_middle_flow_ratio: 0.443267
+  downstream_percolation_ratio: 0.5
+  downstream_middle_flow_ratio: 0.0326612
+  upstream_deep_percolation_ratio: 0.540584
+
+sensitivity_bounds:
+
+  # Modified from the previous basin settings.
+  # Central value aligned with the approximate Abukuma forest share.
+  forest_area_ratio: [0.70, 0.90, 0.80]
+
+  # Downstream paddy fraction.
+  # Central value approximately 0.108.
+  paddy_field_ratio: [0.07, 0.15, 0.108]
+
+  ratio_of_paddy_field_in_risky_area: [0.05, 0.15, 0.10]
+  innundation_risky_area_ratio: [0.5, 0.8, 0.8]
+  flood_risky_area_ratio: [0.5, 0.8, 0.8]
+  recovery_ratio: [0.5, 1.0, 0.9]
+  crop_price: [200, 400, 250]
+  waterholding_capacity_of_forest_base: [200, 250, 225]
+  innundation_damage_per_resident: [13698.6301369863, 41095.8904109589, 27397.2602739726]
+  flood_damage_per_resident: [13698.6301369863, 41095.8904109589, 27397.2602739726]
+  gdp_per_resident: [6849.31506849315, 9589.04109589041, 8219.17808219178]
+  paddy_field_capacity_per_area: [400, 600, 500]
+  paddy_dam_capacity_per_area: [1000, 2000, 1500]
+  unmanaged_plantation_forest_coef: [0.5, 0.9, 0.7]
+
+hydrology_calibration:
+  calibration_fraction: 0.7
+  objective_weights: {upstream_nse: 1.0, downstream_nse: 1.0}
+  bounds:
+    upstream_outflow_ratio: [0.01, 0.99]
+    downstream_outflow_ratio: [0.01, 0.99]
+    direct_discharge_ratio: [0.01, 0.99]
+    upstream_percolation_ratio: [0.01, 0.5]
+    downstream_deep_percolation_ratio: [0.01, 0.5]
+    upstream_middle_flow_ratio: [0.01, 0.99]
+    downstream_percolation_ratio: [0.01, 0.5]
+    downstream_middle_flow_ratio: [0.01, 0.99]
+    upstream_deep_percolation_ratio: [0.01, 0.99]

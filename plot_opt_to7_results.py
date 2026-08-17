@@ -11,12 +11,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from basin_config import load_active_basin
+
 
 # Set explicitly, for example "260723_2017", to reproduce a past run.
 # Leave as None to use the latest complete optimisation output set.
 RUN_STAMP = None
-DATA_DIR = Path("data")
-FIG_DIR = Path("figures/opt_to7")
+BASE_DIR = Path(__file__).resolve().parent
+BASIN_KEY = load_active_basin()["key"]
+PRIMARY_DATA_DIR = BASE_DIR / "results" / "optimization" / BASIN_KEY
+DATA_DIR = (
+    PRIMARY_DATA_DIR
+    if list(PRIMARY_DATA_DIR.glob("opt_to7_*_summary.csv"))
+    else BASE_DIR / "data"
+)
+FIG_DIR = BASE_DIR / "figures" / "opt_to7" / BASIN_KEY
 SCENARIO_ORDER = ["present", "2C", "4C"]
 SCENARIO_LABELS = {"present": "Present", "2C": "2℃", "4C": "4℃"}
 SCENARIO_COLORS = {"present": "#1f77b4", "2C": "#ff7f0e", "4C": "#d62728"}

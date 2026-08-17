@@ -1,8 +1,24 @@
-baselines
-node_modules
-sde-prep
+# OS / Python
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# Python environments
+.venv/
+venv/
+
+# Generated simulation and analysis output
+results/
+figures/
+out_metrics/
 *.vdf
 *.vdfx
 *.3vmfx
-data
-out_metrics
+
+# Local input data (not distributed through Git)
+data/
+
+# SDEverywhere / Node.js generated files
+baselines/
+node_modules/
+sde-prep/

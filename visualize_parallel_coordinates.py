@@ -1,6 +1,6 @@
 """シナリオ比較用パラレル座標ビューア。
 
-data/ 内の para_to7_all_scenarios_*_overall_summary.csv /
+results/parameter_study/ 内の para_to7_all_scenarios_*_overall_summary.csv /
 *_yearly_summary.csv を読み込み、ブラウザ上で
 シナリオ・年・表示パラメータをインタラクティブに切り替えながら
 Parallel Coordinates（パラレル座標プロット）で比較できる Dash アプリ。
@@ -19,7 +19,14 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, dcc, html
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+from basin_config import load_active_basin
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASIN_KEY = load_active_basin()["key"]
+DATA_DIR_CANDIDATES = [
+    os.path.join(BASE_DIR, "results", "parameter_study", BASIN_KEY),
+    os.path.join(BASE_DIR, "data"),  # Legacy output location.
+]
 
 META_COLS = ["scenario", "case_id", "varied_parameter", "level"]
 CATEGORICAL_AXES = ["scenario", "varied_parameter", "level"]
@@ -53,11 +60,25 @@ DEFAULT_AXES = [
 ]
 
 
+def _find_data_dir() -> str:
+    for data_dir in DATA_DIR_CANDIDATES:
+        overall = glob.glob(
+            os.path.join(data_dir, "para_to7_all_scenarios_*_overall_summary.csv")
+        )
+        yearly = glob.glob(
+            os.path.join(data_dir, "para_to7_all_scenarios_*_yearly_summary.csv")
+        )
+        if overall and yearly:
+            return data_dir
+    searched = ", ".join(DATA_DIR_CANDIDATES)
+    raise FileNotFoundError(f"No complete parameter-study output set under: {searched}")
+
+
+DATA_DIR = _find_data_dir()
+
+
 def _latest(pattern: str) -> str:
-    matches = sorted(glob.glob(os.path.join(DATA_DIR, pattern)))
-    if not matches:
-        raise FileNotFoundError(f"No files matching {pattern!r} under {DATA_DIR}")
-    return matches[-1]
+    return sorted(glob.glob(os.path.join(DATA_DIR, pattern)))[-1]
 
 
 OVERALL_CSV = _latest("para_to7_all_scenarios_*_overall_summary.csv")

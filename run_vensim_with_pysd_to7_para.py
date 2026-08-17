@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 from pysd import load
 
+from basin_config import load_active_basin, scenario_maps, sensitivity_bounds
+
 
 # PySD reports a known missing initial point in the validated observed-flow
 # files. The model interpolates it; suppress only this repeated warning.
@@ -17,8 +19,14 @@ warnings.filterwarnings(
 )
 
 
-# ---- Input model ----
-MODEL_PY = Path("River_management_xls_to6.py")
+# ---- Repository paths / input model ----
+# Resolve paths from this file so the runner also works when called from a
+# different current working directory.
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PY = BASE_DIR / "River_management_xls_to6.py"
+BASIN_CONFIG = load_active_basin()
+BASIN_KEY = BASIN_CONFIG["key"]
+OUTPUT_DIR = BASE_DIR / "results" / "parameter_study" / BASIN_KEY
 _MODEL = None
 
 
@@ -28,15 +36,16 @@ def get_model():
         if MODEL_PY.exists():
             _MODEL = load(MODEL_PY.as_posix())
         else:
-            raise FileNotFoundError("River_management_xls_to6.py が見つかりません。")
+            raise FileNotFoundError(f"モデルが見つかりません: {MODEL_PY}")
     return _MODEL
 
 
 # ---- Simulation settings ----
-CALENDAR_START_YEAR = 2009
-CALENDAR_NUM_YEARS = 15
-USE_LEAP_YEARS = True
-SCENARIOS = ["present", "2C", "4C"]
+CALENDAR_START_YEAR = int(BASIN_CONFIG["calendar"]["start_year"])
+CALENDAR_NUM_YEARS = int(BASIN_CONFIG["calendar"]["num_years"])
+USE_LEAP_YEARS = bool(BASIN_CONFIG["calendar"]["use_leap_years"])
+SCENARIO_TO_PRECIP_RATIO, SCENARIO_TO_TEMP_SHIFT = scenario_maps(BASIN_CONFIG)
+SCENARIOS = list(BASIN_CONFIG["climate_scenarios"])
 RUN_STAMP = datetime.now().strftime("%y%m%d_%H%M")
 
 SAMPLE_MODE = "lhs"  # "one_at_a_time", "random", or "lhs"
@@ -45,44 +54,17 @@ RANDOM_SEED = 42
 SAVE_DAILY_OUTPUT = True
 MAX_WORKERS = 15 #=10でCPU負荷50%ぐらい。
 
-SCENARIO_TO_PRECIP_RATIO = {
-    "present": 1.0,
-    "2C": 1.1,
-    "4C": 1.3,
-}
-
-SCENARIO_TO_TEMP_SHIFT = {
-    "present": 0.0,
-    "2C": 1.3,
-    "4C": 4.1,
-}
-
 for scenario in SCENARIOS:
     if scenario not in SCENARIO_TO_PRECIP_RATIO:
         raise ValueError(f"Unknown scenario: {scenario}")
 
 
-ASSUMPTION_BOUNDS = {
-    "forest_area_ratio": (0.85, 0.95, 0.92),
-    "paddy_field_ratio": (0.10, 0.20, 0.15),
-    "ratio_of_paddy_field_in_risky_area": (0.05, 0.15, 0.10),
-    "innundation_risky_area_ratio": (0.5, 0.8, 0.8),
-    "flood_risky_area_ratio": (0.5, 0.8, 0.8),
-    "recovery_ratio": (0.5, 1.0, 0.9),
-    "crop_price": (200, 400, 250),
-    # This sampled value also determines erosion_control_of_forest in the model.
-    "waterholding_capacity_of_forest_base": (200, 250, 225),
-    "innundation_damage_per_resident": (5e6 / 365, 1.5e7 / 365, 1e7 / 365),
-    "flood_damage_per_resident": (5e6 / 365, 1.5e7 / 365, 1e7 / 365),
-    "gdp_per_resident": (2.5e6 / 365, 3.5e6 / 365, 3.0e6 / 365),
-    "paddy_field_capacity_per_area": (400, 600, 500),
-    "paddy_dam_capacity_per_area": (1000, 2000, 1500),
-    "unmanaged_plantation_forest_coef": (0.5, 0.9, 0.7),
-}
+ASSUMPTION_BOUNDS = sensitivity_bounds(BASIN_CONFIG)
 
 
 def fixed_params_for_scenario(scenario):
-    return {
+    params = dict(BASIN_CONFIG["model_parameters"])
+    params.update({
         "daily_precipitation_future_ratio": SCENARIO_TO_PRECIP_RATIO[scenario],
         "temperature_scenario_shift": SCENARIO_TO_TEMP_SHIFT[scenario],
         "levee_investment_amount": 0,
@@ -92,17 +74,8 @@ def fixed_params_for_scenario(scenario):
         "number_of_migration": 0,
         "annual_paddy_dam_investment": 0,
         "annual_breeding_investment": 0,
-        # Calibrated hydrological parameters. Keep fixed in this assumption study.
-        "upstream_outflow_ratio": 0.272198,
-        "downstream_outflow_ratio": 0.240634,
-        "direct_discharge_ratio": 0.815126,
-        "upstream_percolation_ratio": 0.5,
-        "downstream_deep_percolation_ratio": 0.0263544,
-        "upstream_middle_flow_ratio": 0.443267,
-        "downstream_percolation_ratio": 0.5,
-        "downstream_middle_flow_ratio": 0.0326612,
-        "upstream_deep_percolation_ratio": 0.540584,
-    }
+    })
+    return params
 
 
 RETURN_COLS = [
@@ -279,10 +252,11 @@ def run_case(case, scenario):
         initial_condition="original",
     )
     res = res.copy()
-    res.insert(0, "scenario", scenario)
-    res.insert(1, "case_id", case["case_id"])
-    res.insert(2, "varied_parameter", case["varied_parameter"])
-    res.insert(3, "level", case["level"])
+    res.insert(0, "basin", BASIN_KEY)
+    res.insert(1, "scenario", scenario)
+    res.insert(2, "case_id", case["case_id"])
+    res.insert(3, "varied_parameter", case["varied_parameter"])
+    res.insert(4, "level", case["level"])
     res["year"] = [_year_index_from_day(day) for day in res.index]
     # Raw precipitation remains observational input. This derived column shows
     # the scenario-adjusted precipitation used by the crop-yield regression.
@@ -309,6 +283,7 @@ def run_case(case, scenario):
 
         yearly_rows.append(
             {
+                "basin": BASIN_KEY,
                 "scenario": scenario,
                 "case_id": case["case_id"],
                 "varied_parameter": case["varied_parameter"],
@@ -541,7 +516,7 @@ def build_overall_summary(yearly_summary):
     }
     return (
         yearly_summary.groupby(
-            ["scenario", "case_id", "varied_parameter", "level"],
+            ["basin", "scenario", "case_id", "varied_parameter", "level"],
             as_index=False,
         )
         .agg(metric_aggs)
@@ -550,10 +525,11 @@ def build_overall_summary(yearly_summary):
 
 
 def main():
-    output_dir = Path("data")
-    output_dir.mkdir(exist_ok=True)
+    output_dir = OUTPUT_DIR
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     parameter_sets = build_parameter_sets()
+    parameter_sets.insert(0, "basin", BASIN_KEY)
     parameter_sets.to_csv(
         output_dir / f"para_to7_all_scenarios_{RUN_STAMP}_parameter_sets.csv",
         index=False,

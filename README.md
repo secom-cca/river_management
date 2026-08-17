@@ -1,236 +1,157 @@
-# System Dynamics Model for River Resilience
+# River Management Model
 
-川のレジリエンス（洪水リスク低減策）の評価を目的とした**Vensimモデル**と、その実行・可視化のための周辺ツール一式です。
-Vensimでの開発資産を **PySD** や **SDEverywhere** で再利用し、研究・教育・プロトタイピングを素早く回せる構成にしています。
+河川管理・洪水リスク・農林業・地域経済を扱うシステムダイナミクスモデルです。
+現行系統は `River_management_xls_to6.py` を、流域別YAML設定から実行します。
 
----
+## セットアップ
 
-## 1. 機能（What’s inside）
-
-* **Vensim モデル**
-
-  * `*.mdl`（Vensimテキスト）と、PySDで実行可能な `*.py` を同梱
-* **PySD での実行**
-
-  * `run_vensim_with_pysd.py`：モデルをCLIから実行し、CSV出力
-* **Streamlit Webアプリ**
-
-  * `app.py`：ブラウザ上でパラメータを操作・結果可視化・観測データとの比較
-* **SDEverywhere**（WASM/JS 変換 & 開発）
-
-  * VensimモデルをWebAssemblyに変換し、ブラウザ/Node.jsで実行可能
-* **水門データ収集（WIS）**
-
-  * `get_suimon_database.py`：国土交通省の水文水質データベース（WIS）から**日流量**CSVをスクレイピング
-
----
-
-## 2. リポジトリ構成（例）
-
-```
-.
-├─ app.py                         # Streamlitアプリ（PySDでモデル実行・可視化）
-├─ run_vensim_with_pysd.py        # CLI実行スクリプト（PySD）
-├─ get_suimon_database.py         # 水門/WIS 日流量スクレイパ
-├─ River_management_xls.mdl       # Vensimモデル（例1）
-├─ River_management_xls.py        # 上記のPySD変換済みファイル（例1）
-├─ River_management_chikugo.mdl   # Vensimモデル（例2）
-├─ River_management_chikugo.py    # 上記のPySD変換済みファイル（例2）
-├─ data/
-│   └─ jma_kurume_2023.xls        # モデルが参照する外部Excel（GET XLS DATA）
-└─ (SDEverywhere プロジェクト一式)
-```
-
-> **メモ**
->
-> * `app.py` の既定は `River_management_xls.(py|mdl)` を参照します。
-> * `run_vensim_with_pysd.py` は `River_management_chikugo.(py|mdl)` を参照します。
->   変更したい場合は各スクリプト冒頭の定数を書き換えてください。
-
----
-
-## 3. セットアップ
-
-### 3.1 Python 環境
+Python 3.10以降を想定しています。
 
 ```bash
-# 推奨: 仮想環境
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-
-pip install -U pip
-pip install streamlit pysd numpy pandas xlrd requests beautifulsoup4 lxml
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
 
-### 3.2 Node.js（SDEverywhere を使う場合）
+## 流域設定
 
-* Node.js 18+ 推奨
-* 既存の SDEverywhere プロジェクトとして利用する場合は `npm install` を実行
+流域固有値は `config/basins/` に集約しています。
 
----
+- `chikugo.yaml`: 現在の筑後川設定
+- `template.yaml`: 別河川用テンプレート
+- `README.md`: 入力列・単位・設定上の注意
+- `basin_config.py`: 設定の読み込みと検証
 
-## 4. 使い方（3通り）
+YAMLには次を記述します。
 
-### 4.1 Streamlitでインタラクティブ実行（おすすめ）
+- 計算開始年、年数、閏年の扱い
+- 上下流の気象・観測流量ファイル
+- 気候シナリオ別の降水倍率・気温上昇量
+- 流域面積、ダム容量、計画高水流量、森林・水田・世帯・被害単価
+- 較正済み水文パラメータ
+- 感度分析範囲
+- 水文較正の探索範囲
+
+流域は環境変数 `RIVER_BASIN` で選択します。未指定時は `chikugo` です。
 
 ```bash
-streamlit run app.py
+# 筑後川
+python run_vensim_with_pysd_to7_para.py
+
+# config/basins/new_basin.yaml を使用
+RIVER_BASIN=new_basin python run_vensim_with_pysd_to7_para.py
 ```
 
-* **モデル読み込み**：`River_management_xls.py`（優先）または `River_management_xls.mdl`
-* **外部データ（GET XLS DATA）**：`jma_kurume_2023.xls` をアップロードするか、同名で配置
-* **プリセット**：筑後川/長良川など代表値をワンクリック適用
-* **パラメータ調整**：スライダーで投資額・流域条件等を上書き
-* **観測データ比較**：CSV（例: `date,flow`）を読み込み、
+YAMLの絶対パスを `RIVER_BASIN` に指定することもできます。
 
-  * 単位 `m3/s` → 自動で `m3/day` に変換（×86400）
-  * 最大±N日のラグ自動探索で**形状比較**（相関最大化）
-  * 指標: RMSE, MAE, Mean Bias, Pearson r, **NSE**
-* **出力保存**：モデル結果や観測マージ結果をCSVでダウンロード
+## 入力データ
 
-**観測CSVの例**
+筑後川設定は次の4ファイルを参照します。
 
-```csv
-date,temperature,precipitation,flow,level
-2023-01-01,8.2,0.0,120.5,0.8
-2023-01-02,8.0,5.1,130.1,0.9
+```text
+data/
+├── jma_asakura_2009_2023.xlsx
+├── jma_hita_2009_2023.xlsx
+├── flow_senoshita_2009_2023_x100000_0to364_utf8.csv
+└── flow_arase_2009_2023_x100000_0to364_utf8.csv
 ```
 
-アプリでは `date` と `flow` 列のみ使用します（列名はUIで変更可）。
+別河川でも、現在のPySDモデルと同じシート・列構成に整形してください。
+気象Excelは `input` シート、観測流量CSVはA列が時刻、D列が流量です。
+`data/` はGit管理外です。
 
----
+## 別河川への適用手順
 
-### 4.2 CLIでサクッと実行（PySD）
+1. `config/basins/template.yaml` を `<流域キー>.yaml` としてコピーする
+2. 上下流の気象・流量データを準備し、`inputs` を更新する
+3. 面積、ダム・排水能力、計画高水流量、土地利用、世帯数などを入力する
+4. `calibrate_hydrology.py` で水文パラメータを較正する
+5. 較正期間と独立検証期間のNSEを確認する
+6. 較正済みYAMLを採用してパラメータスタディ・施策最適化を実行する
+
+河道形状が大きく異なる場合、YAML値だけでなく流量―水位関係や洪水・内水被害関数の
+構造確認も必要です。現在の流量―水位関係は、基準水位と平方根係数をYAMLから設定できます。
+
+## 水文パラメータの較正
 
 ```bash
-python run_vensim_with_pysd.py
+RIVER_BASIN=new_basin python calibrate_hydrology.py \
+  --maxiter 100 \
+  --popsize 10 \
+  --seed 42
 ```
 
-* 取得列はスクリプト内 `return_cols` を変更
-* 出力：`data/simulation_output.csv`
-* 参照Excel：`data/jma_kurume_2023.xls`（モデルの ExtData が参照）
+9つの流出・浸透パラメータをSciPyのDifferential Evolutionで探索します。
+既定では期間先頭70%を較正、残り30%を独立検証に使用し、上下流NSEを同時に評価します。
+比率はYAMLの `hydrology_calibration.calibration_fraction` または
+`--calibration-fraction` で変更できます。
 
----
-
-### 4.3 SDEverywhere（WASM/JS化・開発モード）
-
-> このリポジトリには SDEverywhere の**テンプレート由来**の構成・設定が含まれています。
-> 既存のSDEプロジェクトとして開発を進められます。
+最適化前に、現在のYAML値と入力データだけを確認できます。
 
 ```bash
-# 初期化（新規プロジェクト作成時）: 「Default」テンプレートを選択
-npm create @sdeverywhere@latest
-
-# ローカル開発（モデル・設定変更を監視し自動ビルド/チェック）
-npm run dev
+RIVER_BASIN=new_basin python calibrate_hydrology.py --check-only
 ```
 
-* Vensimモデル → **WebAssembly** モジュールに変換
-* `config/` のCSVで入出力/ユニット等を設定
-* 生成されたコアAPIをJS/TSから呼び出し可能
-* シンプルなWebアプリ（jQueryベース）で動作確認
+```text
+results/calibration/<流域キー>/<日時>/
+├── calibration_report.yaml
+├── best_daily_flow.csv
+└── <流域キー>_calibrated.yaml
+```
 
-> ライセンスは SDEverywhere の `LICENSE`（MIT）に従います。
+元の設定は自動上書きしません。結果と検証値を確認してから、生成された
+`<流域キー>_calibrated.yaml` を `config/basins/` に採用してください。
 
----
-
-## 5. モデルとパラメータ
-
-* **モデル開始日**：アプリで指定（既定: `2023-01-01`）。モデル時刻0日目に対応
-* **主要出力（例）**：
-  `daily_total_gdp`, `dam_storage`, `downstream_storage`,
-  `upstream_storage`, `river_discharge_downstream`,
-  `houses_damaged_by_inundation`,
-  `financial_damage_by_innundation`, `financial_damage_by_flood`
-* **代表パラメータ**（一部）
-
-  * 将来降水補正、ダム/堤防/排水/ため池の**投資額**と**開始時期**
-  * 高齢者比率、防災力（避難率係数）、住民流出入率
-  * 圃場比率、リスク域圃場比率
-  * **流域条件**（初期ダム容量、上・下流面積、森林面積比、直接流出比、計画高水流量 など）
-* **プリセット**：筑後川・長良川・利根川（例）を同梱。必要に応じて実測代表値に更新してください。
-
----
-
-## 6. 水門/WIS 日流量データの取得
-
-`get_suimon_database.py` は、WISのフレーム/エンコード差異に頑健な実装です。
-代表地点⇔観測所IDは `REP_TO_ID` に追記してください。
-
-### 使い方
+## パラメータスタディ
 
 ```bash
-# 2015年のみ
-python get_suimon_database.py sumimata 2015
-
-# 2008年～2018年を一括
-python get_suimon_database.py sumimata 2008-2018
-
-# 欠測を前日値で補間したCSVも出力
-python get_suimon_database.py sumimata 2015 --fill-forward
+RIVER_BASIN=chikugo python run_vensim_with_pysd_to7_para.py
 ```
 
-* 出力：`flow_<rep>_<year>.csv`（必要なら `_filled` 版も）
-* 失敗時はデバッグHTMLを保存（`wis_debug_*.html`）。`WIS_BASES` を切替トライします。
+標本数・並列数などはスクリプト冒頭で設定します。
 
----
+- `SAMPLE_MODE`: `one_at_a_time`、`random`、`lhs`
+- `N_SAMPLES`: ランダム/LHSの標本数
+- `RANDOM_SEED`: 乱数シード
+- `SAVE_DAILY_OUTPUT`: 日次結果を保存するか
+- `MAX_WORKERS`: 並列プロセス数
 
-## 7. 外部データ（GET XLS DATA）
+感度分析対象と `[下限, 上限, 基準値]` は流域YAMLの `sensitivity_bounds` で管理します。
+日次出力は大きいため、不要なら `SAVE_DAILY_OUTPUT = False` にしてください。
 
-* モデル側の **ExtData** が参照する既定名：`jma_kurume_2023.xls`
-* `app.py` では**アップローダ**から同名で保存、またはルート/`data/`に配置
-* ファイル名を変更する場合は、各スクリプト冒頭の定数を合わせて修正してください
+```text
+results/parameter_study/<流域キー>/
+├── para_to7_all_scenarios_<日時>_parameter_sets.csv
+├── para_to7_all_scenarios_<日時>_daily.csv
+├── para_to7_all_scenarios_<日時>_yearly_summary.csv
+└── para_to7_all_scenarios_<日時>_overall_summary.csv
+```
 
----
-
-## 8. トラブルシューティング
-
-* **「モデルが見つからない」**
-
-  * `*.py` or `*.mdl` のパスを確認（`app.py` サイドバーで指定可）
-* **観測と単位が合わない**
-
-  * 観測が `m3/s` の場合、UIで選ぶと自動で `m3/day` に変換されます
-* **選択した出力列が存在しない**
-
-  * `app.py` は例外時に**フル実行→存在列のみ再抽出**します（警告を表示）
-* **WISスクレイピングが失敗**
-
-  * `REP_TO_ID` のID再確認、期間・種別（`KIND=7`）を見直し
-  * 失敗時のメッセージ内URLで手動確認、`WIS_BASES` の別ドメインを試行
-
----
-
-## 9. 参考（詳細説明）
-
-ドキュメントはこちら：
-[https://docs.google.com/document/d/116Xg9WkcorllC6vz6C-agFRKM3BDTerf/edit?usp=drive\_link\&ouid=107470865859100242765\&rtpof=true\&sd=true](https://docs.google.com/document/d/116Xg9WkcorllC6vz6C-agFRKM3BDTerf/edit?usp=drive_link&ouid=107470865859100242765&rtpof=true&sd=true)
-
----
-
-## 10. ライセンス
-
-* 本リポジトリの SDEverywhere 部分は **MIT License**（`LICENSE` 参照）
-* その他のコンテンツのライセンスは各ファイルの記述に従います
-
----
-
-## 付録：よく使うコマンド早見表
+## 施策最適化・可視化
 
 ```bash
-# 1) Webアプリ
-streamlit run app.py
-
-# 2) CLI実行（PySD）
-python run_vensim_with_pysd.py
-
-# 3) 観測データ取得（WIS）
-python get_suimon_database.py sumimata 2015
-python get_suimon_database.py sumimata 2008-2018 --fill-forward
-
-# 4) SDEverywhere 開発
-npm install
-npm run dev
+RIVER_BASIN=chikugo python run_vensim_with_pysd_to7_opt.py
+RIVER_BASIN=chikugo python plot_opt_to7_results.py
+RIVER_BASIN=chikugo python plot_opt_to7_patterns.py
+RIVER_BASIN=chikugo python visualize_parallel_coordinates.py
 ```
 
-> ご不明点や追加したい流域・観測所IDがあれば `REP_TO_ID`・プリセットを更新してください。
+- 最適化結果: `results/optimization/<流域キー>/`
+- 最適化図: `figures/opt_to7/<流域キー>/`
+- 平行座標ビューアは流域別パラメータスタディ結果を優先し、旧 `data/` にもフォールバック
+
+`run_vensim_with_pysd_to7_opt.py` が最適化するのはダム・堤防・排水・移転などの施策です。
+水文パラメータの較正は `calibrate_hydrology.py` が担当します。
+
+## その他のワークフロー
+
+- `app.py`: `River_management_xls.py` を使う旧Streamlit系統
+- `get_suimon_database.py`: 国土交通省WISの日流量取得
+- `compute_nies_metrics.py`: NIES気候データの年次指標作成
+- `src/`: AMeDAS・サンプルデータ・lookup作成
+- `sde.config.js`, `config/`, `packages/`: SDEverywhere
+- `archive/`: 旧版モデル・実行コード・Vensim較正生成物
+
+研究資料の詳細説明:
+[Google Docs](https://docs.google.com/document/d/116Xg9WkcorllC6vz6C-agFRKM3BDTerf/edit?usp=drive_link)

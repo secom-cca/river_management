@@ -9,11 +9,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from basin_config import load_active_basin
+
 
 # Set explicitly, for example "260724_1719", to reproduce a past run.
 RUN_STAMP = None
-DATA_DIR = Path("data")
-FIG_DIR = Path("figures/opt_to7")
+BASE_DIR = Path(__file__).resolve().parent
+BASIN_KEY = load_active_basin()["key"]
+PRIMARY_DATA_DIR = BASE_DIR / "results" / "optimization" / BASIN_KEY
+DATA_DIR = (
+    PRIMARY_DATA_DIR
+    if list(PRIMARY_DATA_DIR.glob("opt_to7_*_summary.csv"))
+    else BASE_DIR / "data"
+)
+FIG_DIR = BASE_DIR / "figures" / "opt_to7" / BASIN_KEY
 PATTERN_ORDER = ["balanced", "disaster_only", "agriculture_only", "ecosystem_only"]
 PATTERN_LABELS = {
     "balanced": "Balanced",
