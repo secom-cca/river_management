@@ -1,23 +1,23 @@
 key: abukuma
-name: 阿武隈川流域
+name: 阿武隈川流域（福島 - 舘矢間）
 
 calendar:
   start_year: 2009
-  num_years: 15
+  num_years: 12
   use_leap_years: true
 
 # Representative points
 #   weather_up   : JMA 郡山
 #   weather_down : JMA 丸森
 #   flow_up      : MLIT 福島（阿武隈川）
-#   flow_down    : MLIT 岩沼（副）（阿武隈川）
+#   flow_down    : MLIT 舘矢間（阿武隈川、宮城県丸森町、河口から 38.0 km）
 #
 # Input files must use the same sheet/column layout as the current model.
 inputs:
-  weather_up: data/jma_koriyama_2009_2023.xlsx
-  weather_down: data/jma_marumori_2009_2023.xlsx
-  flow_up: data/flow_fukushima_2009_2023_x100000_0to364_utf8.csv
-  flow_down: data/flow_iwanuma_2009_2023_x100000_0to364_utf8.csv
+  weather_up: data/jma_koriyama_2009_2020.xlsx
+  weather_down: data/jma_marumori_2009_2020.xlsx
+  flow_up: data/flow_fukushima_2009_2020_m3day_utf8.csv
+  flow_down: data/flow_tateyama_2009_2020_m3day_utf8.csv
 
 climate_scenarios:
   present: {precip_ratio: 1.0, temperature_shift: 0.0}
@@ -33,10 +33,15 @@ model_parameters:
   # = 29.8 million m3
   initial_dam_capacity: 29800000
 
-  # Representative drainage capacity of the downstream agricultural plain.
-  # Ejiri drainage pumping station in Kakuda:
-  # approximately 62 m3/s.
-  initial_drainage_capacity: 62
+  # Drainage capacity within the MLIT-administered reach of the Abukuma.
+  # Source: 阿武隈川水系河川整備基本方針 基本高水等に関する資料（案）,
+  # 国土交通省河川局, 2003-11, p.12, 第8節(3) 排水機場等:
+  #   河川管理施設 76.0 m3/s / 許可工作物 90.6 m3/s (直轄管理区間の施設のみ)
+  # The 許可工作物 total is used here.
+  # NOTE: this covers the whole MLIT-administered reach, not only the
+  # Fukushima-Tateyama incremental catchment, so it is likely an over-estimate
+  # for the downstream block.
+  initial_drainage_capacity: 90.6
 
   # Channel-design/high-water discharge at Fukushima.
   # The model uses this as channel discharge allowance, rather than
@@ -53,20 +58,21 @@ model_parameters:
   # 3,172 km2 = 317,200 ha
   upstream_area: 317200
 
-  # Incremental catchment between Fukushima and Iwanuma.
-  # (5,265 - 3,172) km2 = 2,093 km2 = 209,300 ha
-  downstream_area: 209300
+  # Incremental catchment between Fukushima and Tateyama.
+  # Tateyama 4,132.5 km2 (MLIT Abukuma lower-reach maintenance plan, Table 1-2)
+  # minus Fukushima 3,171.9 km2 = 960.6 km2 = 96,060 ha
+  downstream_area: 96060
 
-  # Proxy threshold for daily rainfall associated with elevated
-  # landslide risk in the upstream block.
-  #
-  # See note below: official warning criteria are NOT based on
-  # daily rainfall alone, so this remains a modelling approximation.
-  landslide_design_daily_precipitation: 150
+  # Daily-rainfall proxy for elevated landslide risk in the upstream block.
+  # 気象庁 極端現象発生頻度マップ 確率降水量一覧表 (1976-2023) の
+  # 100年確率日降水量: 福島 198 mm / 二本松 203 mm / 梁川 192 mm.
+  # NOTE: 河川整備基本方針の計画降雨 (1/150, 36時間流域平均 261 mm) とは
+  # 規模も継続時間も別概念なので混同しないこと。
+  landslide_design_daily_precipitation: 200
 
   # Approximate households potentially exposed to inundation
   # from MLIT project-evaluation material.
-  initial_total_risk_households: 24700
+  initial_total_risk_households: 25000
 
   risk_household_overlap_ratio: 0.5
 
@@ -80,15 +86,17 @@ model_parameters:
   river_water_level_discharge_coefficient: 0.001
 
   # Approximation for the upstream block.
+  # Set to 0.92 by user instruction (2026-08-20); this is also the chikugo
+  # default value. Previously 0.80.
   # This should ultimately be replaced by GIS-derived forest cover
   # specifically upstream of Fukushima.
-  forest_area_ratio: 0.80
+  forest_area_ratio: 0.92
 
-  # Approximate downstream paddy/irrigated-land fraction.
-  # Lower Abukuma official figures give about 143 km2 irrigated
-  # out of 1,320 km2 lower-basin area (~0.108).
-  # Used here as a practical paddy-field proxy.
-  paddy_field_ratio: 0.108
+  # Paddy-field fraction. Set to 0.15 by user instruction (2026-08-25);
+  # this is also the chikugo default.
+  # For reference, official Abukuma figures give 農地 913.47/5,365 km2 = 0.170
+  # (基本方針参考資料 表3-1-1) and かんがい面積 ~400/5,400 km2 = 0.074.
+  paddy_field_ratio: 0.15
 
   ratio_of_paddy_field_in_risky_area: 0.10
   innundation_risky_area_ratio: 0.8
@@ -96,35 +104,54 @@ model_parameters:
   recovery_ratio: 0.9
   crop_price: 250
   waterholding_capacity_of_forest_base: 225
-  innundation_damage_per_resident: 27397.2602739726
-  flood_damage_per_resident: 27397.2602739726
-  gdp_per_resident: 8219.17808219178
+  # NOTE: despite the "per_resident" name, the model multiplies these by
+  # HOUSEHOLD counts (see financial_damage_by_flood / daily_total_gdp in
+  # River_management_xls_to6.py), so the values below are per household.
+  #
+  # Flood/inundation damage per household per day.
+  # 令和元年水害統計調査 (MLIT), 福島県:
+  #   表-6 資産等別一般資産等被害額 家屋 137,712,130 千円
+  #                              + 家庭用品 106,090,829 千円 = 243,802,959 千円
+  #   表-3 市区町村別水害被害 被災世帯数 16,679
+  #   => 14,617,361 yen/household, / 365 = 40,047.56
+  innundation_damage_per_resident: 40047.5643674056
+  flood_damage_per_resident: 40047.5643674056
+
+  # GDP per household per day.
+  # 福島県県民経済計算 令和5年度 主要系列表 主1-1 経済活動別県内総生産(名目)
+  #   県内総生産 8,395,029 百万円
+  # 令和2年国勢調査 表13 世帯種類別世帯数 一般世帯 740,089
+  #   => 11,343,270 yen/household/year, / 365 = 31,077.45
+  gdp_per_resident: 31077.4527840887
   paddy_field_capacity_per_area: 500
   paddy_dam_capacity_per_area: 1500
   unmanaged_plantation_forest_coef: 0.7
 
   # Hydrological parameters:
-  # retain existing initial guesses and estimate against
-  # Fukushima + Iwanuma observed discharge.
-  upstream_outflow_ratio: 0.272198
-  downstream_outflow_ratio: 0.240634
-  direct_discharge_ratio: 0.815126
-  upstream_percolation_ratio: 0.5
-  downstream_deep_percolation_ratio: 0.0263544
-  upstream_middle_flow_ratio: 0.443267
-  downstream_percolation_ratio: 0.5
-  downstream_middle_flow_ratio: 0.0326612
-  upstream_deep_percolation_ratio: 0.540584
+  # calibrated against Fukushima + Tateyama observed discharge
+  # (2009-2020, masked for missing observations, 90-day spin-up, seed 42).
+  # Run: results/calibration/abukuma_tateyama/260820_0519_newparams
+  # Calibration NSE 0.576 (up) / 0.694 (down);
+  # validation NSE 0.628 (up) / 0.781 (down).
+  upstream_outflow_ratio: 0.024897
+  downstream_outflow_ratio: 0.348109
+  direct_discharge_ratio: 0.824470
+  upstream_percolation_ratio: 0.355358
+  downstream_deep_percolation_ratio: 0.092644
+  upstream_middle_flow_ratio: 0.506952
+  downstream_percolation_ratio: 0.378626
+  downstream_middle_flow_ratio: 0.243141
+  upstream_deep_percolation_ratio: 0.316431
 
 sensitivity_bounds:
 
-  # Modified from the previous basin settings.
-  # Central value aligned with the approximate Abukuma forest share.
-  forest_area_ratio: [0.70, 0.90, 0.80]
+  # Central value aligned with model_parameters.forest_area_ratio (0.92).
+  # Same range as the chikugo configuration.
+  forest_area_ratio: [0.85, 0.95, 0.92]
 
-  # Downstream paddy fraction.
-  # Central value approximately 0.108.
-  paddy_field_ratio: [0.07, 0.15, 0.108]
+  # Central value aligned with model_parameters.paddy_field_ratio (0.15).
+  # Same range as the chikugo configuration.
+  paddy_field_ratio: [0.10, 0.20, 0.15]
 
   ratio_of_paddy_field_in_risky_area: [0.05, 0.15, 0.10]
   innundation_risky_area_ratio: [0.5, 0.8, 0.8]
@@ -132,9 +159,10 @@ sensitivity_bounds:
   recovery_ratio: [0.5, 1.0, 0.9]
   crop_price: [200, 400, 250]
   waterholding_capacity_of_forest_base: [200, 250, 225]
-  innundation_damage_per_resident: [13698.6301369863, 41095.8904109589, 27397.2602739726]
-  flood_damage_per_resident: [13698.6301369863, 41095.8904109589, 27397.2602739726]
-  gdp_per_resident: [6849.31506849315, 9589.04109589041, 8219.17808219178]
+  # Same relative width as before (+-50% for damage, +-16.7% for GDP).
+  innundation_damage_per_resident: [20023.7821837028, 60071.3465511084, 40047.5643674056]
+  flood_damage_per_resident: [20023.7821837028, 60071.3465511084, 40047.5643674056]
+  gdp_per_resident: [25897.8773200739, 36257.0282481034, 31077.4527840887]
   paddy_field_capacity_per_area: [400, 600, 500]
   paddy_dam_capacity_per_area: [1000, 2000, 1500]
   unmanaged_plantation_forest_coef: [0.5, 0.9, 0.7]
