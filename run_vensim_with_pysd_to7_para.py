@@ -9,6 +9,12 @@ from pysd import load
 
 from basin_config import load_active_basin, scenario_maps, sensitivity_bounds
 
+# ExtData の時系列参照を numpy 直参照に置き換える（1 実行 10.8 秒 -> 2.2 秒）。
+# モジュール先頭で有効化することで、ProcessPoolExecutor のワーカーにも適用される。
+import pysd_fast_extdata
+
+pysd_fast_extdata.enable()
+
 
 # PySD reports a known missing initial point in the validated observed-flow
 # files. The model interpolates it; suppress only this repeated warning.
@@ -52,7 +58,7 @@ SAMPLE_MODE = "lhs"  # "one_at_a_time", "random", or "lhs"
 N_SAMPLES = 100
 RANDOM_SEED = 42
 SAVE_DAILY_OUTPUT = True
-MAX_WORKERS = 15 #=10でCPU負荷50%ぐらい。
+MAX_WORKERS = 8  # 実コア数に合わせる
 
 for scenario in SCENARIOS:
     if scenario not in SCENARIO_TO_PRECIP_RATIO:

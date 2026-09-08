@@ -11,6 +11,7 @@ venv/
 results/
 figures/
 out_metrics/
+*.log
 *.vdf
 *.vdfx
 *.3vmfx

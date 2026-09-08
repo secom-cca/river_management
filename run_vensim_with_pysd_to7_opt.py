@@ -25,6 +25,13 @@ from pysd import load
 
 from basin_config import load_active_basin, scenario_maps
 
+# ExtData の時系列参照を numpy 直参照に置き換える（1 評価 10.8 秒 -> 2.2 秒）。
+# モジュール先頭で有効化しておくことで、differential_evolution が spawn する
+# ワーカープロセスでも再 import 時に必ず適用される。
+import pysd_fast_extdata
+
+pysd_fast_extdata.enable()
+
 try:
     from scipy.optimize import differential_evolution
 except ImportError as exc:
@@ -84,7 +91,7 @@ OPTIMIZATION_SEEDS = [42]
 # Print each completed DE generation so long PySD runs visibly advance in the
 # PowerShell console. Set this higher only when console output is excessive.
 PROGRESS_EVERY = 1
-MAX_WORKERS = 12 #10でCPU消費50%弱
+MAX_WORKERS = 8  # 実コア数に合わせる
 BREEDING_ANNUAL_COST = 50_000_000
 BREEDING_DURATION_YEARS = 10
 # Set to a checkpoint directory to seed a new run from its final populations.
