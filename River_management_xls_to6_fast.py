@@ -1,7 +1,7 @@
 """River_management_xls_to6.py の水文サブモデルだけを numpy 逐次ループで再実装した高速版。
 
 較正（calibrate_hydrology_fast.py）で数千回モデルを回すためのもの。
-PySD 版との一致は verify_River_management_xls_to6_fast.py で確認する。
+PySD 版との一致は、このファイルを直接実行して確認する（下記）。
 
 目的は較正（scipy.optimize.differential_evolution）で数千回モデルを回すこと。
 PySD の Euler 積分（dt=1、initial_condition="original"）を厳密に再現する。
@@ -746,7 +746,7 @@ def _verify_errors(reference: np.ndarray, emulated: np.ndarray) -> tuple[float, 
     return float(absolute.max()), float(relative.max()), int(np.argmax(relative))
 
 
-def _verify__verify_diagnose(model, fast, parameters, base_params, timestamps) -> None:
+def _verify_diagnose(model, fast, parameters, base_params, timestamps) -> None:
     """どの中間変数から食い違うかを因果順に調べる。"""
     print("  --- 中間変数の突き合わせ ---")
     params = dict(base_params)
