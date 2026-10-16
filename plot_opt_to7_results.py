@@ -1,4 +1,4 @@
-"""Create six diagnostic figures for a completed to7 optimisation run."""
+"""Create six diagnostic figures for a completed to7 optimisation trial."""
 
 from pathlib import Path
 
@@ -12,11 +12,18 @@ import numpy as np
 import pandas as pd
 
 
-# Set explicitly, for example "260723_2017", to reproduce a past run.
-# Leave as None to use the latest complete optimisation output set.
+# Select the latest complete output set. Set an explicit stamp to reproduce a
+# past run after a newer continuation batch has finished.
 RUN_STAMP = None
 DATA_DIR = Path("data")
 FIG_DIR = Path("figures/opt_to7")
+CALENDAR_START_YEAR = 2009
+EXPECTED_PATTERNS = {
+    "balanced",
+    "disaster_only",
+    "agriculture_only",
+    "ecosystem_only",
+}
 SCENARIO_ORDER = ["present", "2C", "4C"]
 SCENARIO_LABELS = {"present": "Present", "2C": "2℃", "4C": "4℃"}
 SCENARIO_COLORS = {"present": "#1f77b4", "2C": "#ff7f0e", "4C": "#d62728"}
@@ -29,9 +36,18 @@ BUDGET_LIMIT = 5_000_000_000
 
 def input_paths():
     if RUN_STAMP is None:
-        candidates = list(DATA_DIR.glob("opt_to7_*_*_summary.csv"))
+        candidates = []
+        for path in DATA_DIR.glob("opt_to7_*_*_summary.csv"):
+            stem = path.name[: -len("_summary.csv")]
+            if all(
+                (DATA_DIR / f"{stem}_{suffix}.csv").exists()
+                for suffix in ("decisions", "yearly")
+            ):
+                candidates.append(path)
         if not candidates:
-            raise FileNotFoundError("No optimisation summary CSV was found in data/.")
+            raise FileNotFoundError(
+                "No complete optimisation output set was found in data/."
+            )
         summary = max(candidates, key=lambda path: path.stat().st_mtime)
         suffix = "_summary.csv"
         stem = summary.name[: -len(suffix)]
@@ -52,12 +68,58 @@ def input_paths():
     return run_stamp, summary, decisions, yearly
 
 
+def validate_inputs(summary, decisions, yearly):
+    """Reject incomplete or ambiguous optimisation output before plotting."""
+    key_columns = ["scenario", "pattern", "seed"]
+    expected_keys = {
+        (scenario, pattern, 42)
+        for scenario in SCENARIO_ORDER
+        for pattern in EXPECTED_PATTERNS
+    }
+    summary_keys = set(summary[key_columns].itertuples(index=False, name=None))
+    decision_keys = set(decisions[key_columns].itertuples(index=False, name=None))
+    yearly_keys = set(yearly[key_columns].drop_duplicates().itertuples(index=False, name=None))
+    if summary.duplicated(key_columns).any() or decisions.duplicated(key_columns).any():
+        raise ValueError("Summary or decisions contains duplicate scenario/pattern/seed rows.")
+    if summary_keys != expected_keys:
+        raise ValueError(
+            "The selected run is not the expected complete 12-case optimisation trial."
+        )
+    if not (summary_keys == decision_keys == yearly_keys):
+        raise ValueError("Summary, decisions, and yearly CSV case keys do not match.")
+    year_counts = yearly.groupby(key_columns)["year"].nunique()
+    if not (year_counts == 15).all():
+        raise ValueError("Every optimisation case must contain 15 calendar years.")
+
+
+def succeeded(value):
+    if isinstance(value, str):
+        return value.strip().lower() == "true"
+    return bool(value)
+
+
+def display_scenario(scenario, data):
+    row = data[data["scenario"] == scenario].iloc[0]
+    marker = "" if succeeded(row["optimizer_success"]) else "†"
+    return SCENARIO_LABELS[scenario] + marker
+
+
+def add_trial_note(fig, data):
+    if not all(succeeded(value) for value in data["optimizer_success"]):
+        fig.text(
+            0.01,
+            0.01,
+            "† Reached the 60-generation limit; reported as a trial solution.",
+            fontsize=8,
+        )
+
+
 def ordered(frame):
     return frame.set_index("scenario").reindex(ACTIVE_SCENARIOS).reset_index()
 
 
 def save(fig, output_dir, name):
-    fig.tight_layout()
+    fig.tight_layout(rect=[0, 0.04, 1, 1])
     fig.savefig(output_dir / name, dpi=220, bbox_inches="tight")
     plt.close(fig)
 
@@ -66,7 +128,7 @@ def plot_objective_changes(summary, output_dir):
     """Five objectives as favourable changes from the no-policy baseline."""
     metrics = [
         ("flood_damage_vs_baseline_ratio", "Flood damage reduction"),
-        ("innundation_damage_vs_baseline_ratio", "Innundation damage reduction"),
+        ("innundation_damage_vs_baseline_ratio", "Inundation damage reduction"),
         ("landslide_risk_vs_baseline_ratio", "Landslide risk reduction"),
         ("crop_revenue_vs_baseline_ratio", "Crop revenue increase"),
         ("biodiversity_vs_baseline_ratio", "Biodiversity increase"),
@@ -87,14 +149,15 @@ def plot_objective_changes(summary, output_dir):
             values,
             width=width,
             color=SCENARIO_COLORS[scenario],
-            label=SCENARIO_LABELS[scenario],
+            label=display_scenario(scenario, data),
         )
 
     ax.axhline(0, color="black", linewidth=0.8)
     ax.set_xticks(x, [label for _, label in metrics], rotation=18, ha="right")
     ax.set_ylabel("Improvement from no-policy baseline (%)")
-    ax.set_title("Optimised outcomes relative to the no-policy baseline")
+    ax.set_title("Balanced trial outcomes relative to the no-policy baseline")
     ax.legend(title="Climate scenario", frameon=False)
+    add_trial_note(fig, data)
     save(fig, output_dir, "01_objective_changes.png")
 
 
@@ -112,7 +175,7 @@ def plot_annual_budget(yearly, output_dir):
         total = data["policy_additional_cost"].to_numpy(dtype=float)
         other = np.maximum(total - breeding - paddy - forest, 0)
         years = data["year"].to_numpy()
-        scale = 1e8
+        scale = 1e9
         ax.bar(
             years,
             other / scale,
@@ -123,14 +186,15 @@ def plot_annual_budget(yearly, output_dir):
         ax.bar(years, forest / scale, bottom=(other + paddy) / scale, label="Forest management", color="#2f6f4e")
         ax.bar(years, breeding / scale, bottom=(other + paddy + forest) / scale, label="Breeding", color="#9b59b6")
         ax.axhline(BUDGET_LIMIT / scale, color="black", linestyle="--", linewidth=1, label="Annual budget limit")
-        ax.set_title(SCENARIO_LABELS[scenario], loc="left", fontsize=11)
-        ax.set_ylabel("Annual cost (100 M Yen)")
+        ax.set_title(display_scenario(scenario, data), loc="left", fontsize=11)
+        ax.set_ylabel("Annual cost (B Yen)")
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.06), frameon=False)
     axes[-1].set_xlabel("Year")
-    fig.suptitle("Annual policy portfolio and budget limit", y=1.08)
-    fig.tight_layout(rect=[0, 0, 1, 0.98])
+    fig.suptitle("Annual policy portfolio and budget limit (balanced trial)", y=1.08)
+    add_trial_note(fig, yearly)
+    fig.tight_layout(rect=[0, 0.04, 1, 0.98])
     fig.savefig(output_dir / "02_annual_policy_budget.png", dpi=220, bbox_inches="tight")
     plt.close(fig)
 
@@ -153,7 +217,7 @@ def plot_policy_schedule(decisions, output_dir):
     for ax, scenario in zip(axes, ACTIVE_SCENARIOS):
         decision = decisions[decisions["scenario"] == scenario].iloc[0]
         for position, (label, start_col, end_col, value_col, color) in enumerate(rows):
-            start = int(decision[start_col])
+            start = CALENDAR_START_YEAR + int(decision[start_col])
             value = float(decision[value_col])
             active = value > 0
             if label == "Breeding":
@@ -163,7 +227,7 @@ def plot_policy_schedule(decisions, output_dir):
             if end_col is None:
                 ax.scatter(start, position, color=color, marker="D", s=65, zorder=3)
             else:
-                end = int(decision[end_col])
+                end = CALENDAR_START_YEAR + int(decision[end_col])
                 ax.barh(position, end - start + 1, left=start, height=0.52, color=color, alpha=0.85)
                 if label == "Breeding":
                     text = "50 M Yen/year"
@@ -175,10 +239,10 @@ def plot_policy_schedule(decisions, output_dir):
                     text = f"{value:,.0f} households/year"
                 ax.text(start + 0.1, position, text, va="center", fontsize=8)
         ax.set_yticks(range(len(rows)), [row[0] for row in rows])
-        ax.set_title(SCENARIO_LABELS[scenario], loc="left", fontsize=11)
+        ax.set_title(display_scenario(scenario, decisions), loc="left", fontsize=11)
         ax.grid(axis="x", alpha=0.25)
         ax.invert_yaxis()
-    axes[-1].set_xlabel("Model year index (0 = 2009)")
+    axes[-1].set_xlabel("Year")
     fig.legend(
         handles=[
             Line2D([], [], marker="D", linestyle="None", color="#555555", label="One-time infrastructure investment"),
@@ -189,17 +253,18 @@ def plot_policy_schedule(decisions, output_dir):
         bbox_to_anchor=(0.5, 1.04),
         frameon=False,
     )
-    fig.suptitle("Optimised policy schedules", y=0.995)
-    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    fig.suptitle("Policy schedules in the balanced trial solutions", y=0.995)
+    add_trial_note(fig, decisions)
+    fig.tight_layout(rect=[0, 0.04, 1, 0.96])
     fig.savefig(output_dir / "03_policy_schedule.png", dpi=220, bbox_inches="tight")
     plt.close(fig)
 
 
 def plot_yearly_outcomes(yearly, output_dir):
-    """Optimised annual trajectories; baseline annual trajectories were not saved."""
+    """Trial annual trajectories; baseline annual trajectories were not saved."""
     metrics = [
-        ("flood_damage", "Flood damage", 1e8),
-        ("innundation_damage", "Innundation damage", 1e8),
+        ("flood_damage", "Flood damage", 1e9),
+        ("innundation_damage", "Inundation damage", 1e9),
         ("landslide_risk", "Landslide risk", 1),
         ("crop_revenue", "Crop revenue", 1e9),
         ("biodiversity", "Biodiversity", 1),
@@ -208,13 +273,20 @@ def plot_yearly_outcomes(yearly, output_dir):
     for ax, (column, label, scale) in zip(axes, metrics):
         for scenario in ACTIVE_SCENARIOS:
             data = yearly[yearly["scenario"] == scenario].sort_values("year")
-            ax.plot(data["year"], data[column] / scale, color=SCENARIO_COLORS[scenario], linewidth=2, label=SCENARIO_LABELS[scenario])
-        suffix = " (100 M Yen)" if scale == 1e8 else " (B Yen)" if scale == 1e9 else ""
+            ax.plot(
+                data["year"],
+                data[column] / scale,
+                color=SCENARIO_COLORS[scenario],
+                linewidth=2,
+                label=display_scenario(scenario, data),
+            )
+        suffix = " (B Yen)" if scale == 1e9 else ""
         ax.set_ylabel(label + suffix)
         ax.grid(alpha=0.25)
     axes[0].legend(title="Climate scenario", ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.42), frameon=False)
     axes[-1].set_xlabel("Year")
-    fig.suptitle("Annual outcomes for optimised policy portfolios", y=0.995)
+    fig.suptitle("Annual outcomes for balanced trial policy portfolios", y=0.995)
+    add_trial_note(fig, yearly)
     # Reserve room for long outcome labels and separate the five panels.
     fig.tight_layout(rect=[0.22, 0.02, 0.99, 0.96], h_pad=1.2)
     fig.savefig(output_dir / "04_yearly_optimised_outcomes.png", dpi=220, bbox_inches="tight")
@@ -228,13 +300,19 @@ def plot_policy_mechanisms(yearly, output_dir):
         ("forest_function_coef", "Forest function coefficient", 1),
         ("managed_plantation_forest_area", "Managed plantation forest area (ha)", 1),
         ("unmanaged_plantation_forest_area", "Unmanaged plantation forest area (ha)", 1),
-        ("accumulated_breeding_investment", "Cumulative breeding investment (100 M Yen)", 1e8),
+        ("accumulated_breeding_investment", "Cumulative breeding investment (B Yen)", 1e9),
     ]
     fig, axes = plt.subplots(len(metrics), 1, figsize=(12.5, 14), sharex=True)
     for ax, (column, label, scale) in zip(axes, metrics):
         for scenario in ACTIVE_SCENARIOS:
             data = yearly[yearly["scenario"] == scenario].sort_values("year")
-            ax.plot(data["year"], data[column] / scale, color=SCENARIO_COLORS[scenario], linewidth=2, label=SCENARIO_LABELS[scenario])
+            ax.plot(
+                data["year"],
+                data[column] / scale,
+                color=SCENARIO_COLORS[scenario],
+                linewidth=2,
+                label=display_scenario(scenario, data),
+            )
             if column == "accumulated_breeding_investment":
                 success = data["breeding_success"].astype(float) > 0
                 ax.scatter(data.loc[success, "year"], data.loc[success, column] / scale, color=SCENARIO_COLORS[scenario], marker="*", s=60, zorder=3)
@@ -257,7 +335,8 @@ def plot_policy_mechanisms(yearly, output_dir):
         frameon=False,
     )
     axes[-1].set_xlabel("Year")
-    fig.suptitle("Policy mechanisms in the optimised portfolios", y=0.995)
+    fig.suptitle("Policy mechanisms in the balanced trial portfolios", y=0.995)
+    add_trial_note(fig, yearly)
     # Long state-variable labels need a wide left margin and panel spacing.
     fig.tight_layout(rect=[0.22, 0.02, 0.99, 0.96], h_pad=1.2)
     fig.savefig(output_dir / "05_policy_mechanisms.png", dpi=220, bbox_inches="tight")
@@ -272,14 +351,16 @@ def plot_cost_gdp_tradeoff(summary, output_dir):
         row = data[data["scenario"] == scenario].iloc[0]
         x = float(row["total_budget_utilisation"]) * 100
         y = (float(row["daily_total_gdp_vs_baseline_ratio"]) - 1) * 100
-        ax.scatter(x, y, s=110, color=SCENARIO_COLORS[scenario], label=SCENARIO_LABELS[scenario], zorder=3)
-        ax.annotate(SCENARIO_LABELS[scenario], (x, y), xytext=(6, 6), textcoords="offset points")
+        label = display_scenario(scenario, data)
+        ax.scatter(x, y, s=110, color=SCENARIO_COLORS[scenario], label=label, zorder=3)
+        ax.annotate(label, (x, y), xytext=(6, 6), textcoords="offset points")
     ax.axhline(0, color="black", linewidth=0.8)
     ax.set_xlabel("Total budget utilisation (%)")
     ax.set_ylabel("Change in total GDP from baseline (%)")
-    ax.set_title("Diagnostic cost and GDP trade-off")
+    ax.set_title("Diagnostic cost and GDP trade-off (balanced trial)")
     ax.text(0.02, 0.02, "GDP is not included in the optimisation objective.", transform=ax.transAxes, fontsize=9)
     ax.grid(alpha=0.25)
+    add_trial_note(fig, data)
     save(fig, output_dir, "06_cost_gdp_tradeoff.png")
 
 
@@ -289,6 +370,15 @@ def main():
     summary = pd.read_csv(summary_path, encoding="utf-8-sig")
     decisions = pd.read_csv(decisions_path, encoding="utf-8-sig")
     yearly = pd.read_csv(yearly_path, encoding="utf-8-sig")
+    validate_inputs(summary, decisions, yearly)
+
+    status = summary[["scenario", "pattern", "seed", "optimizer_success"]]
+    decisions = decisions.merge(
+        status, on=["scenario", "pattern", "seed"], validate="one_to_one"
+    )
+    yearly = yearly.merge(
+        status, on=["scenario", "pattern", "seed"], validate="many_to_one"
+    )
 
     summary = summary[summary["pattern"] == OBJECTIVE_PATTERN].copy()
     decisions = decisions[decisions["pattern"] == OBJECTIVE_PATTERN].copy()
@@ -300,6 +390,13 @@ def main():
     ]
     output_dir = FIG_DIR / run_stamp / OBJECTIVE_PATTERN
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    failed = summary[~summary["optimizer_success"].map(succeeded)]
+    if not failed.empty:
+        print(
+            "Note: balanced cases marked with † reached the generation limit and "
+            "are trial solutions, not confirmed optima."
+        )
 
     plot_objective_changes(summary, output_dir)
     plot_annual_budget(yearly, output_dir)

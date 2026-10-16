@@ -1,0 +1,2 @@
+# NSGAIIISampler, constrained multi-objective sampling, and JournalStorage.
+optuna>=4.9,<6

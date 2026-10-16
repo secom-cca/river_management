@@ -22,6 +22,7 @@ import warnings
 import numpy as np
 import pandas as pd
 from pysd import load
+from breeding_response_to7 import model_configuration, model_parameters
 
 try:
     from scipy.optimize import differential_evolution
@@ -49,23 +50,25 @@ warnings.filterwarnings(
 
 
 # ---- Model and simulation settings ----
-MODEL_PY = Path("River_management_xls_to6.py")
+MODEL_PY = Path("River_management_xls_to7.py")
 OUTPUT_DIR = Path("data")
-RUN_STAMP = datetime.now().strftime("%y%m%d_%H%M")
+RUN_STAMP = datetime.now().strftime("%y%m%d_%H%M%S")
 
 CALENDAR_START_YEAR = 2009
 CALENDAR_NUM_YEARS = 15
 USE_LEAP_YEARS = True
 
-#SCENARIOS = ["present"]
-SCENARIOS = ["2C", "4C"]
+# Use a subset such as ["present"] for an exploratory run. Because the to7
+# damage structure changed, prior to6-based optimisation results are not
+# directly comparable and all three scenarios should be rerun for analysis.
+SCENARIOS = ["present", "2C", "4C"]
 
-# Present-climate exploration across all objective patterns. Restore all climate
-# scenarios after confirming convergence and policy-pattern behaviour.
-MAXITER = 120
-POPSIZE = 8
-# Require a tighter population-objective spread before declaring convergence.
-# This lets the small policy-cost tie-breaker distinguish near-equal solutions.
+# Coarse first-stage search across every scenario and objective pattern. Resume
+# promising cases from their checkpoints with larger values for final analysis.
+MAXITER = 60
+POPSIZE = 5
+# Use a tighter tolerance for the continuation so small outcome differences and
+# the 0.001 policy-cost tie-breaker do not trigger another coarse early stop.
 DE_TOLERANCE = 0.001
 
 # Keep one seed for an exploratory run. For final analysis, for example use
@@ -75,13 +78,21 @@ OPTIMIZATION_SEEDS = [42]
 # Print each completed DE generation so long PySD runs visibly advance in the
 # PowerShell console. Set this higher only when console output is excessive.
 PROGRESS_EVERY = 1
-MAX_WORKERS = 12 #10でCPU消費50%弱
+# Keep part of the workstation's logical CPU capacity available for the OS.
+MAX_WORKERS = 12
 BREEDING_ANNUAL_COST = 50_000_000
 BREEDING_DURATION_YEARS = 10
-# Set to a checkpoint directory to seed a new run from its final populations.
-# This starts a new DE run; SciPy does not support an exact generation-by-
-# generation continuation with its public API.
+# Continue only the cases that ended with optimizer_success=False. Their saved
+# Historical checkpoints use the old calendar/breeding model. Start a new batch
+# after this model revision; only compatible new checkpoints can be continued.
+CONTINUE_FROM_CHECKPOINT_DIR = None
+# Leave this as None for the first continuation run. If that run is interrupted
+# after completing one or more cases, set this to its new checkpoint directory
+# and rerun while keeping CONTINUE_FROM_CHECKPOINT_DIR unchanged.
 RESUME_CHECKPOINT_DIR = None
+# The original random-generator state was not saved. Use a distinct,
+# reproducible stream for the continuation instead of replaying seed 42.
+CONTINUATION_RNG_SEED_OFFSET = 1_000
 
 # The policy budget excludes management of the initially managed plantation.
 BUDGET_CASE = "standard"
@@ -110,14 +121,23 @@ FIXED_ASSUMPTIONS = {
     "innundation_risky_area_ratio": 0.8,
     "flood_risky_area_ratio": 0.8,
     "recovery_ratio": 0.9,
+    "delay_of_recovery": 365,
+    "initial_total_risk_households": 50_000,
+    "risk_household_overlap_ratio": 0.5,
     "crop_price": 250,
     "waterholding_capacity_of_forest_base": 225,
     "landslide_design_daily_precipitation": 322,
-    "innundation_damage_per_resident": 1e7 / 365,
-    "flood_damage_per_resident": 1e7 / 365,
+    "inundation_damage_per_household": 30_000_000,
+    "flood_damage_per_household": 30_000_000,
+    "average_household_size": 2.21,
     "gdp_per_resident": 3e6 / 365,
     "paddy_field_capacity_per_area": 500,
     "paddy_dam_capacity_per_area": 1500,
+    "paddy_dam_cost_per_area": 1_500_000,
+    "daily_paddy_damage_fraction": 0.10,
+    "paddy_damage_depth_threshold": 0.3,
+    "paddy_field_recovery_years_to_90_percent": 2.0,
+    "predischarge_capacity_ratio": 0.10,
     "unmanaged_plantation_forest_coef": 0.7,
     "upstream_outflow_ratio": 0.272198,
     "downstream_outflow_ratio": 0.240634,
@@ -191,7 +211,9 @@ OBJECTIVE_PATTERNS = {
 
 RETURN_COLS = [
     "financial_damage_by_flood",
-    "financial_damage_by_innundation",
+    "financial_damage_by_inundation",
+    "flood_event_healthy_households",
+    "inundation_event_healthy_households",
     "landslide_disaster_risk",
     "crop_production_cashflow",
     "biodiversity",
@@ -200,11 +222,22 @@ RETURN_COLS = [
     "forest_mitigation",
     "scenario_adjusted_daily_precip_up",
     "landslide_design_daily_precipitation",
+    "dam_storage",
+    "dam_capacity",
+    "predischarge_control",
+    "predischarge_capacity",
+    "predischarge_capacity_ratio",
+    "dam_spill",
+    "dam_outflow",
     "houses_in_flood_risk",
     "houses_in_inundation_risk",
     "flood_only_risk_houses",
     "innundation_only_risk_houses",
     "overlapping_risk_houses",
+    "damaged_flood_only_houses",
+    "damaged_inundation_only_houses",
+    "damaged_overlapping_houses",
+    "damaged_houses",
     "houses_in_nonrisky_area",
     "elevated_houses",
     "managed_plantation_forest_area",
@@ -213,9 +246,31 @@ RETURN_COLS = [
     "paddy_dam_investment",
     "paddy_dam_area",
     "paddy_dam_ratio",
+    "physical_paddy_field",
+    "damaged_paddy_field",
+    "paddyfield_storage_capacity",
     "breeding_investment",
     "accumulated_breeding_investment",
     "breeding_success",
+    "breeding_effect_ratio",
+    "chalky_kernel_ratio",
+    "effective_chalky_kernel_ratio",
+    "crop_price_quality_factor",
+    "harvest_trigger",
+]
+
+# Observe stocks after the final integration step of each calendar year.
+# Daily flows still have exactly 365/366 samples, excluding next January 1.
+YEAR_END_COLUMNS = [
+    "dam_storage", "dam_capacity", "houses_in_flood_risk",
+    "houses_in_inundation_risk", "flood_only_risk_houses",
+    "innundation_only_risk_houses", "overlapping_risk_houses",
+    "damaged_flood_only_houses", "damaged_inundation_only_houses",
+    "damaged_overlapping_houses", "damaged_houses", "houses_in_nonrisky_area",
+    "elevated_houses", "managed_plantation_forest_area",
+    "unmanaged_plantation_forest_area", "paddy_dam_area", "paddy_dam_ratio",
+    "physical_paddy_field", "damaged_paddy_field", "paddyfield_storage_capacity",
+    "accumulated_breeding_investment", "breeding_success", "breeding_effect_ratio",
 ]
 
 UNIT_COST_OF_ELEVATION = 3_000_000
@@ -234,19 +289,130 @@ def get_model():
 
 
 def load_resume_population(scenario, pattern_name, seed):
-    """Load a prior final population as the initial population for a new run."""
-    if RESUME_CHECKPOINT_DIR is None:
-        return None
-    path = Path(RESUME_CHECKPOINT_DIR) / (
-        f"population_{scenario}_{pattern_name}_seed{seed}.csv"
+    """Load a saved population from the active batch or continuation source."""
+    directories = []
+    if RESUME_CHECKPOINT_DIR is not None:
+        directories.append(Path(RESUME_CHECKPOINT_DIR))
+    if CONTINUE_FROM_CHECKPOINT_DIR is not None:
+        source = Path(CONTINUE_FROM_CHECKPOINT_DIR)
+        if source not in directories:
+            directories.append(source)
+
+    filename = f"population_{scenario}_{pattern_name}_seed{seed}.csv"
+    for directory in directories:
+        path = directory / filename
+        if not path.exists():
+            continue
+        population = pd.read_csv(path, encoding="utf-8-sig")
+        missing = [name for name in DECISION_BOUNDS if name not in population.columns]
+        if missing:
+            raise ValueError(
+                f"Resume population is missing decision columns: {missing}"
+            )
+        values = population[list(DECISION_BOUNDS)].to_numpy(dtype=float)
+        if values.shape != (POPSIZE * len(DECISION_BOUNDS), len(DECISION_BOUNDS)):
+            raise ValueError(
+                f"Unexpected saved population shape {values.shape} in {path}; "
+                f"expected {(POPSIZE * len(DECISION_BOUNDS), len(DECISION_BOUNDS))}."
+            )
+        return values
+    return None
+
+
+def _case_key(row):
+    return str(row["scenario"]), str(row["pattern"]), int(row["seed"])
+
+
+def _as_bool(value):
+    if isinstance(value, str):
+        return value.strip().lower() == "true"
+    return bool(value)
+
+
+def _configured_case_keys():
+    return {
+        (scenario, pattern_name, int(seed))
+        for scenario in SCENARIOS
+        for pattern_name in OBJECTIVE_PATTERNS
+        for seed in OPTIMIZATION_SEEDS
+    }
+
+
+def _filter_records(records, selected_keys):
+    return [row for row in records if _case_key(row) in selected_keys]
+
+
+def _filter_yearly_frame(frame, selected_keys):
+    keys = frame.apply(_case_key, axis=1)
+    return frame[keys.isin(selected_keys)].copy()
+
+
+def _order_output_frame(frame):
+    """Keep scenario/pattern/seed/year order stable in combined output files."""
+    frame = frame.copy()
+    scenario_order = {name: index for index, name in enumerate(SCENARIOS)}
+    pattern_order = {
+        name: index for index, name in enumerate(OBJECTIVE_PATTERNS)
+    }
+    frame["_scenario_order"] = frame["scenario"].map(scenario_order)
+    frame["_pattern_order"] = frame["pattern"].map(pattern_order)
+    sort_columns = ["_scenario_order", "_pattern_order", "seed"]
+    if "year" in frame.columns:
+        sort_columns.append("year")
+    frame = frame.sort_values(sort_columns).drop(
+        columns=["_scenario_order", "_pattern_order"]
     )
-    if not path.exists():
-        raise FileNotFoundError(f"Resume population not found: {path}")
-    population = pd.read_csv(path, encoding="utf-8-sig")
-    missing = [name for name in DECISION_BOUNDS if name not in population.columns]
+    return frame.reset_index(drop=True)
+
+
+def load_completed_checkpoint(checkpoint_dir):
+    """Load and validate completed cases from an interrupted optimisation batch."""
+    metadata_path = checkpoint_dir / "resume_metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.exists() else {}
+    if metadata.get("model_configuration") != model_configuration():
+        raise ValueError("Checkpoint uses a different calendar/breeding model; start a new optimisation batch.")
+    table_names = ("summary", "decisions", "yearly", "optimiser_state")
+    paths = {name: checkpoint_dir / f"{name}.csv" for name in table_names}
+    missing = [str(path) for path in paths.values() if not path.exists()]
     if missing:
-        raise ValueError(f"Resume population is missing decision columns: {missing}")
-    return population[list(DECISION_BOUNDS)].to_numpy(dtype=float)
+        raise FileNotFoundError(
+            "Resume checkpoint is missing required files: " + ", ".join(missing)
+        )
+
+    summary = pd.read_csv(paths["summary"], encoding="utf-8-sig")
+    decisions = pd.read_csv(paths["decisions"], encoding="utf-8-sig")
+    yearly = pd.read_csv(paths["yearly"], encoding="utf-8-sig")
+    optimiser_state = pd.read_csv(
+        paths["optimiser_state"], encoding="utf-8-sig"
+    )
+
+    summary_keys = {_case_key(row) for row in summary.to_dict("records")}
+    decision_keys = {_case_key(row) for row in decisions.to_dict("records")}
+    yearly_keys = {_case_key(row) for row in yearly.to_dict("records")}
+    state_keys = {_case_key(row) for row in optimiser_state.to_dict("records")}
+    if not summary_keys or not (
+        summary_keys == decision_keys == yearly_keys == state_keys
+    ):
+        raise ValueError(
+            "Resume checkpoint tables do not contain the same completed cases."
+        )
+
+    for scenario, pattern_name, seed in summary_keys:
+        population_path = checkpoint_dir / (
+            f"population_{scenario}_{pattern_name}_seed{seed}.csv"
+        )
+        if not population_path.exists():
+            raise FileNotFoundError(
+                f"Completed case is missing its population: {population_path}"
+            )
+
+    return {
+        "summary_rows": summary.to_dict("records"),
+        "decision_rows": decisions.to_dict("records"),
+        "yearly_frames": [yearly],
+        "state_rows": optimiser_state.to_dict("records"),
+        "completed_keys": summary_keys,
+    }
 
 
 def _is_leap_year(year):
@@ -316,6 +482,7 @@ def fixed_params_for_scenario(scenario):
     if scenario not in SCENARIO_TO_PRECIP_RATIO:
         raise ValueError(f"Unknown scenario: {scenario}")
     params = FIXED_ASSUMPTIONS.copy()
+    params.update(model_parameters())
     params.update(
         {
             "daily_precipitation_future_ratio": SCENARIO_TO_PRECIP_RATIO[scenario],
@@ -408,10 +575,12 @@ def policy_cost_before_forest(decision, year_index):
     return cost
 
 
-def run_model_yearly(scenario, decision):
+def run_model_yearly(scenario, decision, *, model_params=None, return_columns=None):
     """Run sequential years so annual policy schedules retain model stocks."""
     model = get_model()
     base_params = fixed_params_for_scenario(scenario)
+    if model_params:
+        base_params.update(model_params)
     results = []
 
     for year_index in range(CALENDAR_NUM_YEARS):
@@ -420,9 +589,15 @@ def run_model_yearly(scenario, decision):
         result = model.run(
             params=params,
             return_timestamps=_year_timestamps(year_index),
-            return_columns=RETURN_COLS,
+            return_columns=RETURN_COLS if return_columns is None else return_columns,
+            final_time=YEAR_STARTS[year_index] + YEAR_LENGTHS[year_index],
             initial_condition="original" if year_index == 0 else "current",
         )
+        result.attrs["year_end_state"] = {
+            name: float(getattr(model.components, name)())
+            for name in YEAR_END_COLUMNS
+        }
+        result.attrs["year_end_time"] = float(model.time())
         results.append(result)
     return results
 
@@ -439,6 +614,11 @@ def aggregate_results(results, decision):
     yearly_rows = []
 
     for year_index, result in enumerate(results):
+        year_end = result.attrs.get("year_end_state", {})
+
+        def at_year_end(name):
+            return float(year_end[name]) if name in year_end else float(result[name].iloc[-1])
+
         forest_cost = float(result["additional_forest_management_cost"].mean())
         paddy_dam_cost = float(result["paddy_dam_investment"].sum())
         breeding_cost = float(result["breeding_investment"].sum())
@@ -451,52 +631,67 @@ def aggregate_results(results, decision):
             "year_index": year_index,
             "year": CALENDAR_START_YEAR + year_index,
             "flood_damage": float(result["financial_damage_by_flood"].sum()),
-            "innundation_damage": float(result["financial_damage_by_innundation"].sum()),
+            # Keep the historical summary key for output compatibility, while
+            # reading the corrected model component name.
+            "innundation_damage": float(result["financial_damage_by_inundation"].sum()),
             "landslide_risk": float(result["landslide_disaster_risk"].sum()),
             "maximum_landslide_risk": float(result["landslide_disaster_risk"].max()),
             "maximum_adjusted_daily_precip_up": float(
                 result["scenario_adjusted_daily_precip_up"].max()
             ),
             "forest_mitigation": float(result["forest_mitigation"].mean()),
+            "dam_storage_at_year_end": at_year_end("dam_storage"),
+            "dam_storage_year_min": float(result["dam_storage"].min()),
+            "dam_storage_year_max": float(result["dam_storage"].max()),
+            "dam_capacity_at_year_end": at_year_end("dam_capacity"),
+            "predischarge_control_year_sum": float(
+                result["predischarge_control"].sum()
+            ),
+            "predischarge_capacity_year_mean": float(
+                result["predischarge_capacity"].mean()
+            ),
+            "dam_spill_year_sum": float(result["dam_spill"].sum()),
+            "dam_outflow_year_sum": float(result["dam_outflow"].sum()),
             # Crop cashflow is booked only at harvest, so its annual sum is revenue.
             "crop_revenue": float(result["crop_production_cashflow"].sum()),
             "biodiversity": float(result["biodiversity"].mean()),
             "daily_total_gdp": float(result["daily_total_gdp"].sum()),
             "forest_function_coef": float(result["forest_function_coef"].mean()),
-            "houses_in_flood_risk": float(result["houses_in_flood_risk"].iloc[-1]),
-            "houses_in_inundation_risk": float(
-                result["houses_in_inundation_risk"].iloc[-1]
-            ),
-            "flood_only_risk_houses": float(
-                result["flood_only_risk_houses"].iloc[-1]
-            ),
-            "innundation_only_risk_houses": float(
-                result["innundation_only_risk_houses"].iloc[-1]
-            ),
-            "overlapping_risk_houses": float(
-                result["overlapping_risk_houses"].iloc[-1]
-            ),
-            "houses_in_nonrisky_area": float(
-                result["houses_in_nonrisky_area"].iloc[-1]
-            ),
-            "elevated_houses": float(result["elevated_houses"].iloc[-1]),
-            "managed_plantation_forest_area": float(
-                result["managed_plantation_forest_area"].iloc[-1]
-            ),
-            "unmanaged_plantation_forest_area": float(
-                result["unmanaged_plantation_forest_area"].iloc[-1]
-            ),
+            "houses_in_flood_risk": at_year_end("houses_in_flood_risk"),
+            "houses_in_inundation_risk": at_year_end("houses_in_inundation_risk"),
+            "flood_only_risk_houses": at_year_end("flood_only_risk_houses"),
+            "innundation_only_risk_houses": at_year_end("innundation_only_risk_houses"),
+            "overlapping_risk_houses": at_year_end("overlapping_risk_houses"),
+            "damaged_flood_only_houses": at_year_end("damaged_flood_only_houses"),
+            "damaged_inundation_only_houses": at_year_end("damaged_inundation_only_houses"),
+            "damaged_overlapping_houses": at_year_end("damaged_overlapping_houses"),
+            "damaged_houses": at_year_end("damaged_houses"),
+            "houses_in_nonrisky_area": at_year_end("houses_in_nonrisky_area"),
+            "elevated_houses": at_year_end("elevated_houses"),
+            "managed_plantation_forest_area": at_year_end("managed_plantation_forest_area"),
+            "unmanaged_plantation_forest_area": at_year_end("unmanaged_plantation_forest_area"),
             "additional_forest_management_cost": forest_cost,
             "paddy_dam_actual_cost": paddy_dam_cost,
-            "paddy_dam_area": float(result["paddy_dam_area"].iloc[-1]),
-            "paddy_dam_ratio": float(result["paddy_dam_ratio"].iloc[-1]),
+            "paddy_dam_area": at_year_end("paddy_dam_area"),
+            "paddy_dam_ratio": at_year_end("paddy_dam_ratio"),
+            "physical_paddy_field": at_year_end("physical_paddy_field"),
+            "damaged_paddy_field": at_year_end("damaged_paddy_field"),
+            "paddyfield_storage_capacity": at_year_end("paddyfield_storage_capacity"),
             "breeding_actual_cost": breeding_cost,
-            "accumulated_breeding_investment": float(
-                result["accumulated_breeding_investment"].iloc[-1]
-            ),
-            "breeding_success": float(result["breeding_success"].iloc[-1]),
+            "accumulated_breeding_investment": at_year_end("accumulated_breeding_investment"),
+            "breeding_success": at_year_end("breeding_success"),
+            "breeding_effect_ratio": at_year_end("breeding_effect_ratio"),
+            "year_end_time": result.attrs.get("year_end_time", float(result.index[-1])),
             "policy_additional_cost": policy_cost,
         }
+        harvest = result[result["harvest_trigger"] > 0.5]
+        if len(harvest) != 1:
+            raise ValueError("Expected exactly one harvest per calendar year")
+        for name in (
+            "accumulated_breeding_investment", "breeding_effect_ratio",
+            "chalky_kernel_ratio", "effective_chalky_kernel_ratio", "crop_price_quality_factor",
+        ):
+            row[name + "_at_harvest"] = float(harvest[name].iloc[0])
         yearly_rows.append(row)
         for metric in ("flood_damage", "innundation_damage", "landslide_risk", "crop_revenue", "daily_total_gdp"):
             metrics[metric] += row[metric]
@@ -512,8 +707,8 @@ def aggregate_results(results, decision):
     return metrics, pd.DataFrame(yearly_rows)
 
 
-def evaluate_policy(scenario, decision):
-    results = run_model_yearly(scenario, decision)
+def evaluate_policy(scenario, decision, *, model_params=None):
+    results = run_model_yearly(scenario, decision, model_params=model_params)
     return aggregate_results(results, decision)
 
 
@@ -605,12 +800,17 @@ def optimise_scenario(scenario, pattern_name, weights, seed):
             "saved population members."
         )
 
+    de_seed = (
+        seed + CONTINUATION_RNG_SEED_OFFSET
+        if CONTINUE_FROM_CHECKPOINT_DIR is not None
+        else seed
+    )
     de_kwargs = {
         "bounds": list(DECISION_BOUNDS.values()),
         "maxiter": MAXITER,
         "popsize": POPSIZE,
         "tol": DE_TOLERANCE,
-        "seed": seed,
+        "seed": de_seed,
         "polish": False,
         "callback": progress,
         # Deferred updating is required when scipy evaluates candidates in
@@ -620,6 +820,9 @@ def optimise_scenario(scenario, pattern_name, weights, seed):
     }
     if initial_population is not None:
         de_kwargs["init"] = initial_population
+        print(
+            f"{scenario}/{pattern_name}: continuation RNG seed={de_seed}."
+        )
 
     result = differential_evolution(
         objective,
@@ -669,7 +872,12 @@ def _comparison_row(scenario, pattern_name, seed, result, baseline, metrics):
 
 
 def save_checkpoint(
-    checkpoint_dir, summary_rows, decision_rows, yearly_frames, optimiser_runs
+    checkpoint_dir,
+    summary_rows,
+    decision_rows,
+    yearly_frames,
+    optimiser_runs,
+    resumed_state_rows=None,
 ):
     """Persist completed patterns and their final DE populations for later reuse."""
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -683,7 +891,7 @@ def save_checkpoint(
         checkpoint_dir / "yearly.csv", index=False, encoding="utf-8-sig"
     )
 
-    state_rows = []
+    state_rows = list(resumed_state_rows or [])
     for scenario, pattern_name, seed, result in optimiser_runs:
         population = np.asarray(result.population, dtype=float)
         population_frame = pd.DataFrame(population, columns=list(DECISION_BOUNDS))
@@ -714,6 +922,7 @@ def save_checkpoint(
         checkpoint_dir / "optimiser_state.csv", index=False, encoding="utf-8-sig"
     )
     metadata = {
+        "model_configuration": model_configuration(),
         "decision_variable_order": list(DECISION_BOUNDS),
         "population_size": POPSIZE * len(DECISION_BOUNDS),
         "maxiter": MAXITER,
@@ -721,6 +930,16 @@ def save_checkpoint(
         "seeds": OPTIMIZATION_SEEDS,
         "scenarios": SCENARIOS,
         "objective_patterns": OBJECTIVE_PATTERNS,
+        "continue_from_checkpoint": (
+            str(CONTINUE_FROM_CHECKPOINT_DIR)
+            if CONTINUE_FROM_CHECKPOINT_DIR is not None
+            else None
+        ),
+        "continuation_rng_seed_offset": (
+            CONTINUATION_RNG_SEED_OFFSET
+            if CONTINUE_FROM_CHECKPOINT_DIR is not None
+            else None
+        ),
     }
     (checkpoint_dir / "resume_metadata.json").write_text(
         json.dumps(metadata, indent=2), encoding="utf-8"
@@ -729,16 +948,133 @@ def save_checkpoint(
 
 def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
-    stem = f"opt_to7_{BUDGET_CASE}_{RUN_STAMP}"
-    checkpoint_dir = OUTPUT_DIR / "checkpoints" / stem
-    summary_rows = []
-    decision_rows = []
-    yearly_frames = []
+    configured_keys = _configured_case_keys()
+    continuation_source = None
+    continuation_target_keys = configured_keys
+    retained_source_keys = set()
+    source_summary_by_key = {}
+    source_state_by_key = {}
+
+    if CONTINUE_FROM_CHECKPOINT_DIR is not None:
+        source_dir = Path(CONTINUE_FROM_CHECKPOINT_DIR)
+        if not source_dir.is_dir():
+            raise FileNotFoundError(
+                f"Continuation source checkpoint not found: {source_dir}"
+            )
+        if (
+            RESUME_CHECKPOINT_DIR is not None
+            and Path(RESUME_CHECKPOINT_DIR).resolve() == source_dir.resolve()
+        ):
+            raise ValueError(
+                "RESUME_CHECKPOINT_DIR must be the new continuation checkpoint, "
+                "not CONTINUE_FROM_CHECKPOINT_DIR."
+            )
+        continuation_source = load_completed_checkpoint(source_dir)
+        source_keys = continuation_source["completed_keys"]
+        missing_source_keys = configured_keys - source_keys
+        if missing_source_keys:
+            raise ValueError(
+                "Continuation source does not contain every configured case: "
+                + ", ".join(map(str, sorted(missing_source_keys)))
+            )
+        source_summary_by_key = {
+            _case_key(row): row for row in continuation_source["summary_rows"]
+        }
+        source_state_by_key = {
+            _case_key(row): row for row in continuation_source["state_rows"]
+        }
+        continuation_target_keys = {
+            key
+            for key in configured_keys
+            if not _as_bool(source_state_by_key[key]["optimizer_success"])
+        }
+        if not continuation_target_keys:
+            raise ValueError(
+                "Continuation source has no configured optimizer_success=False cases."
+            )
+        retained_source_keys = configured_keys - continuation_target_keys
+        print(
+            f"Continuation source: {source_dir}; extending "
+            f"{len(continuation_target_keys)} unconverged case(s) by up to "
+            f"{MAXITER} generations and retaining {len(retained_source_keys)} "
+            "converged case(s)."
+        )
+
+    if RESUME_CHECKPOINT_DIR is None:
+        stem = f"opt_to7_{BUDGET_CASE}_{RUN_STAMP}"
+        checkpoint_dir = OUTPUT_DIR / "checkpoints" / stem
+    else:
+        checkpoint_dir = Path(RESUME_CHECKPOINT_DIR)
+        stem = checkpoint_dir.name
+        expected_prefix = f"opt_to7_{BUDGET_CASE}_"
+        if not stem.startswith(expected_prefix):
+            raise ValueError(
+                f"Resume checkpoint '{stem}' does not match budget case "
+                f"'{BUDGET_CASE}'."
+            )
+
+    final_paths = [
+        OUTPUT_DIR / f"{stem}_summary.csv",
+        OUTPUT_DIR / f"{stem}_decisions.csv",
+        OUTPUT_DIR / f"{stem}_yearly.csv",
+    ]
+
+    if RESUME_CHECKPOINT_DIR is None:
+        existing = [path for path in final_paths if path.exists()]
+        if checkpoint_dir.exists():
+            existing.append(checkpoint_dir)
+        if existing:
+            raise FileExistsError(
+                "Refusing to overwrite existing optimisation output: "
+                + ", ".join(str(path) for path in existing)
+            )
+        summary_rows = []
+        decision_rows = []
+        yearly_frames = []
+        resumed_state_rows = []
+        completed_keys = set()
+    else:
+        if not checkpoint_dir.is_dir():
+            raise FileNotFoundError(
+                f"Resume checkpoint directory not found: {checkpoint_dir}"
+            )
+        completed = load_completed_checkpoint(checkpoint_dir)
+        summary_rows = completed["summary_rows"]
+        decision_rows = completed["decision_rows"]
+        yearly_frames = completed["yearly_frames"]
+        resumed_state_rows = completed["state_rows"]
+        completed_keys = completed["completed_keys"]
+        if CONTINUE_FROM_CHECKPOINT_DIR is not None and not completed_keys.issubset(
+            continuation_target_keys
+        ):
+            raise ValueError(
+                "The resume checkpoint contains cases outside this continuation set."
+            )
+        print(
+            f"Resuming {stem}: loaded {len(completed_keys)} completed case(s)."
+        )
+
     optimiser_runs = []
 
     for scenario in SCENARIOS:
         for pattern_name, weights in OBJECTIVE_PATTERNS.items():
             for seed in OPTIMIZATION_SEEDS:
+                case_key = (scenario, pattern_name, int(seed))
+                if (
+                    CONTINUE_FROM_CHECKPOINT_DIR is not None
+                    and case_key not in continuation_target_keys
+                ):
+                    print(
+                        f"Retaining previously converged case: {scenario}/"
+                        f"{pattern_name}/seed={seed}"
+                    )
+                    continue
+                if case_key in completed_keys:
+                    print(
+                        f"Skipping completed case: {scenario}/{pattern_name}/"
+                        f"seed={seed}"
+                    )
+                    continue
                 print(
                     f"\n=== {scenario}: {pattern_name} / {BUDGET_CASE} "
                     f"budget / seed={seed} ==="
@@ -747,11 +1083,26 @@ def main():
                     scenario, pattern_name, weights, seed
                 )
                 optimiser_runs.append((scenario, pattern_name, seed, result))
-                summary_rows.append(
-                    _comparison_row(
-                        scenario, pattern_name, seed, result, baseline, metrics
-                    )
+                comparison_row = _comparison_row(
+                    scenario, pattern_name, seed, result, baseline, metrics
                 )
+                if CONTINUE_FROM_CHECKPOINT_DIR is not None:
+                    source_summary = source_summary_by_key[case_key]
+                    source_state = source_state_by_key[case_key]
+                    comparison_row.update(
+                        {
+                            "continuation_applied": True,
+                            "previous_objective_score": float(
+                                source_summary["objective_score"]
+                            ),
+                            "additional_iterations": int(result.nit),
+                            "cumulative_iterations": int(
+                                source_state["iterations"]
+                            )
+                            + int(result.nit),
+                        }
+                    )
+                summary_rows.append(comparison_row)
                 decision_rows.append(
                     {
                         "scenario": scenario,
@@ -770,17 +1121,57 @@ def main():
                     decision_rows,
                     yearly_frames,
                     optimiser_runs,
+                    resumed_state_rows,
                 )
                 print(f"Checkpoint saved: {checkpoint_dir}")
 
-    pd.DataFrame(summary_rows).to_csv(
-        OUTPUT_DIR / f"{stem}_summary.csv", index=False, encoding="utf-8-sig"
+    if CONTINUE_FROM_CHECKPOINT_DIR is not None:
+        continued_keys = {_case_key(row) for row in summary_rows}
+        if continued_keys != continuation_target_keys:
+            missing = continuation_target_keys - continued_keys
+            raise RuntimeError(
+                "Continuation ended without every target case: "
+                + ", ".join(map(str, sorted(missing)))
+            )
+
+        retained_summary_rows = []
+        for row in _filter_records(
+            continuation_source["summary_rows"], retained_source_keys
+        ):
+            annotated = dict(row)
+            key = _case_key(row)
+            annotated.update(
+                {
+                    "continuation_applied": False,
+                    "previous_objective_score": float(row["objective_score"]),
+                    "additional_iterations": 0,
+                    "cumulative_iterations": int(
+                        source_state_by_key[key]["iterations"]
+                    ),
+                }
+            )
+            retained_summary_rows.append(annotated)
+        final_summary_rows = retained_summary_rows + summary_rows
+        final_decision_rows = _filter_records(
+            continuation_source["decision_rows"], retained_source_keys
+        ) + decision_rows
+        retained_yearly = _filter_yearly_frame(
+            continuation_source["yearly_frames"][0], retained_source_keys
+        )
+        final_yearly_frames = [retained_yearly] + yearly_frames
+    else:
+        final_summary_rows = summary_rows
+        final_decision_rows = decision_rows
+        final_yearly_frames = yearly_frames
+
+    _order_output_frame(pd.DataFrame(final_summary_rows)).to_csv(
+        final_paths[0], index=False, encoding="utf-8-sig"
     )
-    pd.DataFrame(decision_rows).to_csv(
-        OUTPUT_DIR / f"{stem}_decisions.csv", index=False, encoding="utf-8-sig"
+    _order_output_frame(pd.DataFrame(final_decision_rows)).to_csv(
+        final_paths[1], index=False, encoding="utf-8-sig"
     )
-    pd.concat(yearly_frames, ignore_index=True).to_csv(
-        OUTPUT_DIR / f"{stem}_yearly.csv", index=False, encoding="utf-8-sig"
+    _order_output_frame(pd.concat(final_yearly_frames, ignore_index=True)).to_csv(
+        final_paths[2], index=False, encoding="utf-8-sig"
     )
     print(f"Saved: {OUTPUT_DIR / stem}")
 

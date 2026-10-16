@@ -15,10 +15,15 @@ warnings.filterwarnings(
     message=r"_ext_data_flow(_d)?",
     category=UserWarning,
 )
+warnings.filterwarnings(
+    "ignore",
+    message=r"_ext_data_daily_precip_up",
+    category=UserWarning,
+)
 
 
 # ---- Input model ----
-MODEL_PY = Path("River_management_xls_to6.py")
+MODEL_PY = Path("River_management_xls_to7.py")
 _MODEL = None
 
 
@@ -28,7 +33,7 @@ def get_model():
         if MODEL_PY.exists():
             _MODEL = load(MODEL_PY.as_posix())
         else:
-            raise FileNotFoundError("River_management_xls_to6.py が見つかりません。")
+            raise FileNotFoundError("River_management_xls_to7.py が見つかりません。")
     return _MODEL
 
 
@@ -37,7 +42,7 @@ CALENDAR_START_YEAR = 2009
 CALENDAR_NUM_YEARS = 15
 USE_LEAP_YEARS = True
 SCENARIOS = ["present", "2C", "4C"]
-RUN_STAMP = datetime.now().strftime("%y%m%d_%H%M")
+RUN_STAMP = datetime.now().strftime("%y%m%d_%H%M%S")
 
 SAMPLE_MODE = "lhs"  # "one_at_a_time", "random", or "lhs"
 N_SAMPLES = 100
@@ -68,12 +73,9 @@ ASSUMPTION_BOUNDS = {
     "ratio_of_paddy_field_in_risky_area": (0.05, 0.15, 0.10),
     "innundation_risky_area_ratio": (0.5, 0.8, 0.8),
     "flood_risky_area_ratio": (0.5, 0.8, 0.8),
-    "recovery_ratio": (0.5, 1.0, 0.9),
     "crop_price": (200, 400, 250),
     # This sampled value also determines erosion_control_of_forest in the model.
     "waterholding_capacity_of_forest_base": (200, 250, 225),
-    "innundation_damage_per_resident": (5e6 / 365, 1.5e7 / 365, 1e7 / 365),
-    "flood_damage_per_resident": (5e6 / 365, 1.5e7 / 365, 1e7 / 365),
     "gdp_per_resident": (2.5e6 / 365, 3.5e6 / 365, 3.0e6 / 365),
     "paddy_field_capacity_per_area": (400, 600, 500),
     "paddy_dam_capacity_per_area": (1000, 2000, 1500),
@@ -92,6 +94,19 @@ def fixed_params_for_scenario(scenario):
         "number_of_migration": 0,
         "annual_paddy_dam_investment": 0,
         "annual_breeding_investment": 0,
+        "recovery_ratio": 0.9,
+        "delay_of_recovery": 365,
+        "initial_total_risk_households": 50_000,
+        "risk_household_overlap_ratio": 0.5,
+        "flood_damage_per_household": 30_000_000,
+        "inundation_damage_per_household": 30_000_000,
+        "average_household_size": 2.21,
+        "daily_paddy_damage_fraction": 0.10,
+        "paddy_damage_depth_threshold": 0.3,
+        "paddy_field_recovery_years_to_90_percent": 2.0,
+        "paddy_dam_cost_per_area": 1_500_000,
+        "predischarge_capacity_ratio": 0.10,
+        "landslide_design_daily_precipitation": 322,
         # Calibrated hydrological parameters. Keep fixed in this assumption study.
         "upstream_outflow_ratio": 0.272198,
         "downstream_outflow_ratio": 0.240634,
@@ -128,10 +143,38 @@ RETURN_COLS = [
     "river_water_level_upstream",
     "river_water_level_downstream",
     "flood_water_level",
+    "dam_storage",
+    "dam_capacity",
+    "dam_inflow",
+    "predischarge_control",
+    "predischarge_capacity",
+    "predischarge_capacity_ratio",
+    "dam_spill",
+    "dam_outflow",
+    "downstream_storage",
+    "downstream_storage_capacity",
+    "paddyfield_storage_capacity",
     "heat_stress_at_heading_plus_20",
     "accumulated_heat_stress",
-    "financial_damage_by_innundation",
+    "financial_damage_by_inundation",
     "financial_damage_by_flood",
+    "flood_damage_ratio",
+    "inundation_damage_ratio",
+    "flood_event_max_damage_ratio",
+    "inundation_event_max_damage_ratio",
+    "combined_event_max_damage_ratio",
+    "incremental_flood_damage_fraction",
+    "incremental_inundation_damage_fraction",
+    "incremental_combined_damage_fraction",
+    "incremental_flood_damage_ratio",
+    "incremental_inundation_damage_ratio",
+    "flood_event_healthy_households",
+    "inundation_event_healthy_households",
+    "houses_damaged_by_flood",
+    "houses_damaged_by_inundation",
+    "newly_damaged_flood_only_houses",
+    "newly_damaged_inundation_only_houses",
+    "newly_damaged_overlapping_houses",
     "daily_crop_production",
     "accumulated_crop_production_within_year",
     "yearly_crop_production",
@@ -148,17 +191,22 @@ RETURN_COLS = [
     "quality_adjusted_crop_price",
     "innundation_level",
     "inundation_flag",
+    "damaging_paddy_inundation_flag",
     "accumulated_inundation_days_until_harvest",
     "accumulated_inundation_events_until_harvest",
     "accumulated_inundated_paddy_areadays_until_harvest",
     "current_year_damaged_paddy_field",
     "carryover_damaged_paddy_field",
     "damaged_paddy_field",
+    "physical_paddy_field",
+    "undamaged_risky_paddy_field",
+    "daily_paddy_damage_fraction",
     "paddy_field_recovery_years_to_90_percent",
     "paddy_field_recovery_rate_per_day",
     "forest_area",
     "forest_function_coef",
     "forest_management_cost",
+    "lumbering_area",
     "sales_of_forestry",
     "forest_area_storage_capacity",
     "co2_absorption",
@@ -172,6 +220,10 @@ RETURN_COLS = [
     "flood_only_risk_houses",
     "innundation_only_risk_houses",
     "overlapping_risk_houses",
+    "damaged_flood_only_houses",
+    "damaged_inundation_only_houses",
+    "damaged_overlapping_houses",
+    "damaged_houses",
     "houses_in_nonrisky_area",
     "elevated_houses",
     "municipality_cost",
@@ -289,6 +341,14 @@ def run_case(case, scenario):
     res["daily_precip_down_scenario_adjusted"] = (
         res["daily_precip_down"] * res["daily_precipitation_future_ratio"]
     )
+    res["flood_damage_event_start"] = (
+        (res["flood_damage_ratio"] > 0)
+        & (res["flood_damage_ratio"].shift(fill_value=0) <= 0)
+    ).astype(int)
+    res["inundation_damage_event_start"] = (
+        (res["inundation_damage_ratio"] > 0)
+        & (res["inundation_damage_ratio"].shift(fill_value=0) <= 0)
+    ).astype(int)
 
     yearly_gdp_total = res.groupby("year")["daily_total_gdp"].sum()
     res["yearly_gdp_total"] = 0.0
@@ -316,6 +376,10 @@ def run_case(case, scenario):
                 "year": year,
                 "harvest_day": harvest_day,
                 "paddy_field_at_harvest": harvest_row["paddy_field_at_harvest"],
+                "physical_paddy_field_at_harvest": harvest_row["physical_paddy_field"],
+                "undamaged_risky_paddy_field_at_harvest": harvest_row[
+                    "undamaged_risky_paddy_field"
+                ],
                 "current_year_damaged_paddy_field_at_harvest": harvest_row[
                     "current_year_damaged_paddy_field"
                 ],
@@ -433,6 +497,19 @@ def run_case(case, scenario):
                 "river_discharge_downstream_year_mean": year_df["river_discharge_downstream"].mean(),
                 "river_discharge_upstream_year_max": year_df["river_discharge_upstream"].max(),
                 "river_discharge_downstream_year_max": year_df["river_discharge_downstream"].max(),
+                "dam_storage_at_year_end": year_end_row["dam_storage"],
+                "dam_storage_year_min": year_df["dam_storage"].min(),
+                "dam_storage_year_max": year_df["dam_storage"].max(),
+                "predischarge_control_year_sum": year_df["predischarge_control"].sum(),
+                "predischarge_capacity_year_mean": year_df[
+                    "predischarge_capacity"
+                ].mean(),
+                "dam_spill_year_sum": year_df["dam_spill"].sum(),
+                "dam_outflow_year_sum": year_df["dam_outflow"].sum(),
+                "downstream_storage_year_max": year_df["downstream_storage"].max(),
+                "downstream_storage_capacity_year_mean": year_df[
+                    "downstream_storage_capacity"
+                ].mean(),
                 "inundation_days_until_harvest": harvest_row[
                     "accumulated_inundation_days_until_harvest"
                 ],
@@ -448,7 +525,8 @@ def run_case(case, scenario):
                 "forest_area": harvest_row["forest_area"],
                 "forest_function_coef": harvest_row["forest_function_coef"],
                 "forest_management_cost": harvest_row["forest_management_cost"],
-                "sales_of_forestry": harvest_row["sales_of_forestry"],
+                "lumbering_area_year_sum": year_df["lumbering_area"].sum(),
+                "sales_of_forestry_year_sum": year_df["sales_of_forestry"].sum(),
                 "forest_area_storage_capacity": harvest_row["forest_area_storage_capacity"],
                 "co2_absorption": harvest_row["co2_absorption"],
                 "landslide_disaster_risk_at_harvest": harvest_row[
@@ -465,12 +543,37 @@ def run_case(case, scenario):
                     "landslide_design_daily_precipitation"
                 ],
                 "biodiversity": harvest_row["biodiversity"],
-                "financial_damage_by_innundation_year_sum": year_df[
-                    "financial_damage_by_innundation"
+                "financial_damage_by_inundation_year_sum": year_df[
+                    "financial_damage_by_inundation"
                 ].sum(),
                 "financial_damage_by_flood_year_sum": year_df[
                     "financial_damage_by_flood"
                 ].sum(),
+                "flood_damage_events_year_count": int(
+                    year_df["flood_damage_event_start"].sum()
+                ),
+                "inundation_damage_events_year_count": int(
+                    year_df["inundation_damage_event_start"].sum()
+                ),
+                "flood_only_risk_houses_at_year_end": year_end_row[
+                    "flood_only_risk_houses"
+                ],
+                "innundation_only_risk_houses_at_year_end": year_end_row[
+                    "innundation_only_risk_houses"
+                ],
+                "overlapping_risk_houses_at_year_end": year_end_row[
+                    "overlapping_risk_houses"
+                ],
+                "damaged_flood_only_houses_at_year_end": year_end_row[
+                    "damaged_flood_only_houses"
+                ],
+                "damaged_inundation_only_houses_at_year_end": year_end_row[
+                    "damaged_inundation_only_houses"
+                ],
+                "damaged_overlapping_houses_at_year_end": year_end_row[
+                    "damaged_overlapping_houses"
+                ],
+                "damaged_houses_at_year_end": year_end_row["damaged_houses"],
                 "municipality_cost_year_sum": year_df["municipality_cost"].sum(),
                 "yearly_gdp_total": year_end_row["yearly_gdp_total"],
             }
@@ -488,6 +591,8 @@ def run_task(task):
 def build_overall_summary(yearly_summary):
     metric_aggs = {
         "paddy_field_at_harvest": "mean",
+        "physical_paddy_field_at_harvest": "mean",
+        "undamaged_risky_paddy_field_at_harvest": "mean",
         "damaged_paddy_field_at_harvest": "mean",
         "damaged_paddy_field_at_year_end": "mean",
         "paddy_field_recovery_years_to_90_percent": "mean",
@@ -504,6 +609,15 @@ def build_overall_summary(yearly_summary):
         "river_discharge_downstream_year_mean": "mean",
         "river_discharge_upstream_year_max": "mean",
         "river_discharge_downstream_year_max": "mean",
+        "dam_storage_at_year_end": "mean",
+        "dam_storage_year_min": "min",
+        "dam_storage_year_max": "max",
+        "predischarge_control_year_sum": "sum",
+        "predischarge_capacity_year_mean": "mean",
+        "dam_spill_year_sum": "sum",
+        "dam_outflow_year_sum": "sum",
+        "downstream_storage_year_max": "max",
+        "downstream_storage_capacity_year_mean": "mean",
         "scenario_adjusted_daily_precip_up_year_max": "mean",
         "daily_ave_temp_up_year_mean": "mean",
         "daily_ave_temp_down_year_mean": "mean",
@@ -529,13 +643,24 @@ def build_overall_summary(yearly_summary):
         "heat_stress_at_heading_plus_20_at_harvest": "mean",
         "accumulated_heat_stress_at_harvest": "mean",
         "biodiversity": "mean",
+        "lumbering_area_year_sum": "sum",
+        "sales_of_forestry_year_sum": "sum",
         "forest_area_storage_capacity": "mean",
         "landslide_disaster_risk_year_sum": "sum",
         "landslide_disaster_risk_year_max": "max",
         "forest_mitigation_year_mean": "mean",
         "landslide_design_daily_precipitation": "mean",
-        "financial_damage_by_innundation_year_sum": "sum",
+        "financial_damage_by_inundation_year_sum": "sum",
         "financial_damage_by_flood_year_sum": "sum",
+        "flood_damage_events_year_count": "sum",
+        "inundation_damage_events_year_count": "sum",
+        "flood_only_risk_houses_at_year_end": "mean",
+        "innundation_only_risk_houses_at_year_end": "mean",
+        "overlapping_risk_houses_at_year_end": "mean",
+        "damaged_flood_only_houses_at_year_end": "mean",
+        "damaged_inundation_only_houses_at_year_end": "mean",
+        "damaged_overlapping_houses_at_year_end": "mean",
+        "damaged_houses_at_year_end": "mean",
         "municipality_cost_year_sum": "sum",
         "yearly_gdp_total": "sum",
     }
@@ -553,9 +678,28 @@ def main():
     output_dir = Path("data")
     output_dir.mkdir(exist_ok=True)
 
+    output_paths = {
+        "parameters": output_dir
+        / f"para_to7_all_scenarios_{RUN_STAMP}_parameter_sets.csv",
+        "daily": output_dir / f"para_to7_all_scenarios_{RUN_STAMP}_daily.csv",
+        "yearly": output_dir
+        / f"para_to7_all_scenarios_{RUN_STAMP}_yearly_summary.csv",
+        "overall": output_dir
+        / f"para_to7_all_scenarios_{RUN_STAMP}_overall_summary.csv",
+    }
+    required_paths = list(output_paths.values())
+    if not SAVE_DAILY_OUTPUT:
+        required_paths.remove(output_paths["daily"])
+    existing = [path for path in required_paths if path.exists()]
+    if existing:
+        raise FileExistsError(
+            "Refusing to overwrite existing parameter-study output: "
+            + ", ".join(str(path) for path in existing)
+        )
+
     parameter_sets = build_parameter_sets()
     parameter_sets.to_csv(
-        output_dir / f"para_to7_all_scenarios_{RUN_STAMP}_parameter_sets.csv",
+        output_paths["parameters"],
         index=False,
     )
 
@@ -583,19 +727,19 @@ def main():
     if SAVE_DAILY_OUTPUT:
         daily_all = pd.concat(all_daily, ignore_index=True)
         daily_all.to_csv(
-            output_dir / f"para_to7_all_scenarios_{RUN_STAMP}_daily.csv",
+            output_paths["daily"],
             index=False,
         )
 
     yearly_all = pd.concat(all_yearly, ignore_index=True)
     yearly_all.to_csv(
-        output_dir / f"para_to7_all_scenarios_{RUN_STAMP}_yearly_summary.csv",
+        output_paths["yearly"],
         index=False,
     )
 
     overall_summary = build_overall_summary(yearly_all)
     overall_summary.to_csv(
-        output_dir / f"para_to7_all_scenarios_{RUN_STAMP}_overall_summary.csv",
+        output_paths["overall"],
         index=False,
     )
 

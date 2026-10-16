@@ -64,6 +64,14 @@ YEARLY_METRICS = [
     "river_discharge_downstream_year_mean",
     "river_discharge_upstream_year_max",
     "river_discharge_downstream_year_max",
+    "dam_storage_at_year_end",
+    "dam_storage_year_min",
+    "dam_storage_year_max",
+    "predischarge_control_year_sum",
+    "predischarge_capacity_year_mean",
+    "dam_spill_year_sum",
+    "dam_outflow_year_sum",
+    "downstream_storage_year_max",
     "daily_ave_temp_up_year_mean",
     "daily_ave_temp_down_year_mean",
     "daily_ave_temp_up_year_max",
@@ -88,9 +96,15 @@ YEARLY_METRICS = [
     "yearly_crop_revenue",
     "yearly_total_crop_yield_kg",
     "yield_per_10a",
-    "financial_damage_by_innundation_year_sum",
+    "financial_damage_by_inundation_year_sum",
     "financial_damage_by_flood_year_sum",
     "paddy_field_at_harvest",
+    "physical_paddy_field_at_harvest",
+    "damaged_paddy_field_at_harvest",
+    "damaged_houses_at_year_end",
+    "sales_of_forestry_year_sum",
+    "flood_damage_events_year_count",
+    "inundation_damage_events_year_count",
     "biodiversity",
     "forest_area_storage_capacity",
     "landslide_disaster_risk_year_sum",
@@ -110,6 +124,14 @@ OVERALL_METRICS = [
     "river_discharge_downstream_year_mean",
     "river_discharge_upstream_year_max",
     "river_discharge_downstream_year_max",
+    "dam_storage_at_year_end",
+    "dam_storage_year_min",
+    "dam_storage_year_max",
+    "predischarge_control_year_sum",
+    "predischarge_capacity_year_mean",
+    "dam_spill_year_sum",
+    "dam_outflow_year_sum",
+    "downstream_storage_year_max",
     "daily_ave_temp_up_year_mean",
     "daily_ave_temp_down_year_mean",
     "solar_radiation_up_year_sum",
@@ -127,8 +149,14 @@ OVERALL_METRICS = [
     "yearly_gdp_total",
     "yearly_crop_revenue",
     "yearly_total_crop_yield_kg",
-    "financial_damage_by_innundation_year_sum",
+    "financial_damage_by_inundation_year_sum",
     "financial_damage_by_flood_year_sum",
+    "physical_paddy_field_at_harvest",
+    "damaged_paddy_field_at_harvest",
+    "damaged_houses_at_year_end",
+    "sales_of_forestry_year_sum",
+    "flood_damage_events_year_count",
+    "inundation_damage_events_year_count",
     "biodiversity",
     "forest_area_storage_capacity",
     "landslide_disaster_risk_year_sum",
@@ -141,11 +169,8 @@ PARAMETER_COLUMNS = [
     "ratio_of_paddy_field_in_risky_area",
     "innundation_risky_area_ratio",
     "flood_risky_area_ratio",
-    "recovery_ratio",
     "crop_price",
     "waterholding_capacity_of_forest_base",
-    "innundation_damage_per_resident",
-    "flood_damage_per_resident",
     "gdp_per_resident",
     "paddy_field_capacity_per_area",
     "paddy_dam_capacity_per_area",
@@ -170,6 +195,22 @@ def _lhs_only(df):
 
 def _base_only(df):
     return df[df["case_id"] == "base"].copy()
+
+
+def _normalise_legacy_columns(frame):
+    """Accept prior to7 output while using corrected names in new figures."""
+    legacy_names = {
+        "financial_damage_by_innundation_year_sum": (
+            "financial_damage_by_inundation_year_sum"
+        ),
+        "sales_of_forestry": "sales_of_forestry_year_sum",
+    }
+    rename = {
+        old: new
+        for old, new in legacy_names.items()
+        if old in frame.columns and new not in frame.columns
+    }
+    return frame.rename(columns=rename)
 
 
 def plot_yearly_uncertainty_bands(yearly, output_dir):
@@ -354,8 +395,8 @@ def plot_correlation_heatmaps(overall, parameter_sets, output_dir):
 def main():
     run_date, yearly_csv, overall_csv, parameter_csv = _input_paths()
     output_dir = _ensure_output_dir(run_date)
-    yearly = pd.read_csv(yearly_csv)
-    overall = pd.read_csv(overall_csv)
+    yearly = _normalise_legacy_columns(pd.read_csv(yearly_csv))
+    overall = _normalise_legacy_columns(pd.read_csv(overall_csv))
     parameter_sets = pd.read_csv(parameter_csv)
 
     plot_yearly_uncertainty_bands(yearly, output_dir)

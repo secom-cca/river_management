@@ -1,102 +1,102 @@
-"""Calculate NSE for the present/base upstream and downstream flow series."""
+"""Run the current to7 base model and calculate upstream/downstream NSE."""
 
-import csv
-import math
+from datetime import datetime
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
 
-RUN_DATE = "260723_1430"
-DATA_DIR = Path("data")
-EXTRACTED_CSV = DATA_DIR / f"para_to7_{RUN_DATE}_present_base_nse_flows.csv"
-DAILY_CSV = DATA_DIR / f"para_to7_all_scenarios_{RUN_DATE}_daily.csv"
-OUTPUT_CSV = DATA_DIR / f"para_to7_{RUN_DATE}_present_base_nse_summary.csv"
+from run_vensim_with_pysd_to7_para import (
+    ASSUMPTION_BOUNDS,
+    TIME,
+    _year_index_from_day,
+    fixed_params_for_scenario,
+    get_model,
+)
+
+
 # Initial storage is set from an approximately 90-day residence-time assumption.
 WARMUP_DAYS = 90
+RUN_STAMP = datetime.now().strftime("%y%m%d_%H%M%S")
+OUTPUT_DIR = Path("data/nse_to7") / RUN_STAMP
+FLOW_COLUMNS = [
+    "flow",
+    "river_discharge_upstream",
+    "flow_d",
+    "river_discharge_downstream",
+]
 
 
-class NseAccumulator:
-    def __init__(self):
-        self.count = 0
-        self.observed_sum = 0.0
-        self.observed_sum_sq = 0.0
-        self.squared_error_sum = 0.0
-        self.skipped = 0
+def performance_summary(frame, location, observed_column, simulated_column):
+    paired = frame[[observed_column, simulated_column]].apply(
+        pd.to_numeric, errors="coerce"
+    )
+    paired = paired.replace([np.inf, -np.inf], np.nan).dropna()
+    observed = paired[observed_column].to_numpy(dtype=float)
+    simulated = paired[simulated_column].to_numpy(dtype=float)
+    if len(observed) < 2:
+        raise ValueError(f"Insufficient valid data for {location} NSE.")
 
-    def add(self, observed_text, simulated_text):
-        try:
-            observed = float(observed_text)
-            simulated = float(simulated_text)
-        except (TypeError, ValueError):
-            self.skipped += 1
-            return
+    error = simulated - observed
+    observed_variance_sum = np.sum((observed - observed.mean()) ** 2)
+    if observed_variance_sum <= 0:
+        raise ValueError(f"Observed flow has no variance for {location} NSE.")
 
-        if not math.isfinite(observed) or not math.isfinite(simulated):
-            self.skipped += 1
-            return
-
-        self.count += 1
-        self.observed_sum += observed
-        self.observed_sum_sq += observed * observed
-        self.squared_error_sum += (simulated - observed) ** 2
-
-    def summary(self, label):
-        if self.count < 2:
-            raise ValueError(f"Insufficient valid data for {label} NSE.")
-
-        observed_mean = self.observed_sum / self.count
-        observed_variance_sum = self.observed_sum_sq - self.count * observed_mean**2
-        if observed_variance_sum <= 0:
-            raise ValueError(f"Observed flow has no variance for {label} NSE.")
-
-        return {
-            "location": label,
-            "warmup_days_excluded": WARMUP_DAYS,
-            "nse": 1 - self.squared_error_sum / observed_variance_sum,
-            "rmse": math.sqrt(self.squared_error_sum / self.count),
-            "valid_days": self.count,
-            "skipped_days": self.skipped,
-            "observed_mean": observed_mean,
-            "squared_error_sum": self.squared_error_sum,
-            "observed_variance_sum": observed_variance_sum,
-        }
-
-
-def input_csv():
-    if EXTRACTED_CSV.exists():
-        return EXTRACTED_CSV, False
-    if DAILY_CSV.exists():
-        return DAILY_CSV, True
-    raise FileNotFoundError(f"Neither input CSV was found: {EXTRACTED_CSV} or {DAILY_CSV}")
+    return {
+        "location": location,
+        "warmup_days_excluded": WARMUP_DAYS,
+        "nse": 1 - np.sum(error**2) / observed_variance_sum,
+        "rmse": np.sqrt(np.mean(error**2)),
+        "pbias_percent": 100 * error.sum() / observed.sum(),
+        "pearson_r": np.corrcoef(observed, simulated)[0, 1],
+        "valid_days": len(observed),
+        "skipped_days": len(frame) - len(observed),
+        "observed_mean": observed.mean(),
+        "simulated_mean": simulated.mean(),
+    }
 
 
 def main():
-    source_csv, needs_filter = input_csv()
-    upstream = NseAccumulator()
-    downstream = NseAccumulator()
+    params = fixed_params_for_scenario("present")
+    params.update({name: values[2] for name, values in ASSUMPTION_BOUNDS.items()})
 
-    with source_csv.open("r", encoding="utf-8-sig", newline="") as source:
-        reader = csv.DictReader(source)
-        for row in reader:
-            if needs_filter and (row["scenario"] != "present" or row["case_id"] != "base"):
-                continue
-            if float(row["time"]) < WARMUP_DAYS:
-                continue
-            upstream.add(row["flow"], row["river_discharge_upstream"])
-            downstream.add(row["flow_d"], row["river_discharge_downstream"])
+    print("Running current to7 present/base simulation...")
+    result = get_model().run(
+        params=params,
+        return_timestamps=TIME,
+        return_columns=FLOW_COLUMNS,
+        initial_condition="original",
+    )
+    flows = result.copy()
+    flows.index.name = "time"
+    flows = flows.reset_index()
+    flows.insert(1, "year", [_year_index_from_day(day) for day in flows["time"]])
+    flows.insert(2, "scenario", "present")
+    flows.insert(3, "case_id", "base")
 
-    summaries = [upstream.summary("upstream"), downstream.summary("downstream")]
-    with OUTPUT_CSV.open("w", encoding="utf-8", newline="") as destination:
-        writer = csv.DictWriter(destination, fieldnames=list(summaries[0]))
-        writer.writeheader()
-        writer.writerows(summaries)
+    evaluated = flows[flows["time"] >= WARMUP_DAYS]
+    summaries = pd.DataFrame(
+        [
+            performance_summary(
+                evaluated, "upstream", "flow", "river_discharge_upstream"
+            ),
+            performance_summary(
+                evaluated, "downstream", "flow_d", "river_discharge_downstream"
+            ),
+        ]
+    )
 
-    for summary in summaries:
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=False)
+    flows.to_csv(OUTPUT_DIR / "present_base_nse_flows.csv", index=False)
+    summaries.to_csv(OUTPUT_DIR / "nse_summary.csv", index=False)
+
+    for summary in summaries.to_dict("records"):
         print(
             f"{summary['location']}: NSE={summary['nse']:.4f}, "
-            f"RMSE={summary['rmse']:.2f}, valid days={summary['valid_days']}, "
-            f"warm-up={WARMUP_DAYS} days"
+            f"RMSE={summary['rmse']:.2f}, PBIAS={summary['pbias_percent']:.2f}%, "
+            f"r={summary['pearson_r']:.4f}, valid days={summary['valid_days']}"
         )
-    print(f"Saved NSE summary to: {OUTPUT_CSV}")
+    print(f"Saved NSE results to: {OUTPUT_DIR}")
 
 
 if __name__ == "__main__":

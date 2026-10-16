@@ -10,12 +10,27 @@ import numpy as np
 import pandas as pd
 
 
-RUN_DATE = "260723_1430"
-DATA_DIR = Path("data")
-INPUT_CSV = DATA_DIR / f"para_to7_{RUN_DATE}_present_base_nse_flows.csv"
-OUTPUT_DIR = Path("figures/nse_to7") / RUN_DATE
+# Set a run stamp to reproduce a specific result. None selects the latest run.
+RUN_STAMP = None
+DATA_DIR = Path("data/nse_to7")
+FIG_DIR = Path("figures/nse_to7")
 WARMUP_DAYS = 90
 CALENDAR_START = "2009-01-01"
+
+
+def input_paths():
+    if RUN_STAMP is not None:
+        run_stamp = RUN_STAMP
+        input_csv = DATA_DIR / run_stamp / "present_base_nse_flows.csv"
+    else:
+        candidates = list(DATA_DIR.glob("*/present_base_nse_flows.csv"))
+        if not candidates:
+            raise FileNotFoundError("No current-format NSE flow CSV was found.")
+        input_csv = max(candidates, key=lambda path: path.stat().st_mtime)
+        run_stamp = input_csv.parent.name
+    if not input_csv.exists():
+        raise FileNotFoundError(f"NSE flow CSV not found: {input_csv}")
+    return run_stamp, input_csv
 
 
 def paired_data(frame, observed_column, simulated_column):
@@ -72,7 +87,7 @@ def annual_diagnostics(paired, location, observed_column, simulated_column):
     return pd.DataFrame(rows)
 
 
-def plot_hydrographs(datasets):
+def plot_hydrographs(datasets, output_dir):
     fig, axes = plt.subplots(len(datasets), 1, figsize=(13, 7), sharex=True)
     for ax, location, paired, observed_column, simulated_column in zip(axes, *zip(*datasets)):
         ax.plot(paired["date"], paired[observed_column], color="#333333", linewidth=0.7, label="Observed")
@@ -84,11 +99,11 @@ def plot_hydrographs(datasets):
     axes[-1].set_xlabel("Date")
     fig.suptitle(f"Daily flow reproduction after {WARMUP_DAYS}-day warm-up")
     fig.tight_layout()
-    fig.savefig(OUTPUT_DIR / "daily_hydrograph.png", dpi=200)
+    fig.savefig(output_dir / "daily_hydrograph.png", dpi=200)
     plt.close(fig)
 
 
-def plot_scatter(datasets):
+def plot_scatter(datasets, output_dir):
     fig, axes = plt.subplots(1, len(datasets), figsize=(10, 4.5))
     for ax, location, paired, observed_column, simulated_column in zip(axes, *zip(*datasets)):
         observed = paired[observed_column].to_numpy(dtype=float)
@@ -104,11 +119,11 @@ def plot_scatter(datasets):
         ax.legend()
     fig.suptitle("Observed versus model daily flow")
     fig.tight_layout()
-    fig.savefig(OUTPUT_DIR / "observed_vs_model_scatter.png", dpi=200)
+    fig.savefig(output_dir / "observed_vs_model_scatter.png", dpi=200)
     plt.close(fig)
 
 
-def plot_annual_diagnostics(annual):
+def plot_annual_diagnostics(annual, output_dir):
     locations = annual["location"].unique()
     fig, axes = plt.subplots(len(locations), 2, figsize=(13, 6), sharex="col")
     if len(locations) == 1:
@@ -134,7 +149,7 @@ def plot_annual_diagnostics(annual):
     axes[-1, 1].set_xlabel("Year")
     fig.suptitle("Annual flow diagnostics")
     fig.tight_layout()
-    fig.savefig(OUTPUT_DIR / "annual_flow_and_peak.png", dpi=200)
+    fig.savefig(output_dir / "annual_flow_and_peak.png", dpi=200)
     plt.close(fig)
 
     fig, axes = plt.subplots(len(locations), 1, figsize=(11, 5.5), sharex=True)
@@ -149,18 +164,16 @@ def plot_annual_diagnostics(annual):
         ax.grid(axis="y", alpha=0.25)
     axes[-1].set_xlabel("Year")
     fig.tight_layout()
-    fig.savefig(OUTPUT_DIR / "annual_peak_timing_error.png", dpi=200)
+    fig.savefig(output_dir / "annual_peak_timing_error.png", dpi=200)
     plt.close(fig)
 
 
 def main():
-    if not INPUT_CSV.exists():
-        raise FileNotFoundError(
-            f"NSE flow CSV not found: {INPUT_CSV}. Run extract_nse_flow_to7.py first."
-        )
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    run_stamp, input_csv = input_paths()
+    output_dir = FIG_DIR / run_stamp
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    flows = pd.read_csv(INPUT_CSV)
+    flows = pd.read_csv(input_csv)
     flows["time"] = pd.to_numeric(flows["time"], errors="coerce")
     flows = flows[flows["time"] >= WARMUP_DAYS].copy()
     flows["date"] = pd.to_datetime(CALENDAR_START) + pd.to_timedelta(flows["time"], unit="D")
@@ -181,13 +194,13 @@ def main():
 
     summary = pd.DataFrame(summaries)
     annual = pd.concat(annual_tables, ignore_index=True)
-    summary.to_csv(OUTPUT_DIR / "nse_summary.csv", index=False)
-    annual.to_csv(OUTPUT_DIR / "annual_flow_diagnostics.csv", index=False)
+    summary.to_csv(output_dir / "nse_summary.csv", index=False)
+    annual.to_csv(output_dir / "annual_flow_diagnostics.csv", index=False)
 
-    plot_hydrographs(datasets)
-    plot_scatter(datasets)
-    plot_annual_diagnostics(annual)
-    print(f"Saved NSE diagnostics to: {OUTPUT_DIR}")
+    plot_hydrographs(datasets, output_dir)
+    plot_scatter(datasets, output_dir)
+    plot_annual_diagnostics(annual, output_dir)
+    print(f"Saved NSE diagnostics to: {output_dir}")
 
 
 if __name__ == "__main__":
