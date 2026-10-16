@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "objectives": [
+    "flood_damage_ratio",
+    "innundation_damage_ratio",
+    "landslide_risk_ratio",
+    "crop_revenue_ratio",
+    "biodiversity_ratio"
+  ],
+  "model_configuration": {
+    "revision": "to7-calendar-breeding-v2",
+    "breeding_mode": "threshold",
+    "parameters": {
+      "breeding_effect_mode": 0,
+      "breeding_investment_target": 500000000.0,
+      "breeding_investment_tolerance": 0.01,
+      "breeding_logistic_midpoint": 300000000.0,
+      "breeding_logistic_scale": 70000000.0,
+      "breeding_max_quality_reduction": 0.5
+    },
+    "year_end_convention": "next January 1 after integrating December 31",
+    "source_sha256": {
+      "River_management_xls_to7.py": "7ad90aea0a1160f058ae23cf3896af4981a9ee005e996f47ddeee8a1b00c76dc",
+      "run_vensim_with_pysd_to7_opt.py": "c83342a81b7442da1092f09411ed52b55ce2e7def2a40e4295a3e6753c9adf63",
+      "breeding_response_to7.py": "eb95fd3bae606b05a49479b010d88b4f4966645b1f99c42ec9a181a15b59be89"
+    }
+  },
+  "scenarios": {
+    "present": {
+      "ideal_losses": [
+        0.7197635653152146,
+        0.7092044375500804,
+        0.8188500183813473,
+        -1.0142412689721894,
+        -1.0314148917462194
+      ],
+      "baseline_losses": [
+        1.0,
+        1.0,
+        1.0,
+        -1.0,
+        -1.0
+      ],
+      "scales": [
+        0.28023643468478543,
+        0.29079556244991955,
+        0.1811499816186527,
+        0.014241268972189358,
+        0.031414891746219364
+      ],
+      "fallback_scale_objectives": [],
+      "reference_point": [
+        1.1,
+        1.1,
+        1.1,
+        1.1,
+        1.1
+      ],
+      "source_trial_count": 12000,
+      "source_feasible_count": 7579
+    },
+    "2C": {
+      "ideal_losses": [
+        0.713649949691654,
+        0.7337481386353535,
+        0.8465034739676942,
+        -1.0333457682122107,
+        -1.0312697553750072
+      ],
+      "baseline_losses": [
+        1.0,
+        1.0,
+        1.0,
+        -1.0,
+        -1.0
+      ],
+      "scales": [
+        0.28635005030834604,
+        0.2662518613646465,
+        0.1534965260323058,
+        0.03334576821221069,
+        0.0312697553750072
+      ],
+      "fallback_scale_objectives": [],
+      "reference_point": [
+        1.1,
+        1.1,
+        1.1,
+        1.1,
+        1.1
+      ],
+      "source_trial_count": 12000,
+      "source_feasible_count": 8044
+    },
+    "4C": {
+      "ideal_losses": [
+        0.5822286024735326,
+        0.7454029512183478,
+        0.8995485070737818,
+        -1.0079501591455755,
+        -1.030930204203425
+      ],
+      "baseline_losses": [
+        1.0,
+        1.0,
+        1.0,
+        -1.0,
+        -1.0
+      ],
+      "scales": [
+        0.4177713975264674,
+        0.25459704878165224,
+        0.10045149292621824,
+        0.007950159145575508,
+        0.03093020420342496
+      ],
+      "fallback_scale_objectives": [],
+      "reference_point": [
+        1.1,
+        1.1,
+        1.1,
+        1.1,
+        1.1
+      ],
+      "source_trial_count": 12000,
+      "source_feasible_count": 7533
+    }
+  },
+  "scaling_source_run": "C:\\Users\\tomus\\Documents\\GitHub\\river_management\\data\\optuna_to7_261012_142402",
+  "scaling_source_max_trials": 12000
+}

@@ -1,0 +1,25 @@
+{
+  "source_run": "C:\\Users\\tomus\\Documents\\GitHub\\river_management\\data\\optuna_to7_261012_142402",
+  "scenarios": [
+    "present",
+    "2C",
+    "4C"
+  ],
+  "sampling_step": 100,
+  "max_trials_requested": 12000,
+  "normalization_file_reused": null,
+  "optuna_version": "5.0.0",
+  "numpy_version": "2.3.3",
+  "created_at": "2026-10-13T10:04:39+09:00",
+  "notes": [
+    "Trial-count axis includes every attempt; only feasible COMPLETE trials enter the front.",
+    "Trial-number order is used, not wall-clock completion order in the parallel run.",
+    "Zero, the final attempt and every 3000-attempt checkpoint are always included.",
+    "Minimization losses: first three ratios unchanged, crop and biodiversity ratios negated.",
+    "New scaling: observed feasible ideal -> 0, no-policy ratio -> 1, fixed throughout the history.",
+    "No observed improvement: use scale=1 and record the affected objective explicitly.",
+    "Vectors outside the reference box contribute zero and are excluded from HV computation.",
+    "Distinct objective vectors are counted; duplicate policies need not have distinct outcomes.",
+    "For extended histories, reuse normalization.json to retain the original scale and reference."
+  ]
+}
